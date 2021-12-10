@@ -31,7 +31,7 @@ def save_to_log(string):
     date = datetime.datetime.now()
     try:
         join = os.path.join(LOG_DIR, 'log_{}_{}.txt')
-        with open(join.format(date.year, getmonth(date.month)), 'a') as file:
+        with open(join.format(date.year, getmonth(date.month)), 'a', encoding="utf-8") as file:
             file.write(string + '\n')
     except OSError as exc:
         pass
@@ -63,7 +63,7 @@ def third_party(text):
 
 
 def get_date():
-    return datetime.datetime.now().strftime("[%d/%m/%y - %H:%M:%S.%f] - ")
+    return datetime.datetime.now().strftime("[%Y-%m-%d - %H:%M:%S.%f] - ")
 
 
 class Log:

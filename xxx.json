@@ -1,0 +1,1469 @@
+{
+  "success": True,
+  "currentState": 4,
+  "memoryReadout": {
+    "songTimer": 11.221,
+    "songID": "JCasGetR",
+    "arrangementID": "D76D74CBDB0F1619D57BA73182FE0B6D",
+    "gameStage": "las_game",
+    "mode": 1,
+    "noteData": {
+      "Accuracy": 100.0,
+      "TotalNotes": 0,
+      "TotalNotesHit": 0,
+      "CurrentHitStreak": 0,
+      "HighestHitStreak": 0,
+      "TotalNotesMissed": 0,
+      "CurrentMissStreak": 0
+    }
+  },
+  "songDetails": {
+    "songID": "JCasGetR",
+    "songName": "Get Rhythm",
+    "artistName": "Johnny Cash",
+    "albumName": "Greatest!",
+    "songLength": 143.352,
+    "albumYear": 1959,
+    "arrangements": [
+      {
+        "name": "Bass",
+        "arrangementID": "30645799E6B88AE0D54F8A39216CDFC4",
+        "type": "Bass",
+        "isBonusArrangement": False,
+        "isAlternateArrangement": False,
+        "tuning": {
+          "CentsOffset": 0,
+          "CapoFret": 0,
+          "String0": 0,
+          "String1": 0,
+          "String2": 0,
+          "String3": 0,
+          "String4": 0,
+          "String5": 0,
+          "TuningName": "E Standard"
+        },
+        "sections": [
+          {
+            "name": "chorus 1",
+            "startTime": 12.243,
+            "endTime": 21.099
+          },
+          {
+            "name": "chorus 2",
+            "startTime": 21.099,
+            "endTime": 30.78
+          },
+          {
+            "name": "verse 1",
+            "startTime": 30.78,
+            "endTime": 39.424
+          },
+          {
+            "name": "verse 2",
+            "startTime": 39.424,
+            "endTime": 48.11
+          },
+          {
+            "name": "chorus 3",
+            "startTime": 48.11,
+            "endTime": 56.823
+          },
+          {
+            "name": "chorus 4",
+            "startTime": 56.823,
+            "endTime": 66.512
+          },
+          {
+            "name": "interlude 1",
+            "startTime": 66.512,
+            "endTime": 75.075
+          },
+          {
+            "name": "interlude 2",
+            "startTime": 75.075,
+            "endTime": 84.709
+          },
+          {
+            "name": "chorus 5",
+            "startTime": 84.709,
+            "endTime": 93.349
+          },
+          {
+            "name": "chorus 6",
+            "startTime": 93.349,
+            "endTime": 103.101
+          },
+          {
+            "name": "verse 3",
+            "startTime": 103.101,
+            "endTime": 111.76
+          },
+          {
+            "name": "verse 4",
+            "startTime": 111.76,
+            "endTime": 120.477
+          },
+          {
+            "name": "chorus 7",
+            "startTime": 120.477,
+            "endTime": 129.241
+          },
+          {
+            "name": "outro 1",
+            "startTime": 129.241,
+            "endTime": 142.802
+          },
+          {
+            "name": "noguitar 1",
+            "startTime": 142.802,
+            "endTime": 143.352
+          }
+        ],
+        "phraseIterations": [],
+        "data": {
+          "Measures": [
+            {
+              "Time": 10.0,
+              "Number": 0
+            },
+            {
+              "Time": 12.243,
+              "Number": 1
+            },
+            {
+              "Time": 14.486,
+              "Number": 2
+            },
+            {
+              "Time": 16.711,
+              "Number": 3
+            },
+            {
+              "Time": 18.913,
+              "Number": 4
+            },
+            {
+              "Time": 21.099,
+              "Number": 5
+            },
+            {
+              "Time": 23.256,
+              "Number": 6
+            },
+            {
+              "Time": 25.402,
+              "Number": 7
+            },
+            {
+              "Time": 27.545,
+              "Number": 8
+            },
+            {
+              "Time": 29.695,
+              "Number": 9
+            },
+            {
+              "Time": 30.78,
+              "Number": 10
+            },
+            {
+              "Time": 32.955,
+              "Number": 11
+            },
+            {
+              "Time": 35.115,
+              "Number": 12
+            },
+            {
+              "Time": 37.29,
+              "Number": 13
+            },
+            {
+              "Time": 39.424,
+              "Number": 14
+            },
+            {
+              "Time": 41.598,
+              "Number": 15
+            },
+            {
+              "Time": 43.793,
+              "Number": 16
+            },
+            {
+              "Time": 45.962,
+              "Number": 17
+            },
+            {
+              "Time": 48.11,
+              "Number": 18
+            },
+            {
+              "Time": 50.285,
+              "Number": 19
+            },
+            {
+              "Time": 52.454,
+              "Number": 20
+            },
+            {
+              "Time": 54.659,
+              "Number": 21
+            },
+            {
+              "Time": 56.823,
+              "Number": 22
+            },
+            {
+              "Time": 58.98,
+              "Number": 23
+            },
+            {
+              "Time": 61.144,
+              "Number": 24
+            },
+            {
+              "Time": 63.303,
+              "Number": 25
+            },
+            {
+              "Time": 65.456,
+              "Number": 26
+            },
+            {
+              "Time": 66.512,
+              "Number": 27
+            },
+            {
+              "Time": 68.643,
+              "Number": 28
+            },
+            {
+              "Time": 70.787,
+              "Number": 29
+            },
+            {
+              "Time": 72.91,
+              "Number": 30
+            },
+            {
+              "Time": 75.075,
+              "Number": 31
+            },
+            {
+              "Time": 77.189,
+              "Number": 32
+            },
+            {
+              "Time": 79.321,
+              "Number": 33
+            },
+            {
+              "Time": 81.455,
+              "Number": 34
+            },
+            {
+              "Time": 83.604,
+              "Number": 35
+            },
+            {
+              "Time": 84.709,
+              "Number": 36
+            },
+            {
+              "Time": 86.867,
+              "Number": 37
+            },
+            {
+              "Time": 89.04,
+              "Number": 38
+            },
+            {
+              "Time": 91.193,
+              "Number": 39
+            },
+            {
+              "Time": 93.349,
+              "Number": 40
+            },
+            {
+              "Time": 95.512,
+              "Number": 41
+            },
+            {
+              "Time": 97.701,
+              "Number": 42
+            },
+            {
+              "Time": 99.846,
+              "Number": 43
+            },
+            {
+              "Time": 102.014,
+              "Number": 44
+            },
+            {
+              "Time": 103.101,
+              "Number": 45
+            },
+            {
+              "Time": 105.273,
+              "Number": 46
+            },
+            {
+              "Time": 107.462,
+              "Number": 47
+            },
+            {
+              "Time": 109.631,
+              "Number": 48
+            },
+            {
+              "Time": 111.76,
+              "Number": 49
+            },
+            {
+              "Time": 113.941,
+              "Number": 50
+            },
+            {
+              "Time": 116.115,
+              "Number": 51
+            },
+            {
+              "Time": 118.295,
+              "Number": 52
+            },
+            {
+              "Time": 120.477,
+              "Number": 53
+            },
+            {
+              "Time": 122.674,
+              "Number": 54
+            },
+            {
+              "Time": 124.858,
+              "Number": 55
+            },
+            {
+              "Time": 127.05,
+              "Number": 56
+            },
+            {
+              "Time": 129.241,
+              "Number": 57
+            },
+            {
+              "Time": 131.41,
+              "Number": 58
+            },
+            {
+              "Time": 133.562,
+              "Number": 59
+            },
+            {
+              "Time": 135.702,
+              "Number": 60
+            },
+            {
+              "Time": 137.873,
+              "Number": 61
+            },
+            {
+              "Time": 140.051,
+              "Number": 62
+            },
+            {
+              "Time": 142.252,
+              "Number": 63
+            }
+          ]
+        }
+      },
+      {
+        "name": "Lead",
+        "arrangementID": "D76D74CBDB0F1619D57BA73182FE0B6D",
+        "type": "Lead",
+        "isBonusArrangement": False,
+        "isAlternateArrangement": False,
+        "tuning": {
+          "CentsOffset": 0,
+          "CapoFret": 0,
+          "String0": 0,
+          "String1": 0,
+          "String2": 0,
+          "String3": 0,
+          "String4": 0,
+          "String5": 0,
+          "TuningName": "E Standard"
+        },
+        "sections": [
+          {
+            "name": "chorus 1",
+            "startTime": 12.243,
+            "endTime": 21.099
+          },
+          {
+            "name": "chorus 2",
+            "startTime": 21.099,
+            "endTime": 29.695
+          },
+          {
+            "name": "verse 1",
+            "startTime": 29.695,
+            "endTime": 39.424
+          },
+          {
+            "name": "verse 2",
+            "startTime": 39.424,
+            "endTime": 48.11
+          },
+          {
+            "name": "verse 3",
+            "startTime": 48.11,
+            "endTime": 56.823
+          },
+          {
+            "name": "verse 4",
+            "startTime": 56.823,
+            "endTime": 65.72
+          },
+          {
+            "name": "solo 1",
+            "startTime": 65.72,
+            "endTime": 75.075
+          },
+          {
+            "name": "solo 2",
+            "startTime": 75.075,
+            "endTime": 84.157
+          },
+          {
+            "name": "chorus 3",
+            "startTime": 84.157,
+            "endTime": 93.349
+          },
+          {
+            "name": "chorus 4",
+            "startTime": 93.349,
+            "endTime": 102.014
+          },
+          {
+            "name": "verse 5",
+            "startTime": 102.014,
+            "endTime": 111.76
+          },
+          {
+            "name": "verse 6",
+            "startTime": 111.76,
+            "endTime": 120.477
+          },
+          {
+            "name": "chorus 5",
+            "startTime": 120.477,
+            "endTime": 129.241
+          },
+          {
+            "name": "chorus 6",
+            "startTime": 129.241,
+            "endTime": 138.95
+          },
+          {
+            "name": "chorus 7",
+            "startTime": 138.95,
+            "endTime": 142.802
+          },
+          {
+            "name": "noguitar 1",
+            "startTime": 142.802,
+            "endTime": 143.352
+          }
+        ],
+        "phraseIterations": [],
+        "data": {
+          "Measures": [
+            {
+              "Time": 10.0,
+              "Number": 0
+            },
+            {
+              "Time": 12.243,
+              "Number": 1
+            },
+            {
+              "Time": 14.486,
+              "Number": 2
+            },
+            {
+              "Time": 16.711,
+              "Number": 3
+            },
+            {
+              "Time": 18.913,
+              "Number": 4
+            },
+            {
+              "Time": 21.099,
+              "Number": 5
+            },
+            {
+              "Time": 23.256,
+              "Number": 6
+            },
+            {
+              "Time": 25.402,
+              "Number": 7
+            },
+            {
+              "Time": 27.545,
+              "Number": 8
+            },
+            {
+              "Time": 29.695,
+              "Number": 9
+            },
+            {
+              "Time": 30.78,
+              "Number": 10
+            },
+            {
+              "Time": 32.955,
+              "Number": 11
+            },
+            {
+              "Time": 35.115,
+              "Number": 12
+            },
+            {
+              "Time": 37.29,
+              "Number": 13
+            },
+            {
+              "Time": 39.424,
+              "Number": 14
+            },
+            {
+              "Time": 41.598,
+              "Number": 15
+            },
+            {
+              "Time": 43.793,
+              "Number": 16
+            },
+            {
+              "Time": 45.962,
+              "Number": 17
+            },
+            {
+              "Time": 48.11,
+              "Number": 18
+            },
+            {
+              "Time": 50.285,
+              "Number": 19
+            },
+            {
+              "Time": 52.454,
+              "Number": 20
+            },
+            {
+              "Time": 54.659,
+              "Number": 21
+            },
+            {
+              "Time": 56.823,
+              "Number": 22
+            },
+            {
+              "Time": 58.98,
+              "Number": 23
+            },
+            {
+              "Time": 61.144,
+              "Number": 24
+            },
+            {
+              "Time": 63.303,
+              "Number": 25
+            },
+            {
+              "Time": 65.456,
+              "Number": 26
+            },
+            {
+              "Time": 66.512,
+              "Number": 27
+            },
+            {
+              "Time": 68.643,
+              "Number": 28
+            },
+            {
+              "Time": 70.787,
+              "Number": 29
+            },
+            {
+              "Time": 72.91,
+              "Number": 30
+            },
+            {
+              "Time": 75.075,
+              "Number": 31
+            },
+            {
+              "Time": 77.189,
+              "Number": 32
+            },
+            {
+              "Time": 79.321,
+              "Number": 33
+            },
+            {
+              "Time": 81.455,
+              "Number": 34
+            },
+            {
+              "Time": 83.604,
+              "Number": 35
+            },
+            {
+              "Time": 84.709,
+              "Number": 36
+            },
+            {
+              "Time": 86.867,
+              "Number": 37
+            },
+            {
+              "Time": 89.04,
+              "Number": 38
+            },
+            {
+              "Time": 91.193,
+              "Number": 39
+            },
+            {
+              "Time": 93.349,
+              "Number": 40
+            },
+            {
+              "Time": 95.512,
+              "Number": 41
+            },
+            {
+              "Time": 97.701,
+              "Number": 42
+            },
+            {
+              "Time": 99.846,
+              "Number": 43
+            },
+            {
+              "Time": 102.014,
+              "Number": 44
+            },
+            {
+              "Time": 103.101,
+              "Number": 45
+            },
+            {
+              "Time": 105.273,
+              "Number": 46
+            },
+            {
+              "Time": 107.462,
+              "Number": 47
+            },
+            {
+              "Time": 109.631,
+              "Number": 48
+            },
+            {
+              "Time": 111.76,
+              "Number": 49
+            },
+            {
+              "Time": 113.941,
+              "Number": 50
+            },
+            {
+              "Time": 116.115,
+              "Number": 51
+            },
+            {
+              "Time": 118.295,
+              "Number": 52
+            },
+            {
+              "Time": 120.477,
+              "Number": 53
+            },
+            {
+              "Time": 122.674,
+              "Number": 54
+            },
+            {
+              "Time": 124.858,
+              "Number": 55
+            },
+            {
+              "Time": 127.05,
+              "Number": 56
+            },
+            {
+              "Time": 129.241,
+              "Number": 57
+            },
+            {
+              "Time": 131.41,
+              "Number": 58
+            },
+            {
+              "Time": 133.562,
+              "Number": 59
+            },
+            {
+              "Time": 135.702,
+              "Number": 60
+            },
+            {
+              "Time": 137.873,
+              "Number": 61
+            },
+            {
+              "Time": 140.051,
+              "Number": 62
+            },
+            {
+              "Time": 142.252,
+              "Number": 63
+            }
+          ]
+        }
+      },
+      {
+        "name": "Rhythm",
+        "arrangementID": "A919908C49B384200840ABDE61933C84",
+        "type": "Rhythm",
+        "isBonusArrangement": False,
+        "isAlternateArrangement": False,
+        "tuning": {
+          "CentsOffset": 0,
+          "CapoFret": 1,
+          "String0": 0,
+          "String1": 0,
+          "String2": 0,
+          "String3": 0,
+          "String4": 0,
+          "String5": 0,
+          "TuningName": "E Standard (Capo Fret 1)"
+        },
+        "sections": [
+          {
+            "name": "chorus 1",
+            "startTime": 12.243,
+            "endTime": 20.004
+          },
+          {
+            "name": "chorus 2",
+            "startTime": 20.004,
+            "endTime": 30.78
+          },
+          {
+            "name": "verse 1",
+            "startTime": 30.78,
+            "endTime": 39.424
+          },
+          {
+            "name": "verse 2",
+            "startTime": 39.424,
+            "endTime": 48.11
+          },
+          {
+            "name": "chorus 3",
+            "startTime": 48.11,
+            "endTime": 55.738
+          },
+          {
+            "name": "chorus 4",
+            "startTime": 55.738,
+            "endTime": 66.512
+          },
+          {
+            "name": "interlude 1",
+            "startTime": 66.512,
+            "endTime": 75.075
+          },
+          {
+            "name": "interlude 2",
+            "startTime": 75.075,
+            "endTime": 84.709
+          },
+          {
+            "name": "chorus 5",
+            "startTime": 84.709,
+            "endTime": 92.27
+          },
+          {
+            "name": "chorus 6",
+            "startTime": 92.27,
+            "endTime": 103.101
+          },
+          {
+            "name": "verse 3",
+            "startTime": 103.101,
+            "endTime": 111.76
+          },
+          {
+            "name": "verse 4",
+            "startTime": 111.76,
+            "endTime": 120.477
+          },
+          {
+            "name": "chorus 7",
+            "startTime": 120.477,
+            "endTime": 128.142
+          },
+          {
+            "name": "outro 1",
+            "startTime": 128.142,
+            "endTime": 142.802
+          },
+          {
+            "name": "noguitar 1",
+            "startTime": 142.802,
+            "endTime": 143.352
+          }
+        ],
+        "phraseIterations": [],
+        "data": {
+          "Measures": [
+            {
+              "Time": 10.0,
+              "Number": 0
+            },
+            {
+              "Time": 12.243,
+              "Number": 1
+            },
+            {
+              "Time": 14.486,
+              "Number": 2
+            },
+            {
+              "Time": 16.711,
+              "Number": 3
+            },
+            {
+              "Time": 18.913,
+              "Number": 4
+            },
+            {
+              "Time": 21.099,
+              "Number": 5
+            },
+            {
+              "Time": 23.256,
+              "Number": 6
+            },
+            {
+              "Time": 25.402,
+              "Number": 7
+            },
+            {
+              "Time": 27.545,
+              "Number": 8
+            },
+            {
+              "Time": 29.695,
+              "Number": 9
+            },
+            {
+              "Time": 30.78,
+              "Number": 10
+            },
+            {
+              "Time": 32.955,
+              "Number": 11
+            },
+            {
+              "Time": 35.115,
+              "Number": 12
+            },
+            {
+              "Time": 37.29,
+              "Number": 13
+            },
+            {
+              "Time": 39.424,
+              "Number": 14
+            },
+            {
+              "Time": 41.598,
+              "Number": 15
+            },
+            {
+              "Time": 43.793,
+              "Number": 16
+            },
+            {
+              "Time": 45.962,
+              "Number": 17
+            },
+            {
+              "Time": 48.11,
+              "Number": 18
+            },
+            {
+              "Time": 50.285,
+              "Number": 19
+            },
+            {
+              "Time": 52.454,
+              "Number": 20
+            },
+            {
+              "Time": 54.659,
+              "Number": 21
+            },
+            {
+              "Time": 56.823,
+              "Number": 22
+            },
+            {
+              "Time": 58.98,
+              "Number": 23
+            },
+            {
+              "Time": 61.144,
+              "Number": 24
+            },
+            {
+              "Time": 63.303,
+              "Number": 25
+            },
+            {
+              "Time": 65.456,
+              "Number": 26
+            },
+            {
+              "Time": 66.512,
+              "Number": 27
+            },
+            {
+              "Time": 68.643,
+              "Number": 28
+            },
+            {
+              "Time": 70.787,
+              "Number": 29
+            },
+            {
+              "Time": 72.91,
+              "Number": 30
+            },
+            {
+              "Time": 75.075,
+              "Number": 31
+            },
+            {
+              "Time": 77.189,
+              "Number": 32
+            },
+            {
+              "Time": 79.321,
+              "Number": 33
+            },
+            {
+              "Time": 81.455,
+              "Number": 34
+            },
+            {
+              "Time": 83.604,
+              "Number": 35
+            },
+            {
+              "Time": 84.709,
+              "Number": 36
+            },
+            {
+              "Time": 86.867,
+              "Number": 37
+            },
+            {
+              "Time": 89.04,
+              "Number": 38
+            },
+            {
+              "Time": 91.193,
+              "Number": 39
+            },
+            {
+              "Time": 93.349,
+              "Number": 40
+            },
+            {
+              "Time": 95.512,
+              "Number": 41
+            },
+            {
+              "Time": 97.701,
+              "Number": 42
+            },
+            {
+              "Time": 99.846,
+              "Number": 43
+            },
+            {
+              "Time": 102.014,
+              "Number": 44
+            },
+            {
+              "Time": 103.101,
+              "Number": 45
+            },
+            {
+              "Time": 105.273,
+              "Number": 46
+            },
+            {
+              "Time": 107.462,
+              "Number": 47
+            },
+            {
+              "Time": 109.631,
+              "Number": 48
+            },
+            {
+              "Time": 111.76,
+              "Number": 49
+            },
+            {
+              "Time": 113.941,
+              "Number": 50
+            },
+            {
+              "Time": 116.115,
+              "Number": 51
+            },
+            {
+              "Time": 118.295,
+              "Number": 52
+            },
+            {
+              "Time": 120.477,
+              "Number": 53
+            },
+            {
+              "Time": 122.674,
+              "Number": 54
+            },
+            {
+              "Time": 124.858,
+              "Number": 55
+            },
+            {
+              "Time": 127.05,
+              "Number": 56
+            },
+            {
+              "Time": 129.241,
+              "Number": 57
+            },
+            {
+              "Time": 131.41,
+              "Number": 58
+            },
+            {
+              "Time": 133.562,
+              "Number": 59
+            },
+            {
+              "Time": 135.702,
+              "Number": 60
+            },
+            {
+              "Time": 137.873,
+              "Number": 61
+            },
+            {
+              "Time": 140.051,
+              "Number": 62
+            },
+            {
+              "Time": 142.252,
+              "Number": 63
+            }
+          ]
+        }
+      },
+      {
+        "name": "Rhythm",
+        "arrangementID": "90EB75117E15B1BEFCE12F0414EF5E84",
+        "type": "Rhythm",
+        "isBonusArrangement": False,
+        "isAlternateArrangement": True,
+        "tuning": {
+          "CentsOffset": 0,
+          "CapoFret": 0,
+          "String0": 0,
+          "String1": 0,
+          "String2": 0,
+          "String3": 0,
+          "String4": 0,
+          "String5": 0,
+          "TuningName": "E Standard"
+        },
+        "sections": [
+          {
+            "name": "chorus 1",
+            "startTime": 12.243,
+            "endTime": 20.004
+          },
+          {
+            "name": "chorus 2",
+            "startTime": 20.004,
+            "endTime": 30.78
+          },
+          {
+            "name": "verse 1",
+            "startTime": 30.78,
+            "endTime": 39.424
+          },
+          {
+            "name": "verse 2",
+            "startTime": 39.424,
+            "endTime": 48.11
+          },
+          {
+            "name": "chorus 3",
+            "startTime": 48.11,
+            "endTime": 55.738
+          },
+          {
+            "name": "chorus 4",
+            "startTime": 55.738,
+            "endTime": 66.512
+          },
+          {
+            "name": "interlude 1",
+            "startTime": 66.512,
+            "endTime": 75.075
+          },
+          {
+            "name": "interlude 2",
+            "startTime": 75.075,
+            "endTime": 84.709
+          },
+          {
+            "name": "chorus 5",
+            "startTime": 84.709,
+            "endTime": 92.27
+          },
+          {
+            "name": "chorus 6",
+            "startTime": 92.27,
+            "endTime": 103.101
+          },
+          {
+            "name": "verse 3",
+            "startTime": 103.101,
+            "endTime": 111.76
+          },
+          {
+            "name": "verse 4",
+            "startTime": 111.76,
+            "endTime": 120.477
+          },
+          {
+            "name": "chorus 7",
+            "startTime": 120.477,
+            "endTime": 128.142
+          },
+          {
+            "name": "outro 1",
+            "startTime": 128.142,
+            "endTime": 142.802
+          },
+          {
+            "name": "noguitar 1",
+            "startTime": 142.802,
+            "endTime": 143.352
+          }
+        ],
+        "phraseIterations": [],
+        "data": {
+          "Measures": [
+            {
+              "Time": 10.0,
+              "Number": 0
+            },
+            {
+              "Time": 12.243,
+              "Number": 1
+            },
+            {
+              "Time": 14.486,
+              "Number": 2
+            },
+            {
+              "Time": 16.711,
+              "Number": 3
+            },
+            {
+              "Time": 18.913,
+              "Number": 4
+            },
+            {
+              "Time": 21.099,
+              "Number": 5
+            },
+            {
+              "Time": 23.256,
+              "Number": 6
+            },
+            {
+              "Time": 25.402,
+              "Number": 7
+            },
+            {
+              "Time": 27.545,
+              "Number": 8
+            },
+            {
+              "Time": 29.695,
+              "Number": 9
+            },
+            {
+              "Time": 30.78,
+              "Number": 10
+            },
+            {
+              "Time": 32.955,
+              "Number": 11
+            },
+            {
+              "Time": 35.115,
+              "Number": 12
+            },
+            {
+              "Time": 37.29,
+              "Number": 13
+            },
+            {
+              "Time": 39.424,
+              "Number": 14
+            },
+            {
+              "Time": 41.598,
+              "Number": 15
+            },
+            {
+              "Time": 43.793,
+              "Number": 16
+            },
+            {
+              "Time": 45.962,
+              "Number": 17
+            },
+            {
+              "Time": 48.11,
+              "Number": 18
+            },
+            {
+              "Time": 50.285,
+              "Number": 19
+            },
+            {
+              "Time": 52.454,
+              "Number": 20
+            },
+            {
+              "Time": 54.659,
+              "Number": 21
+            },
+            {
+              "Time": 56.823,
+              "Number": 22
+            },
+            {
+              "Time": 58.98,
+              "Number": 23
+            },
+            {
+              "Time": 61.144,
+              "Number": 24
+            },
+            {
+              "Time": 63.303,
+              "Number": 25
+            },
+            {
+              "Time": 65.456,
+              "Number": 26
+            },
+            {
+              "Time": 66.512,
+              "Number": 27
+            },
+            {
+              "Time": 68.643,
+              "Number": 28
+            },
+            {
+              "Time": 70.787,
+              "Number": 29
+            },
+            {
+              "Time": 72.91,
+              "Number": 30
+            },
+            {
+              "Time": 75.075,
+              "Number": 31
+            },
+            {
+              "Time": 77.189,
+              "Number": 32
+            },
+            {
+              "Time": 79.321,
+              "Number": 33
+            },
+            {
+              "Time": 81.455,
+              "Number": 34
+            },
+            {
+              "Time": 83.604,
+              "Number": 35
+            },
+            {
+              "Time": 84.709,
+              "Number": 36
+            },
+            {
+              "Time": 86.867,
+              "Number": 37
+            },
+            {
+              "Time": 89.04,
+              "Number": 38
+            },
+            {
+              "Time": 91.193,
+              "Number": 39
+            },
+            {
+              "Time": 93.349,
+              "Number": 40
+            },
+            {
+              "Time": 95.512,
+              "Number": 41
+            },
+            {
+              "Time": 97.701,
+              "Number": 42
+            },
+            {
+              "Time": 99.846,
+              "Number": 43
+            },
+            {
+              "Time": 102.014,
+              "Number": 44
+            },
+            {
+              "Time": 103.101,
+              "Number": 45
+            },
+            {
+              "Time": 105.273,
+              "Number": 46
+            },
+            {
+              "Time": 107.462,
+              "Number": 47
+            },
+            {
+              "Time": 109.631,
+              "Number": 48
+            },
+            {
+              "Time": 111.76,
+              "Number": 49
+            },
+            {
+              "Time": 113.941,
+              "Number": 50
+            },
+            {
+              "Time": 116.115,
+              "Number": 51
+            },
+            {
+              "Time": 118.295,
+              "Number": 52
+            },
+            {
+              "Time": 120.477,
+              "Number": 53
+            },
+            {
+              "Time": 122.674,
+              "Number": 54
+            },
+            {
+              "Time": 124.858,
+              "Number": 55
+            },
+            {
+              "Time": 127.05,
+              "Number": 56
+            },
+            {
+              "Time": 129.241,
+              "Number": 57
+            },
+            {
+              "Time": 131.41,
+              "Number": 58
+            },
+            {
+              "Time": 133.562,
+              "Number": 59
+            },
+            {
+              "Time": 135.702,
+              "Number": 60
+            },
+            {
+              "Time": 137.873,
+              "Number": 61
+            },
+            {
+              "Time": 140.051,
+              "Number": 62
+            },
+            {
+              "Time": 142.252,
+              "Number": 63
+            }
+          ]
+        }
+      }
+    ],
+    "toolkit": {
+      "version": None,
+      "author": "Ubisoft",
+      "package_version": None,
+      "comment": None
+    },
+    "albumArt": "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",
+    "psarcFileHash": "6WDwqD8Y7l0LRDJe0csoXg==",
+    "NumArrangements": 4
+  },
+  "Version": "0.3.4"
+}
