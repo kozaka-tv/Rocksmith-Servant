@@ -2,6 +2,8 @@ import datetime
 import os
 import pathlib
 
+import logger
+
 SETLIST_DIR = 'setlist'
 
 
@@ -24,6 +26,7 @@ class SongLogger:
 
     def log_a_song(self, song):
         if song not in self.setlist:
+            logger.notice("Song was added to setlist: " + song)
             self.setlist.append(song)
             self.write_to_setlist_file(song)
 

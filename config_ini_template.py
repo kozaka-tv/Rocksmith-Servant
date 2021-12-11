@@ -1,12 +1,12 @@
 serialized = {
+    "RockSniffer": {
+        "host": "localhost",
+        "port": "9938",
+    },
     "OBSWebSocket": {
         "host": "localhost",
         "port": 4444,
         "pass": "",
-    },
-    "RockSniffer": {
-        "host": "localhost",
-        "port": "9938",
     },
     "Behaviour": {
         "cooldown": 3,
@@ -15,8 +15,11 @@ serialized = {
         "in_menu": "MenuSceneName",
         "forbidden_switch_on_scenes": "IntroSceneName; OutroSceneName"
     },
+    "SongLogger": {
+        "setlist_path": ""
+    },
     "Debugging": {
         "debug": 0,
-        "log_state_interval": 1
+        "debug_log_interval": 1
     }
 }
