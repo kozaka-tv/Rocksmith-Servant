@@ -7,10 +7,16 @@ import logger
 SETLIST_DIR = 'setlist'
 
 
-class SongLogger:
+class SetlistLogger:
     # TODO add params like file location
-    def __init__(self, log_file_path):
+    def __init__(self, enabled, log_file_path):
+        """
+        Setlist Logger
+        :param enabled: Is the Module enabled?
+        :param log_file_path: TODO
+        """
         # Init setlist directory and file
+        self.enabled = enabled
         create_setlist_directory()
         self.file_name = setlist_file_name()
         self.write_to_setlist_file(
@@ -22,7 +28,6 @@ class SongLogger:
         self.log_file_name = "TODO.txt"
         self.setlist = []
         self.last_song = None
-        pass
 
     def log_a_song(self, song):
         if song not in self.setlist:

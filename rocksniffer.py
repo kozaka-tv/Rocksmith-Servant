@@ -2,12 +2,14 @@ import requests
 
 
 class Rocksniffer:
-    def __init__(self, host, port):
+    def __init__(self, enabled, host, port):
         """
         Rocksniffer reader. Minimalistic, can be improved
+        :param enabled: Is the Module enabled?
         :param host: Rocksniffer host IP (localhost by default)
         :param port: Rocksniffer port (9938 by default)
         """
+        self.enabled = enabled
         self.host = host
         self.port = port
 

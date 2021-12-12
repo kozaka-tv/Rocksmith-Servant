@@ -1,56 +1,85 @@
+import os
 from time import sleep
 
 import logger
 from configReader import ConfigReader
-# Initializing configuration
 from debug import Debugger
 from rocksniffer import Rocksniffer
-from song_logger import SongLogger
+from scene_switcher import SceneSwitcher
+from setlist_logger import SetlistLogger
+from song_loader import SongLoader
 
+# Initializing configuration
 conf = ConfigReader()
 
-# Initializing main objects
-# Init Rocksniffer values
+# Initializing Modules
 sniffer = Rocksniffer(
+    # TODO is this enabled disabled needed? Or it should work with other modules together. Like Setlist will not work
+    # without sniffer, etc.
+    conf.get_bool_value("RockSniffer", "enabled"),
     conf.get_value("RockSniffer", "host"),
     conf.get_value("RockSniffer", "port"),
 )
-# Init OBSWebSocket
-# TODO
-# Init Behaviour
-# TODO
-# Init debug
-# TODO
-# Init SongLogger values
-song_logger = SongLogger(
-    conf.get_value("SongLogger", "setlist_path"),
+setlist_logger = SetlistLogger(
+    conf.get_bool_value("SetlistLogger", "enabled"),
+    conf.get_value("SetlistLogger", "setlist_path"),
 )
+song_loader = SongLoader(
+    conf.get_bool_value("SongLoader", "enabled"),
+    # TODO
+    # conf.get_value("SetlistLogger", "setlist_path"),
+)
+scene_switcher = SceneSwitcher(
+    conf.get_bool_value("SceneSwitcher", "enabled"),
+    # TODO
+)
+
+# Initializing Debugger
 debugger = Debugger(
-    conf.get_value("Debugging", "debug", int),
+    conf.get_bool_value("Debugging", "debug"),
     conf.get_value("Debugging", "debug_log_interval", int)
 )
 
 
 # TODO extend with other values!
+# TODO can not this be in the Module itself?
 def update_config():
+    # Updating Modules Configurations
+    sniffer.enabled = conf.get_bool_value("RockSniffer", "enabled")
+    setlist_logger.enabled = conf.get_bool_value("RockSniffer", "enabled")
+    sniffer.enabled = conf.get_bool_value("RockSniffer", "enabled")
+    sniffer.enabled = conf.get_bool_value("RockSniffer", "enabled")
+
     # Updating Rocksniffer Configurations
     sniffer.host = conf.get_value("RockSniffer", "host")
     sniffer.port = conf.get_value("RockSniffer", "port")
 
     # Updating Debug Configurations
-    debugger.debug = conf.get_value("Debugging", "debug", int)
-    debugger.interval = conf.get_value("Debugging", "debug_log_interval", int)
+    debugger.debug = conf.get_bool_value("Debugging", "debug")
+    debugger.interval = conf.get_int_value("Debugging", "debug_log_interval")
 
 
 # TODO move to debug Class?
 def get_debug_message():
-    sniffer_str = "{sniffer.artistName} - {sniffer.songName} " \
+    # TODO
+    # "SceneSwitcher: {sniffer.enabled}" \
+    modules_str = "--- Modules ---" + os.linesep + \
+                  "RockSniffer: {sniffer.enabled}" \
+                  "SetlistLogger: {setlist_logger.enabled}" \
+                  "SongLoader: {song_loader.enabled}" \
+                  "".format(sniffer=sniffer, setlist_logger=setlist_logger, song_loader=song_loader) + os.linesep + \
+                  "---------------" + os.linesep
+
+    sniffer_str = "Song: {sniffer.artistName} - {sniffer.songName} " \
                   "({sniffer.albumYear}, {sniffer.albumName}), " \
                   "duration:{sniffer.songLength}s " \
-                  "".format(sniffer=sniffer)
-    debug_str = " | debug: {0} interval: {1}".format(str(debugger.debug), str(debugger.interval))
-    setlist = " | setlist: {0}".format(str(song_logger.setlist));
-    return sniffer_str + debug_str + setlist
+                  "".format(sniffer=sniffer) + os.linesep
+
+    debug_str = "Debug: {0} interval: {1}".format(str(debugger.debug), str(debugger.interval)) + os.linesep
+
+    setlist = "Setlist: {0}".format(str(setlist_logger.setlist)) + os.linesep
+
+    return os.linesep + modules_str + sniffer_str + debug_str + setlist
 
 
 def in_game():
@@ -58,7 +87,7 @@ def in_game():
 
 
 def register_song_to_setlist():
-    song_logger.log_a_song(sniffer.artistName + " - " + sniffer.songName)
+    setlist_logger.log_a_song(sniffer.artistName + " - " + sniffer.songName)
 
 
 def update_sniffer_internals():
@@ -66,13 +95,11 @@ def update_sniffer_internals():
         if not sniffer.memory:
             logger.notice("Starting sniffing..")
         sniffer.update()
-        # return sniffer.success
     except ConnectionError:
         import traceback
 
         traceback.print_exc()
         sniffer.memory = None
-        # return True
 
 
 # Main loop
@@ -83,13 +110,25 @@ while True:
     if conf.reload_if_changed():
         update_config()
 
-    # Updating Rocksniffer and if failed, restarting the loop till it is fixed
-    update_sniffer_internals()
-    if not sniffer.success:
-        continue
+    if sniffer.enabled:
+        # Updating Rocksniffer and if failed, restarting the loop till it is fixed
+        update_sniffer_internals()
+        # TODO needed? It could be that we do not use Sniffer!
+        # if not sniffer.success:
+        #     continue
 
-    if in_game():
+    # if in game, try to register a new song to the setlist if not already added
+    if setlist_logger.enabled and in_game():
         register_song_to_setlist()
+
+    if song_loader.enabled and sniffer.enabled:
+        # TODO or maybe this should be configurable?
+        # else:  # load songs only in case we are not in game to avoid lagg in game
+        song_loader.load()
+
+    if scene_switcher.enabled:
+        # TODO
+        pass
 
     # Interval debugging
     debugger.log_on_interval(get_debug_message())

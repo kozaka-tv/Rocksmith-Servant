@@ -1,6 +1,7 @@
 import configparser
 import os
 import sys
+from distutils import util
 
 import logger
 from config_ini_template import serialized
@@ -38,11 +39,18 @@ class ConfigReader:
 
         return config
 
+    # TODO actually this should be used by all the modules to log config out. Config, Debug, Run.
     def log_config(self):
         logger.notice('------- CONFIG ------------------------------------------------')
+        logger.notice('--- Modules ---')
+        logger.notice('RockSniffer.enabled=' + str(self.get_bool_value('RockSniffer', 'enabled')))
+        logger.notice('SetlistLogger.enabled=' + str(self.get_bool_value('SetlistLogger', 'enabled')))
+        logger.notice('SongLoader.enabled=' + str(self.get_bool_value('SongLoader', 'enabled')))
+        logger.notice('SceneSwitcher.enabled=' + str(self.get_bool_value('SceneSwitcher', 'enabled')))
+        logger.notice('---------------')
         logger.notice('RockSniffer.host=' + str(self.get_str_value('RockSniffer', 'host')))
         logger.notice('RockSniffer.port=' + str(self.get_str_value('RockSniffer', 'port')))
-        logger.notice('Debugging.debug=' + str(self.get_int_value('Debugging', 'debug')))
+        logger.notice('Debugging.debug=' + str(self.get_bool_value('Debugging', 'debug')))
         logger.notice('Debugging.debug_log_interval=' + str(self.get_int_value('Debugging', 'debug_log_interval')))
         logger.notice('---------------------------------------------------------------')
 
@@ -93,6 +101,9 @@ class ConfigReader:
     def get_str_value(self, section, key):
         return self.get_value(section, key, str)
 
+    def get_bool_value(self, section, key):
+        return self.get_value(section, key, bool)
+
     # TODO this should be not available to call!
     def get_value(self, section, key, cast=str):
 
@@ -100,6 +111,10 @@ class ConfigReader:
             # List in config are separated with ";". Leading and trailing whitespaces will be removed
             if cast == list:
                 value = [v.strip() for v in self.content[section][key].split(";")]
+            # Cast to bool
+            if cast == bool:
+                # value = self.content[section][key].lower() in ['true', '1', 't', 'y', 'yes']
+                value = bool(util.strtobool(self.content[section][key].lower()))
             # Else we cast it
             else:
                 value = cast(self.content[section][key])
@@ -114,7 +129,8 @@ class ConfigReader:
                 key,
             ))
             # Getting the new value
-            logger.notice("Replacing value with : {}".format(serialized[section][key]))
+            key_ = serialized[section][key]
+            logger.notice("Replacing value with : {}".format(key_))
             # Replacing the config value with a default value
             self.content[section][key] = serialized[section][key]
             # Saving the current INI to keep it safe to use
