@@ -64,9 +64,9 @@ def get_debug_message():
     # TODO
     # "SceneSwitcher: {sniffer.enabled}" \
     modules_str = "--- Modules ---" + os.linesep + \
-                  "RockSniffer: {sniffer.enabled}" \
-                  "SetlistLogger: {setlist_logger.enabled}" \
-                  "SongLoader: {song_loader.enabled}" \
+                  "RockSniffer: {sniffer.enabled}" + os.linesep + \
+                  "SetlistLogger: {setlist_logger.enabled}" + os.linesep + \
+                  "SongLoader: {song_loader.enabled}" + os.linesep + \
                   "".format(sniffer=sniffer, setlist_logger=setlist_logger, song_loader=song_loader) + os.linesep + \
                   "---------------" + os.linesep
 
@@ -93,42 +93,52 @@ def register_song_to_setlist():
 def update_sniffer_internals():
     try:
         if not sniffer.memory:
-            logger.notice("Starting sniffing..")
+            logger.notice("Try update Sniffer...")
         sniffer.update()
     except ConnectionError:
         import traceback
 
-        traceback.print_exc()
+        logger.warning("Connection problem to Rocksniffer!")
+        logger.warning(traceback.format_exc())
         sniffer.memory = None
 
 
 # Main loop
 while True:
-    # Sleep a bit
-    sleep(0.1)
+    #
+    try:
+        # Sleep a bit
+        sleep(0.1)
 
-    if conf.reload_if_changed():
-        update_config()
+        if conf.reload_if_changed():
+            update_config()
 
-    if sniffer.enabled:
-        # Updating Rocksniffer and if failed, restarting the loop till it is fixed
-        update_sniffer_internals()
-        # TODO needed? It could be that we do not use Sniffer!
-        # if not sniffer.success:
-        #     continue
+        if sniffer.enabled:
+            # Updating Rocksniffer and if failed, restarting the loop till it is fixed
+            update_sniffer_internals()
+            # TODO needed? It could be that we do not use Sniffer!
+            # if not sniffer.success:
+            #     continue
 
-    # if in game, try to register a new song to the setlist if not already added
-    if setlist_logger.enabled and in_game():
-        register_song_to_setlist()
+        # if in game, try to register a new song to the setlist if not already added
+        if setlist_logger.enabled and in_game():
+            register_song_to_setlist()
 
-    if song_loader.enabled and sniffer.enabled:
-        # TODO or maybe this should be configurable?
-        # else:  # load songs only in case we are not in game to avoid lagg in game
-        song_loader.load()
+        if song_loader.enabled and sniffer.enabled:
+            # TODO or maybe this should be configurable?
+            # else:  # load songs only in case we are not in game to avoid lagg in game
+            song_loader.load()
 
-    if scene_switcher.enabled:
-        # TODO
-        pass
+        if scene_switcher.enabled:
+            # TODO
+            pass
 
-    # Interval debugging
-    debugger.log_on_interval(get_debug_message())
+        # Interval debugging
+        debugger.log_on_interval(get_debug_message())
+
+    # Catch all the type of known exceptions, but keep app alive.
+    except (TypeError, ConnectionError):
+        import traceback
+
+        logger.warning("Error in main logic!")
+        logger.warning(traceback.format_exc())
