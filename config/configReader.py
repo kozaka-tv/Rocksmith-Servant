@@ -6,12 +6,13 @@ from distutils import util
 import logger
 from config.config_ini_template import serialized
 
+PATH_CONFIG = os.path.join(os.path.dirname(__file__), "config.ini")
+
 
 class ConfigReader:
     def __init__(self):
-        self.path = os.path.join(os.path.dirname(__file__), "config.ini")
 
-        logger.notice('Initialising ' + self.path + ' ...')
+        logger.notice('Initialising ' + PATH_CONFIG + ' ...')
 
         # TODO remove content later and use variables only?
         self.content = self.load()
@@ -20,7 +21,7 @@ class ConfigReader:
         self.last_modified = self.last_modification_time
         if self.last_modification_time == 0:
             self.save()
-            logger.notice('A config.ini file was created for you from a template in: ' + self.path)
+            logger.notice('A config.ini file was created for you from a template in: ' + PATH_CONFIG)
             logger.notice('Please change the values according to your needs, and then relaunch Rocksmith Servant!')
             logger.notice('...now please press any key to exit this program.')
             input()
@@ -32,10 +33,10 @@ class ConfigReader:
         :return: Config Object
         """
         config = self.get_default_config_ini()
-        config.read(self.path, encoding="UTF-8")
+        config.read(PATH_CONFIG, encoding="UTF-8")
         self.last_modified = self.last_modification_time
 
-        logger.notice(self.path + ' has been loaded!')
+        logger.notice(PATH_CONFIG + ' has been loaded!')
 
         return config
 
@@ -77,14 +78,14 @@ class ConfigReader:
         """
         Write the config to the specified path
         """
-        with open(self.path, 'w') as configfile:
+        with open(PATH_CONFIG, 'w') as configfile:
             self.content.write(configfile)
 
     @property
     def last_modification_time(self):
         """ Return last modified time of the config """
         try:
-            return os.stat(self.path).st_mtime
+            return os.stat(PATH_CONFIG).st_mtime
         except FileNotFoundError:
             return 0
 
@@ -130,11 +131,7 @@ class ConfigReader:
             # To keep consistency and ease to use for the end user
             # Logging where the value was expected.
             # Replacing it to be sure it's still working even after this error.
-            logger.notice("Error retrieving value for {} [{}][{}].".format(
-                self.path,
-                section,
-                key,
-            ))
+            logger.notice("Error retrieving value for {} [{}][{}].".format(PATH_CONFIG, section, key, ))
             # Getting the new value
             key_ = serialized[section][key]
             logger.notice("Replacing value with : {}".format(key_))
