@@ -130,7 +130,7 @@ dmypy.json
 
 /.idea/
 *.iml
-/config.ini
+/config/config.ini
 /log_*.txt
 /log/
 /setlist/

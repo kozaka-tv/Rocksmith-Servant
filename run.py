@@ -2,7 +2,7 @@ import os
 from time import sleep
 
 import logger
-from configReader import ConfigReader
+from config.configReader import ConfigReader
 from debug import Debugger
 from modules.songloader.song_loader import SongLoader
 from rocksniffer import Rocksniffer

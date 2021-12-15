@@ -4,12 +4,12 @@ import sys
 from distutils import util
 
 import logger
-from config_ini_template import serialized
+from config.config_ini_template import serialized
 
 
 class ConfigReader:
     def __init__(self):
-        self.path = "config.ini"
+        self.path = os.path.join(os.path.dirname(__file__), "config.ini")
 
         logger.notice('Initialising ' + self.path + ' ...')
 
@@ -20,7 +20,7 @@ class ConfigReader:
         self.last_modified = self.last_modification_time
         if self.last_modification_time == 0:
             self.save()
-            logger.notice('A config.ini file was created for you from a template.')
+            logger.notice('A config.ini file was created for you from a template in: ' + self.path)
             logger.notice('Please change the values according to your needs, and then relaunch Rocksmith Servant!')
             logger.notice('...now please press any key to exit this program.')
             input()
@@ -42,17 +42,24 @@ class ConfigReader:
     # TODO actually this should be used by all the modules to log config out. Config, Debug, Run.
     def log_config(self):
         logger.notice('------- CONFIG ------------------------------------------------')
-        logger.notice('--- Modules ---')
-        logger.notice('RockSniffer.enabled=' + str(self.get_bool_value('RockSniffer', 'enabled')))
-        logger.notice('SetlistLogger.enabled=' + str(self.get_bool_value('SetlistLogger', 'enabled')))
-        logger.notice('SongLoader.enabled=' + str(self.get_bool_value('SongLoader', 'enabled')))
-        logger.notice('SceneSwitcher.enabled=' + str(self.get_bool_value('SceneSwitcher', 'enabled')))
-        logger.notice('---------------')
+        self.log_enabled_modules()
         logger.notice('RockSniffer.host=' + str(self.get_str_value('RockSniffer', 'host')))
         logger.notice('RockSniffer.port=' + str(self.get_str_value('RockSniffer', 'port')))
         logger.notice('Debugging.debug=' + str(self.get_bool_value('Debugging', 'debug')))
         logger.notice('Debugging.debug_log_interval=' + str(self.get_int_value('Debugging', 'debug_log_interval')))
         logger.notice('---------------------------------------------------------------')
+
+    def log_enabled_modules(self):
+        logger.notice('--- Enabled Modules ---')
+        self.log_module_if_enabled('RockSniffer')
+        self.log_module_if_enabled('SetlistLogger')
+        self.log_module_if_enabled('SongLoader')
+        self.log_module_if_enabled('SceneSwitcher')
+        logger.notice('---------------')
+
+    def log_module_if_enabled(self, feature_name):
+        if self.get_bool_value(feature_name, 'enabled'):
+            logger.notice(feature_name)
 
     def reload(self):
         """
