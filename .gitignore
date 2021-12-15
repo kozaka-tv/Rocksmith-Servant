@@ -129,6 +129,7 @@ dmypy.json
 .pyre/
 
 /.idea/
+*.iml
 /config.ini
 /log_*.txt
 /log/

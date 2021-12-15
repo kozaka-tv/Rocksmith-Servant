@@ -4,10 +4,10 @@ from time import sleep
 import logger
 from configReader import ConfigReader
 from debug import Debugger
+from modules.songloader.song_loader import SongLoader
 from rocksniffer import Rocksniffer
 from scene_switcher import SceneSwitcher
 from setlist_logger import SetlistLogger
-from song_loader import SongLoader
 
 # Initializing configuration
 conf = ConfigReader()
@@ -124,7 +124,7 @@ while True:
         if setlist_logger.enabled and in_game():
             register_song_to_setlist()
 
-        if song_loader.enabled and sniffer.enabled:
+        if song_loader.enabled:
             # TODO or maybe this should be configurable?
             # else:  # load songs only in case we are not in game to avoid lagg in game
             song_loader.load()
