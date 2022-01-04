@@ -1,10 +1,9 @@
 import datetime
 import os
-import pathlib
 
 import colorama
 
-LOG_DIR = 'log'
+from utils import file_utils
 
 colorama.init()
 
@@ -26,20 +25,16 @@ def get_month(n):
 
 
 def save_to_log(string):
-    create_log_dir()
+    file_utils.create_log_dir()
 
     date = datetime.datetime.now()
     try:
-        join = os.path.join(LOG_DIR, 'log_{}_{}.txt')
+        join = os.path.join(file_utils.LOG_DIR, 'log_{}_{}.txt')
         with open(join.format(date.year, get_month(date.month)), 'a', encoding="utf-8") as file:
             file.write(string + '\n')
-    except OSError as exc:
+    except OSError:
         pass
     return str(string)
-
-
-def create_log_dir():
-    pathlib.Path(os.path.join(LOG_DIR)).mkdir(parents=True, exist_ok=True)
 
 
 def warning(text):
