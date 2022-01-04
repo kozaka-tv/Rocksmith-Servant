@@ -7,8 +7,13 @@ from config.config_ini_template import serialized
 from utils import logger
 
 ERROR_MSG = "Error retrieving value from {} for section [{}] with key [{}]."
-
 PATH_CONFIG = os.path.join(os.path.dirname(__file__), "config.ini")
+PATH_CONFIG_TEMPLATE = os.path.join(os.path.dirname(__file__), "config_ini_template.py")
+
+
+class ConfigTemplateError(Exception):
+    def __init__(self, section, key):
+        super().__init__(ERROR_MSG.format(PATH_CONFIG_TEMPLATE, section, key))
 
 
 class ConfigReader:
@@ -137,16 +142,19 @@ class ConfigReader:
                 return cast(self.content[section][key])
         except:
             # To keep consistency and ease to use for the end user correct the bad value
-            self.log_bad_value_message(key, section, cast)
+            self.log_bad_value_message(section, key, cast)
             self.replace_bad_value(section, key, cast)
             return self.get_value(section, key, cast)
 
     def replace_bad_value(self, section, key, cast):
         # Get value from the template
-        if cast == bool:
-            new_key = str(serialized[section][key])
-        else:
-            new_key = serialized[section][key]
+        try:
+            if cast == bool:
+                new_key = str(serialized[section][key])
+            else:
+                new_key = serialized[section][key]
+        except KeyError:
+            raise ConfigTemplateError(section, key)
 
         # Replace and save the config value with a default value according to type
         self.content[section][key] = new_key
@@ -155,7 +163,7 @@ class ConfigReader:
         logger.notice("Bad value has been replaced with the default: {}".format(new_key))
 
     @staticmethod
-    def log_bad_value_message(key, section, cast):
+    def log_bad_value_message(section, key, cast):
         logger.warning(ERROR_MSG.format(PATH_CONFIG, section, key))
         if cast == bool:
             logger.discrete("For this type of kye, please use either False, No, 0 or True, Yes, 1")

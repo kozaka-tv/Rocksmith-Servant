@@ -14,8 +14,6 @@ conf = ConfigReader()
 
 # Initializing Modules
 sniffer = Rocksniffer(
-    # TODO is this enabled disabled needed? Or it should work with other modules together. Like Setlist will not work
-    # without sniffer, etc.
     conf.get_bool_value("RockSniffer", "enabled"),
     conf.get_value("RockSniffer", "host"),
     conf.get_value("RockSniffer", "port"),
@@ -26,6 +24,7 @@ setlist_logger = SetlistLogger(
 )
 song_loader = SongLoader(
     conf.get_bool_value("SongLoader", "enabled"),
+    conf.get_bool_value("SongLoader", "allow_load_when_in_game"),
     # TODO
     # conf.get_value("SetlistLogger", "setlist_path"),
 )
@@ -110,9 +109,9 @@ def update_game_information():
             raise rce
 
 
-# Main loop
+# Main 'endless' loop
 while True:
-    #
+
     try:
         # Sleep a bit
         sleep(0.1)

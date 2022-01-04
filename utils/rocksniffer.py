@@ -2,21 +2,18 @@ import os
 
 import requests
 
+SNIFFER_ERROR_MSG = "Could not connect to Rocksniffer!" + os.linesep + os.linesep + os.linesep + \
+                    "--------------------------------------------------" + os.linesep + \
+                    "Please check that is Rocksniffer running or not!" + os.linesep + \
+                    "Please check host and port defined in config:" + os.linesep + \
+                    "host={}" + os.linesep + \
+                    "port={}" + os.linesep + \
+                    "--------------------------------------------------" + os.linesep + os.linesep
+
 
 class RocksnifferConnectionError(Exception):
-    """ Connection error. """
-
     def __init__(self, host, port):
-        super().__init__(
-            "Could not connect to Rocksniffer!" + os.linesep +
-            os.linesep +
-            os.linesep +
-            "--------------------------------------------------" + os.linesep +
-            "Please check that is Rocksniffer running or not!" + os.linesep +
-            "Please check host and port defined in config:" + os.linesep +
-            "host=" + host + os.linesep +
-            "port=" + port + os.linesep +
-            "--------------------------------------------------" + os.linesep + os.linesep)
+        super().__init__(SNIFFER_ERROR_MSG.format(host, port))
 
 
 class Rocksniffer:

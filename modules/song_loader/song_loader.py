@@ -6,12 +6,13 @@ from utils import logger
 
 
 class SongLoader:
-    def __init__(self, enabled):
+    def __init__(self, enabled, allow_load_when_in_game):
         """
         Song Loader
         :param enabled: Is the Module enabled?
         """
         self.enabled = enabled
+        self.allow_load_when_in_game = allow_load_when_in_game
         # TODO maybe call this different...do we need this?
         self.raw_playlist = None
         pass
