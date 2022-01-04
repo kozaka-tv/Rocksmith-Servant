@@ -17,7 +17,7 @@ serialized = {
     },
     "FileManager": {
         "enabled": False,
-        "source_directories": "<Enter source directories (separated by ',') from where do you want to move CDLC files>",
+        "source_directories": "<Enter source directories (separated by ';') from where do you want to move CDLC files>",
         "destination_directory": "<Enter Your Directory to where do you want to move CDLC files>",
         "using_cfsm": False,
     },

@@ -24,37 +24,44 @@ def get_month(n):
             ][n - 1]
 
 
-def save_to_log(string):
+def create_message_and_save_to_log(name, string):
     file_utils.create_log_dir()
 
-    date = datetime.datetime.now()
+    date = datetime.date.today()
+
+    if name:
+        string = get_date() + "(" + name + ") - " + string
+    else:
+        string = get_date() + string
+
     try:
         join = os.path.join(file_utils.LOG_DIR, 'log_{}_{}.txt')
         with open(join.format(date.year, get_month(date.month)), 'a', encoding="utf-8") as file:
+
             file.write(string + '\n')
     except OSError:
         pass
     return str(string)
 
 
-def warning(text):
-    print(colorama.Fore.RED, save_to_log(get_date() + str(text)), sep='')
+def warning(text, name=''):
+    print(colorama.Fore.RED, create_message_and_save_to_log(name, str(text)), sep='')
 
 
-def notice(text):
-    print(colorama.Fore.YELLOW, save_to_log(get_date() + str(text)), sep='')
+def notice(text, name=''):
+    print(colorama.Fore.YELLOW, create_message_and_save_to_log(name, str(text)), sep='')
 
 
-def log(text):
-    print(colorama.Fore.CYAN, save_to_log(get_date() + str(text)), sep='')
+def log(text, name=''):
+    print(colorama.Fore.CYAN, create_message_and_save_to_log(name, str(text)), sep='')
 
 
-def discrete(text):
-    print(colorama.Fore.LIGHTBLACK_EX, save_to_log(get_date() + str(text)), sep='')
+def discrete(text, name=''):
+    print(colorama.Fore.LIGHTBLACK_EX, create_message_and_save_to_log(name, str(text)), sep='')
 
 
-def third_party(text):
-    print('\033[92m', save_to_log(get_date() + str(text)), '\033[0m', sep='')
+def third_party(text, name=''):
+    print('\033[92m', create_message_and_save_to_log(name, str(text)), '\033[0m', sep='')
 
 
 def get_date():

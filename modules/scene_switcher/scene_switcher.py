@@ -14,5 +14,3 @@ class SceneSwitcher:
         if self.enabled:
             # TODO create main method and call it from here like other
             logger.notice("TODO Scene switcher!")
-            pass
-        pass

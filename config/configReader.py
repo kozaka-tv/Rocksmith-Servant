@@ -52,9 +52,9 @@ class ConfigReader:
     def log_config(self):
         logger.notice('------- CONFIG ------------------------------------------------')
         self.log_enabled_modules()
-        logger.notice('RockSniffer.host=' + str(self.get_str_value('RockSniffer', 'host')))
-        logger.notice('RockSniffer.port=' + str(self.get_str_value('RockSniffer', 'port')))
-        logger.notice('Debugging.debug=' + str(self.get_bool_value('Debugging', 'debug')))
+        logger.notice('RockSniffer.host=' + str(self.get('RockSniffer', 'host')))
+        logger.notice('RockSniffer.port=' + str(self.get('RockSniffer', 'port')))
+        logger.notice('Debugging.debug=' + str(self.get_bool('Debugging', 'debug')))
         logger.notice('Debugging.debug_log_interval=' + str(self.get_int_value('Debugging', 'debug_log_interval')))
         logger.notice('---------------------------------------------------------------')
 
@@ -68,7 +68,7 @@ class ConfigReader:
         logger.notice('---------------')
 
     def log_module_if_enabled(self, feature_name):
-        if self.get_bool_value(feature_name, 'enabled'):
+        if self.get_bool(feature_name, 'enabled'):
             logger.notice(feature_name)
 
     def reload(self):
@@ -112,17 +112,16 @@ class ConfigReader:
 
         return config
 
-    def get_int_value(self, section, key):
-        return self.get_value(section, key, int)
+    def get_int_value(self, section, key) -> int:
+        return self.get(section, key, int)
 
-    def get_str_value(self, section, key):
-        return self.get_value(section, key, str)
+    def get_bool(self, section, key) -> bool:
+        return self.get(section, key, bool)
 
-    def get_bool_value(self, section, key):
-        return self.get_value(section, key, bool)
+    def get_list(self, section, key) -> list:
+        return self.get(section, key, list)
 
-    # TODO this should be not available to call!
-    def get_value(self, section, key, cast=str):
+    def get(self, section, key, cast=str):
 
         try:
             # List in config are separated with ";". Leading and trailing whitespaces will be removed
@@ -131,13 +130,7 @@ class ConfigReader:
 
             # Cast to bool
             if cast == bool:
-                # try:
                 return util.strtobool(self.content[section][key].lower())
-                # except ValueError:
-                #     self.log_bad_value_message(key, section)
-                #     logger.warning("Please use: False, No or 0 | True, Yes or 1")
-                #     self.replace_bad_value(section, key, cast)
-                #     return self.get_value(section, key, cast)
 
             # Else we cast it
             else:
@@ -146,7 +139,7 @@ class ConfigReader:
             # To keep consistency and ease to use for the end user correct the bad value
             self.log_bad_value_message(section, key, cast)
             self.replace_bad_value(section, key, cast)
-            return self.get_value(section, key, cast)
+            return self.get(section, key, cast)
 
     def replace_bad_value(self, section, key, cast):
         # Get value from the template

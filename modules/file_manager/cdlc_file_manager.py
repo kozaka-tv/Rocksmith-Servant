@@ -1,4 +1,10 @@
+import fnmatch
+import os
+from time import sleep
+
 from utils import logger
+
+MODULE_NAME = "FileManager"
 
 
 class FileManager:
@@ -15,7 +21,14 @@ class FileManager:
 
     def run(self):
         if self.enabled:
-            # TODO create main method and call it from here like other
-            logger.notice("TODO FileManager!")
-            pass
-        pass
+            # TODO remove log and sleep later
+            sleep(1)
+
+            cdlc_files = []
+            for source in self.source_directories:
+                for root, dir_names, filenames in os.walk(source):
+                    for filename in fnmatch.filter(filenames, '*.psarc'):
+                        file = os.path.join(root, filename)
+                        cdlc_files.append(file)
+                        logger.discrete('Found a new CDLC file: {}'.format(file), MODULE_NAME)
+            logger.notice('Found {} new CDLC files!'.format(len(cdlc_files)), MODULE_NAME)

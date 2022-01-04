@@ -29,28 +29,28 @@ conf = ConfigReader()
 
 # Initializing Modules
 sniffer = Rocksniffer(
-    conf.get_bool_value(SECTION_ROCK_SNIFFER, KEY_ENABLED),
-    conf.get_value(SECTION_ROCK_SNIFFER, "host"),
-    conf.get_value(SECTION_ROCK_SNIFFER, "port"),
+    conf.get_bool(SECTION_ROCK_SNIFFER, KEY_ENABLED),
+    conf.get(SECTION_ROCK_SNIFFER, "host"),
+    conf.get(SECTION_ROCK_SNIFFER, "port"),
 )
 setlist_logger = SetlistLogger(
-    conf.get_bool_value(SECTION_SETLIST_LOGGER, KEY_ENABLED),
-    conf.get_value(SECTION_SETLIST_LOGGER, "setlist_path"),
+    conf.get_bool(SECTION_SETLIST_LOGGER, KEY_ENABLED),
+    conf.get(SECTION_SETLIST_LOGGER, "setlist_path"),
 )
 song_loader = SongLoader(
-    conf.get_bool_value(SECTION_SONG_LOADER, KEY_ENABLED),
-    conf.get_bool_value(SECTION_SONG_LOADER, "allow_load_when_in_game"),
+    conf.get_bool(SECTION_SONG_LOADER, KEY_ENABLED),
+    conf.get_bool(SECTION_SONG_LOADER, "allow_load_when_in_game"),
     # TODO
-    # conf.get_value(SongLoader, "setlist_path"),
+    # conf.get(SongLoader, "setlist_path"),
 )
 scene_switcher = SceneSwitcher(
-    conf.get_bool_value(SECTION_SCENE_SWITCHER, KEY_ENABLED)
+    conf.get_bool(SECTION_SCENE_SWITCHER, KEY_ENABLED)
 )
 file_manager = FileManager(
-    conf.get_bool_value(SECTION_FILE_MANAGER, KEY_ENABLED),
-    conf.get_value(SECTION_FILE_MANAGER, "source_directories"),
-    conf.get_value(SECTION_FILE_MANAGER, "destination_directory"),
-    conf.get_value(SECTION_FILE_MANAGER, "using_cfsm")
+    conf.get_bool(SECTION_FILE_MANAGER, KEY_ENABLED),
+    conf.get_list(SECTION_FILE_MANAGER, "source_directories"),
+    conf.get(SECTION_FILE_MANAGER, "destination_directory"),
+    conf.get(SECTION_FILE_MANAGER, "using_cfsm")
 )
 
 # TODO OBS
@@ -58,8 +58,8 @@ file_manager = FileManager(
 
 # Initializing Debugger
 debugger = Debugger(
-    conf.get_bool_value(SECTION_DEBUGGING, "debug"),
-    conf.get_value(SECTION_DEBUGGING, "debug_log_interval", int)
+    conf.get_bool(SECTION_DEBUGGING, "debug"),
+    conf.get(SECTION_DEBUGGING, "debug_log_interval", int)
 )
 
 
@@ -68,32 +68,32 @@ debugger = Debugger(
 def update_config():
     if conf.reload_if_changed():
         # Updating Rocksniffer Configurations
-        sniffer.enabled = conf.get_bool_value(SECTION_ROCK_SNIFFER, KEY_ENABLED)
-        sniffer.host = conf.get_value(SECTION_ROCK_SNIFFER, "host")
-        sniffer.port = conf.get_value(SECTION_ROCK_SNIFFER, "port")
+        sniffer.enabled = conf.get_bool(SECTION_ROCK_SNIFFER, KEY_ENABLED)
+        sniffer.host = conf.get(SECTION_ROCK_SNIFFER, "host")
+        sniffer.port = conf.get(SECTION_ROCK_SNIFFER, "port")
 
         # Updating Setlist Configurations
-        setlist_logger.enabled = conf.get_bool_value(SECTION_SETLIST_LOGGER, KEY_ENABLED)
-        setlist_logger.setlist_path = conf.get_value(SECTION_SETLIST_LOGGER, "setlist_path")
+        setlist_logger.enabled = conf.get_bool(SECTION_SETLIST_LOGGER, KEY_ENABLED)
+        setlist_logger.setlist_path = conf.get(SECTION_SETLIST_LOGGER, "setlist_path")
 
         # Updating Song Loader Configurations
-        song_loader.enabled = conf.get_bool_value(SECTION_SONG_LOADER, KEY_ENABLED)
-        song_loader.allow_load_when_in_game = conf.get_bool_value(SECTION_SONG_LOADER, "allow_load_when_in_game")
+        song_loader.enabled = conf.get_bool(SECTION_SONG_LOADER, KEY_ENABLED)
+        song_loader.allow_load_when_in_game = conf.get_bool(SECTION_SONG_LOADER, "allow_load_when_in_game")
 
         # Updating Scene Switcher Configurations
-        scene_switcher.enabled = conf.get_bool_value(SECTION_SCENE_SWITCHER, KEY_ENABLED)
+        scene_switcher.enabled = conf.get_bool(SECTION_SCENE_SWITCHER, KEY_ENABLED)
 
         # Updating FileManager Configurations
-        file_manager.enabled = conf.get_bool_value(SECTION_FILE_MANAGER, KEY_ENABLED)
-        file_manager.source_directories = conf.get_value(SECTION_FILE_MANAGER, "source_directories")
-        file_manager.destination_directory = conf.get_value(SECTION_FILE_MANAGER, "destination_directory")
-        file_manager.using_cfsm = conf.get_value(SECTION_FILE_MANAGER, "using_cfsm")
+        file_manager.enabled = conf.get_bool(SECTION_FILE_MANAGER, KEY_ENABLED)
+        file_manager.source_directories = conf.get_list(SECTION_FILE_MANAGER, "source_directories")
+        file_manager.destination_directory = conf.get(SECTION_FILE_MANAGER, "destination_directory")
+        file_manager.using_cfsm = conf.get(SECTION_FILE_MANAGER, "using_cfsm")
 
         # TODO OBS
         # TODO Behaviour
 
         # Updating Debug Configurations
-        debugger.debug = conf.get_bool_value(SECTION_DEBUGGING, "debug")
+        debugger.debug = conf.get_bool(SECTION_DEBUGGING, "debug")
         debugger.interval = conf.get_int_value(SECTION_DEBUGGING, "debug_log_interval")
 
 
@@ -152,10 +152,11 @@ while True:
 
         update_config()
 
+        scene_switcher.run()
+        file_manager.run()
+        song_loader.load()
         update_game_information()
         put_the_song_into_the_setlist()
-        song_loader.load()
-        scene_switcher.run()
 
         # Interval debugging
         debugger.log_on_interval(get_debug_message())
