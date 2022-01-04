@@ -2,6 +2,7 @@ import os
 from time import sleep
 
 from config.configReader import ConfigReader
+from modules.file_manager.cdlc_file_manager import FileManager
 from modules.scene_switcher.scene_switcher import SceneSwitcher
 from modules.setlist.setlist_logger import SetlistLogger
 from modules.song_loader.song_loader import SongLoader
@@ -9,33 +10,56 @@ from utils import logger
 from utils.debug import Debugger
 from utils.rocksniffer import Rocksniffer, RocksnifferConnectionError
 
+# TODO move this to config.py and use it everywhere? Also in config reader we could use them!
+# Section name definitions
+SECTION_ROCK_SNIFFER = "RockSniffer"
+SECTION_SETLIST_LOGGER = "SetlistLogger"
+SECTION_SONG_LOADER = "SongLoader"
+SECTION_SCENE_SWITCHER = "SceneSwitcher"
+SECTION_FILE_MANAGER = "FileManager"
+# OBS
+# Behaviour
+SECTION_DEBUGGING = "Debugging"
+
+# Key name definitions
+KEY_ENABLED = "enabled"
+
 # Initializing configuration
 conf = ConfigReader()
 
 # Initializing Modules
 sniffer = Rocksniffer(
-    conf.get_bool_value("RockSniffer", "enabled"),
-    conf.get_value("RockSniffer", "host"),
-    conf.get_value("RockSniffer", "port"),
+    conf.get_bool_value(SECTION_ROCK_SNIFFER, KEY_ENABLED),
+    conf.get_value(SECTION_ROCK_SNIFFER, "host"),
+    conf.get_value(SECTION_ROCK_SNIFFER, "port"),
 )
 setlist_logger = SetlistLogger(
-    conf.get_bool_value("SetlistLogger", "enabled"),
-    conf.get_value("SetlistLogger", "setlist_path"),
+    conf.get_bool_value(SECTION_SETLIST_LOGGER, KEY_ENABLED),
+    conf.get_value(SECTION_SETLIST_LOGGER, "setlist_path"),
 )
 song_loader = SongLoader(
-    conf.get_bool_value("SongLoader", "enabled"),
-    conf.get_bool_value("SongLoader", "allow_load_when_in_game"),
+    conf.get_bool_value(SECTION_SONG_LOADER, KEY_ENABLED),
+    conf.get_bool_value(SECTION_SONG_LOADER, "allow_load_when_in_game"),
     # TODO
-    # conf.get_value("SetlistLogger", "setlist_path"),
+    # conf.get_value(SongLoader, "setlist_path"),
 )
 scene_switcher = SceneSwitcher(
-    conf.get_bool_value("SceneSwitcher", "enabled"),
+    conf.get_bool_value(SECTION_SCENE_SWITCHER, KEY_ENABLED)
 )
+file_manager = FileManager(
+    conf.get_bool_value(SECTION_FILE_MANAGER, KEY_ENABLED),
+    conf.get_value(SECTION_FILE_MANAGER, "source_directories"),
+    conf.get_value(SECTION_FILE_MANAGER, "destination_directory"),
+    conf.get_value(SECTION_FILE_MANAGER, "using_cfsm")
+)
+
+# TODO OBS
+# TODO Behaviour
 
 # Initializing Debugger
 debugger = Debugger(
-    conf.get_bool_value("Debugging", "debug"),
-    conf.get_value("Debugging", "debug_log_interval", int)
+    conf.get_bool_value(SECTION_DEBUGGING, "debug"),
+    conf.get_value(SECTION_DEBUGGING, "debug_log_interval", int)
 )
 
 
@@ -44,35 +68,45 @@ debugger = Debugger(
 def update_config():
     if conf.reload_if_changed():
         # Updating Rocksniffer Configurations
-        sniffer.enabled = conf.get_bool_value("RockSniffer", "enabled")
-        sniffer.host = conf.get_value("RockSniffer", "host")
-        sniffer.port = conf.get_value("RockSniffer", "port")
+        sniffer.enabled = conf.get_bool_value(SECTION_ROCK_SNIFFER, KEY_ENABLED)
+        sniffer.host = conf.get_value(SECTION_ROCK_SNIFFER, "host")
+        sniffer.port = conf.get_value(SECTION_ROCK_SNIFFER, "port")
 
         # Updating Setlist Configurations
-        setlist_logger.enabled = conf.get_bool_value("SetlistLogger", "enabled")
+        setlist_logger.enabled = conf.get_bool_value(SECTION_SETLIST_LOGGER, KEY_ENABLED)
+        setlist_logger.setlist_path = conf.get_value(SECTION_SETLIST_LOGGER, "setlist_path")
 
         # Updating Song Loader Configurations
-        song_loader.enabled = conf.get_bool_value("SongLoader", "enabled")
-        # song_loader.setlist_path =  conf.get_value("SetlistLogger", "setlist_path")
-
-        # TODO file
+        song_loader.enabled = conf.get_bool_value(SECTION_SONG_LOADER, KEY_ENABLED)
+        song_loader.allow_load_when_in_game = conf.get_bool_value(SECTION_SONG_LOADER, "allow_load_when_in_game")
 
         # Updating Scene Switcher Configurations
-        scene_switcher.enabled = conf.get_bool_value("SceneSwitcher", "enabled")
+        scene_switcher.enabled = conf.get_bool_value(SECTION_SCENE_SWITCHER, KEY_ENABLED)
+
+        # Updating FileManager Configurations
+        file_manager.enabled = conf.get_bool_value(SECTION_FILE_MANAGER, KEY_ENABLED)
+        file_manager.source_directories = conf.get_value(SECTION_FILE_MANAGER, "source_directories")
+        file_manager.destination_directory = conf.get_value(SECTION_FILE_MANAGER, "destination_directory")
+        file_manager.using_cfsm = conf.get_value(SECTION_FILE_MANAGER, "using_cfsm")
+
+        # TODO OBS
+        # TODO Behaviour
 
         # Updating Debug Configurations
-        debugger.debug = conf.get_bool_value("Debugging", "debug")
-        debugger.interval = conf.get_int_value("Debugging", "debug_log_interval")
+        debugger.debug = conf.get_bool_value(SECTION_DEBUGGING, "debug")
+        debugger.interval = conf.get_int_value(SECTION_DEBUGGING, "debug_log_interval")
 
 
 # TODO move to debug Class?
 def get_debug_message():
-    # TODO
-    # "SceneSwitcher: {sniffer.enabled}" \
+    # TODO OBS
+    # TODO Behaviour
     modules_str = "--- Modules ---" + os.linesep + \
-                  "RockSniffer: {sniffer.enabled}" + os.linesep + \
-                  "SetlistLogger: {setlist_logger.enabled}" + os.linesep + \
-                  "SongLoader: {song_loader.enabled}" + os.linesep + \
+                  SECTION_ROCK_SNIFFER + ": {sniffer.enabled}" + os.linesep + \
+                  SECTION_SETLIST_LOGGER + ": {setlist_logger.enabled}" + os.linesep + \
+                  SECTION_SONG_LOADER + ": {song_loader.enabled}" + os.linesep + \
+                  SECTION_SCENE_SWITCHER + ": {scene_switcher.enabled}" + os.linesep + \
+                  SECTION_FILE_MANAGER + ": {file_manager.enabled}" + os.linesep + \
                   "".format(sniffer=sniffer, setlist_logger=setlist_logger, song_loader=song_loader) + os.linesep + \
                   "---------------" + os.linesep
 

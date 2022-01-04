@@ -48,6 +48,7 @@ class ConfigReader:
         return config
 
     # TODO actually this should be used by all the modules to log config out. Config, Debug, Run.
+    # TODO enhance with other values? Or mage a debug part in the module itself? Would be better!
     def log_config(self):
         logger.notice('------- CONFIG ------------------------------------------------')
         self.log_enabled_modules()
@@ -58,11 +59,12 @@ class ConfigReader:
         logger.notice('---------------------------------------------------------------')
 
     def log_enabled_modules(self):
-        logger.notice('--- Enabled Modules ---')
+        logger.warning('--- Enabled Modules ---')
         self.log_module_if_enabled('RockSniffer')
         self.log_module_if_enabled('SetlistLogger')
         self.log_module_if_enabled('SongLoader')
         self.log_module_if_enabled('SceneSwitcher')
+        self.log_module_if_enabled('FileManager')
         logger.notice('---------------')
 
     def log_module_if_enabled(self, feature_name):
