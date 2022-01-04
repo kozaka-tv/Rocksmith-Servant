@@ -13,4 +13,4 @@ class SceneSwitcher:
     def run(self):
         if self.enabled:
             # TODO create main method and call it from here like other
-            logger.notice("TODO Scene switcher!")
+            logger.warning("TODO Scene switcher!")

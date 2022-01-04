@@ -19,7 +19,7 @@ class ConfigTemplateError(Exception):
 class ConfigReader:
     def __init__(self):
 
-        logger.notice('Initialising ' + PATH_CONFIG + ' ...')
+        logger.warning('Initialising ' + PATH_CONFIG + ' ...')
 
         # TODO remove content later and use variables only?
         self.content = self.load()
@@ -28,9 +28,9 @@ class ConfigReader:
         self.last_modified = self.last_modification_time
         if self.last_modification_time == 0:
             self.save()
-            logger.notice('A config.ini file was created for you from a template in: ' + PATH_CONFIG)
-            logger.notice('Please change the values according to your needs, and then relaunch Rocksmith Servant!')
-            logger.notice('...now please press any key to exit this program.')
+            logger.warning('A config.ini file was created for you from a template in: ' + PATH_CONFIG)
+            logger.warning('Please change the values according to your needs, and then relaunch Rocksmith Servant!')
+            logger.warning('...now please press any key to exit this program.')
             input()
             sys.exit()
 
@@ -43,33 +43,33 @@ class ConfigReader:
         config.read(PATH_CONFIG, encoding="UTF-8")
         self.last_modified = self.last_modification_time
 
-        logger.notice(PATH_CONFIG + ' has been loaded!')
+        logger.warning(PATH_CONFIG + ' has been loaded!')
 
         return config
 
     # TODO actually this should be used by all the modules to log config out. Config, Debug, Run.
     # TODO enhance with other values? Or mage a debug part in the module itself? Would be better!
     def log_config(self):
-        logger.notice('------- CONFIG ------------------------------------------------')
+        logger.warning('------- CONFIG ------------------------------------------------')
         self.log_enabled_modules()
-        logger.notice('RockSniffer.host=' + str(self.get('RockSniffer', 'host')))
-        logger.notice('RockSniffer.port=' + str(self.get('RockSniffer', 'port')))
-        logger.notice('Debugging.debug=' + str(self.get_bool('Debugging', 'debug')))
-        logger.notice('Debugging.debug_log_interval=' + str(self.get_int_value('Debugging', 'debug_log_interval')))
-        logger.notice('---------------------------------------------------------------')
+        logger.warning('RockSniffer.host=' + str(self.get('RockSniffer', 'host')))
+        logger.warning('RockSniffer.port=' + str(self.get('RockSniffer', 'port')))
+        logger.warning('Debugging.debug=' + str(self.get_bool('Debugging', 'debug')))
+        logger.warning('Debugging.debug_log_interval=' + str(self.get_int_value('Debugging', 'debug_log_interval')))
+        logger.warning('---------------------------------------------------------------')
 
     def log_enabled_modules(self):
-        logger.warning('--- Enabled Modules ---')
+        logger.error('--- Enabled Modules ---')
         self.log_module_if_enabled('RockSniffer')
         self.log_module_if_enabled('SetlistLogger')
         self.log_module_if_enabled('SongLoader')
         self.log_module_if_enabled('SceneSwitcher')
         self.log_module_if_enabled('FileManager')
-        logger.notice('---------------')
+        logger.warning('---------------')
 
     def log_module_if_enabled(self, feature_name):
         if self.get_bool(feature_name, 'enabled'):
-            logger.notice(feature_name)
+            logger.warning(feature_name)
 
     def reload(self):
         """
@@ -155,17 +155,17 @@ class ConfigReader:
         self.content[section][key] = new_key
         self.save()
 
-        logger.notice("Bad value has been replaced with the default: {}".format(new_key))
+        logger.warning("Bad value has been replaced with the default: {}".format(new_key))
 
     @staticmethod
     def log_bad_value_message(section, key, cast):
-        logger.warning(ERROR_MSG.format(PATH_CONFIG, section, key))
+        logger.error(ERROR_MSG.format(PATH_CONFIG, section, key))
         if cast == bool:
             logger.discrete("For this type of kye, please use either False, No, 0 or True, Yes, 1")
 
     def reload_if_changed(self):
         if self.reload():
-            logger.notice("Configuration has been reloaded!")
+            logger.warning("Configuration has been reloaded!")
             self.log_config()
             return True
         else:

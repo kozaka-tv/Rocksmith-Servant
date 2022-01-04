@@ -136,7 +136,7 @@ def update_game_information():
     if sniffer.enabled:
         try:
             if not sniffer.memory or sniffer.memory is None:
-                logger.notice("Try to connect to RockSniffer to get the information from Rocksmith...")
+                logger.warning("Try to connect to RockSniffer to get the information from Rocksmith...")
             sniffer.update()
         except RocksnifferConnectionError as rce:
             sniffer.memory = None
@@ -163,4 +163,4 @@ while True:
 
     # Catch and log all the known exceptions, but keep app alive.
     except RocksnifferConnectionError as error:
-        logger.warning(error)
+        logger.error(error)

@@ -17,7 +17,7 @@ class FileManager:
         self.destination_directory = destination_directory
         self.using_cfsm = using_cfsm
 
-        logger.notice("FileManager is initialised!")
+        logger.warning("FileManager is initialised!")
 
     def run(self):
         if self.enabled:
@@ -31,4 +31,4 @@ class FileManager:
                         file = os.path.join(root, filename)
                         cdlc_files.append(file)
                         logger.discrete('Found a new CDLC file: {}'.format(file), MODULE_NAME)
-            logger.notice('Found {} new CDLC files!'.format(len(cdlc_files)), MODULE_NAME)
+            logger.warning('Found {} new CDLC files!'.format(len(cdlc_files)), MODULE_NAME)

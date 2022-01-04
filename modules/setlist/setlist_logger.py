@@ -30,7 +30,7 @@ class SetlistLogger:
 
     def log_a_song(self, song):
         if song not in self.setlist:
-            logger.notice("Song was added to setlist: " + song)
+            logger.warning("Song was added to setlist: " + song)
             self.setlist.append(song)
             self.write_to_setlist_file(song)
 

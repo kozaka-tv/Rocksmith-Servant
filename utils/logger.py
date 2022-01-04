@@ -44,11 +44,11 @@ def create_message_and_save_to_log(name, string):
     return str(string)
 
 
-def warning(text, name=''):
+def error(text, name=''):
     print(colorama.Fore.RED, create_message_and_save_to_log(name, str(text)), sep='')
 
 
-def notice(text, name=''):
+def warning(text, name=''):
     print(colorama.Fore.YELLOW, create_message_and_save_to_log(name, str(text)), sep='')
 
 
@@ -74,10 +74,10 @@ class Logger:
         self.form = form
 
     def warning(self, text):
-        warning(self.form.format(self.name, text))
+        error(self.form.format(self.name, text))
 
     def notice(self, text):
-        notice(self.form.format(self.name, text))
+        warning(self.form.format(self.name, text))
 
     def log(self, text):
         log(self.form.format(self.name, text))

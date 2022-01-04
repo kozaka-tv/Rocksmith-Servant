@@ -29,4 +29,4 @@ class SongLoader:
         with urllib.request.urlopen("https://rsplaylist.com/ajax/playlist.php?channel=kozaka") as url:
             data = json.loads(url.read().decode())
         self.raw_playlist = data
-        logger.notice(data)
+        logger.warning(data)
