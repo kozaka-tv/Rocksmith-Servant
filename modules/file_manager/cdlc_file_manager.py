@@ -1,7 +1,6 @@
 import fnmatch
 import os
 import shutil
-from time import sleep
 
 from utils import logger
 
@@ -22,9 +21,6 @@ class FileManager:
 
     def run(self):
         if self.enabled:
-            # TODO remove log and sleep later
-            sleep(1)
-
             self.move_cdlc_files(self.scan_cdlc_files_in_source_dirs())
 
     def scan_cdlc_files_in_source_dirs(self):
