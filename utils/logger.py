@@ -53,10 +53,10 @@ def warning(text, name=''):
 
 
 def log(text, name=''):
-    print(colorama.Fore.CYAN, create_message_and_save_to_log(name, str(text)), sep='')
+    print(colorama.Fore.WHITE, create_message_and_save_to_log(name, str(text)), sep='')
 
 
-def discrete(text, name=''):
+def debug(text, name=''):
     print(colorama.Fore.LIGHTBLACK_EX, create_message_and_save_to_log(name, str(text)), sep='')
 
 
@@ -69,21 +69,22 @@ def get_date_formatted():
 
 
 class Logger:
-    def __init__(self, name, form="[{}] {}"):
+    def __init__(self, debug_on, name, form="[{}] {}"):
         self.name = name
         self.form = form
+        self.debug = debug_on
 
-    def warning(self, text):
+    def error(self, text):
         error(self.form.format(self.name, text))
 
-    def notice(self, text):
+    def warning(self, text):
         warning(self.form.format(self.name, text))
 
     def log(self, text):
         log(self.form.format(self.name, text))
 
-    def discrete(self, text):
-        discrete(self.form.format(self.name, text))
+    def debug(self, text):
+        debug(self.form.format(self.name, text))
 
     def third_party(self, text):
         third_party(self.form.format(self.name, text))

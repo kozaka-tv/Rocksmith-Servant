@@ -1,5 +1,6 @@
 import fnmatch
 import os
+import shutil
 from time import sleep
 
 from utils import logger
@@ -24,11 +25,25 @@ class FileManager:
             # TODO remove log and sleep later
             sleep(1)
 
-            cdlc_files = []
-            for source in self.source_directories:
-                for root, dir_names, filenames in os.walk(source):
-                    for filename in fnmatch.filter(filenames, '*.psarc'):
-                        file = os.path.join(root, filename)
-                        cdlc_files.append(file)
-                        logger.discrete('Found a new CDLC file: {}'.format(file), MODULE_NAME)
-            logger.warning('Found {} new CDLC files!'.format(len(cdlc_files)), MODULE_NAME)
+            self.move_cdlc_files(self.scan_cdlc_files_in_source_dirs())
+
+    def scan_cdlc_files_in_source_dirs(self):
+        cdlc_files = []
+
+        for source in self.source_directories:
+            for root, dir_names, filenames in os.walk(source):
+                for filename in fnmatch.filter(filenames, '*.psarc'):
+                    file = os.path.join(root, filename)
+                    cdlc_files.append(file)
+                    logger.log('Found a new CDLC file to parse: {}'.format(file), MODULE_NAME)
+
+        if len(cdlc_files) > 0:
+            logger.log('Found {} new CDLC files.'.format(len(cdlc_files)), MODULE_NAME)
+
+        return cdlc_files
+
+    def move_cdlc_files(self, cdlc_files):
+        if len(cdlc_files) > 0:
+            logger.log('Moving {} CLDC files to: {}'.format(len(cdlc_files), self.destination_directory), MODULE_NAME)
+            for file in cdlc_files:
+                shutil.move(file, self.destination_directory)

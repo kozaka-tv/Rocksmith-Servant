@@ -161,7 +161,7 @@ class ConfigReader:
     def log_bad_value_message(section, key, cast):
         logger.error(ERROR_MSG.format(PATH_CONFIG, section, key))
         if cast == bool:
-            logger.discrete("For this type of kye, please use either False, No, 0 or True, Yes, 1")
+            logger.log("For this type of key, please use either False, No, 0 or True, Yes, 1")
 
     def reload_if_changed(self):
         if self.reload():
