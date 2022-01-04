@@ -1,6 +1,6 @@
 import time
 
-import logger
+from utils import logger
 
 
 class Debugger:
@@ -18,4 +18,3 @@ class Debugger:
         if self.last_log + self.interval < time.time():
             self.log(message)
             self.last_log = time.time()
-

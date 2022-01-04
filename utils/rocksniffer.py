@@ -1,4 +1,22 @@
+import os
+
 import requests
+
+
+class RocksnifferConnectionError(Exception):
+    """ Connection error. """
+
+    def __init__(self, host, port):
+        super().__init__(
+            "Could not connect to Rocksniffer!" + os.linesep +
+            os.linesep +
+            os.linesep +
+            "--------------------------------------------------" + os.linesep +
+            "Please check that is Rocksniffer running or not!" + os.linesep +
+            "Please check host and port defined in config:" + os.linesep +
+            "host=" + host + os.linesep +
+            "port=" + port + os.linesep +
+            "--------------------------------------------------" + os.linesep + os.linesep)
 
 
 class Rocksniffer:
@@ -33,8 +51,8 @@ class Rocksniffer:
             if self.memory["success"]:
                 self.take_sample()
                 self.get_song_details()
-        except:
-            raise ConnectionError
+        except Exception:
+            raise RocksnifferConnectionError(self.host, self.port)
 
     def get_song_details(self):
         self.artistName = self.memory['songDetails']['artistName']

@@ -3,8 +3,10 @@ import os
 import sys
 from distutils import util
 
-import logger
 from config.config_ini_template import serialized
+from utils import logger
+
+ERROR_MSG = "Error retrieving value from {} for section [{}] with key [{}]."
 
 PATH_CONFIG = os.path.join(os.path.dirname(__file__), "config.ini")
 
@@ -118,33 +120,49 @@ class ConfigReader:
         try:
             # List in config are separated with ";". Leading and trailing whitespaces will be removed
             if cast == list:
-                value = [v.strip() for v in self.content[section][key].split(";")]
+                return [v.strip() for v in self.content[section][key].split(";")]
+
             # Cast to bool
             if cast == bool:
-                # value = self.content[section][key].lower() in ['true', '1', 't', 'y', 'yes']
-                value = bool(util.strtobool(self.content[section][key].lower()))
+                # try:
+                return util.strtobool(self.content[section][key].lower())
+                # except ValueError:
+                #     self.log_bad_value_message(key, section)
+                #     logger.warning("Please use: False, No or 0 | True, Yes or 1")
+                #     self.replace_bad_value(section, key, cast)
+                #     return self.get_value(section, key, cast)
+
             # Else we cast it
             else:
-                value = cast(self.content[section][key])
-            return value
+                return cast(self.content[section][key])
         except:
-            # To keep consistency and ease to use for the end user
-            # Logging where the value was expected.
-            # Replacing it to be sure it's still working even after this error.
-            logger.notice("Error retrieving value for {} [{}][{}].".format(PATH_CONFIG, section, key, ))
-            # Getting the new value
-            key_ = serialized[section][key]
-            logger.notice("Replacing value with : {}".format(key_))
-            # Replacing the config value with a default value
-            self.content[section][key] = serialized[section][key]
-            # Saving the current INI to keep it safe to use
-            self.save()
-            # Returning new value, using this method
+            # To keep consistency and ease to use for the end user correct the bad value
+            self.log_bad_value_message(key, section, cast)
+            self.replace_bad_value(section, key, cast)
             return self.get_value(section, key, cast)
+
+    def replace_bad_value(self, section, key, cast):
+        # Get value from the template
+        if cast == bool:
+            new_key = str(serialized[section][key])
+        else:
+            new_key = serialized[section][key]
+
+        # Replace and save the config value with a default value according to type
+        self.content[section][key] = new_key
+        self.save()
+
+        logger.notice("Bad value has been replaced with the default: {}".format(new_key))
+
+    @staticmethod
+    def log_bad_value_message(key, section, cast):
+        logger.warning(ERROR_MSG.format(PATH_CONFIG, section, key))
+        if cast == bool:
+            logger.discrete("For this type of kye, please use either False, No, 0 or True, Yes, 1")
 
     def reload_if_changed(self):
         if self.reload():
-            logger.notice("Configuration has been changed, so it is reloaded!")
+            logger.notice("Configuration has been reloaded!")
             self.log_config()
             return True
         else:

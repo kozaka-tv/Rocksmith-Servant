@@ -2,7 +2,7 @@ import json
 import urllib.request
 from time import sleep
 
-import logger
+from utils import logger
 
 
 class SongLoader:
@@ -17,7 +17,10 @@ class SongLoader:
         pass
 
     def load(self):
-        self.get_playlist()
+        if self.enabled:
+            # TODO or maybe this should be configurable?
+            # else:  # load songs only in case we are not in game to avoid lagg in game
+            self.get_playlist()
 
     def get_playlist(self):
         # TODO sleep to avoid too much requests

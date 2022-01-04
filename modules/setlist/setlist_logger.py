@@ -2,9 +2,8 @@ import datetime
 import os
 import pathlib
 
-import logger
-
-SETLIST_DIR = 'setlist'
+from utils import logger
+from utils.file_utils import SETLIST_DIR
 
 
 class SetlistLogger:
