@@ -3,7 +3,8 @@ import os
 import pathlib
 
 from utils import logger
-from utils.file_utils import SETLIST_DIR
+
+SETLIST_DIR = 'setlist'
 
 
 class SetlistLogger:
@@ -51,4 +52,5 @@ def setlist_file_name():
 
 
 def create_setlist_directory():
+    logger.log("Creating setlist director to: {}".format(os.path.join(SETLIST_DIR)))
     pathlib.Path(os.path.join(SETLIST_DIR)).mkdir(parents=True, exist_ok=True)

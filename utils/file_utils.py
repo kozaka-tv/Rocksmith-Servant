@@ -2,7 +2,6 @@ import os
 import pathlib
 
 LOG_DIR = 'log'
-SETLIST_DIR = '../../setlist'
 
 
 def create_log_dir():
