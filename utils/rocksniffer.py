@@ -1,6 +1,6 @@
+import json
 import os
-
-import requests
+from urllib.request import urlopen
 
 SNIFFER_ERROR_MSG = "Could not connect to Rocksniffer!" + os.linesep + os.linesep + os.linesep + \
                     "--------------------------------------------------" + os.linesep + \
@@ -44,7 +44,10 @@ class Rocksniffer:
         Get the content of Rocksniffer. In case of success, take a sample of the song time
         """
         try:
-            self.memory = requests.get("http://{}:{}/".format(self.host, self.port)).json()
+            request = "http://{}:{}/".format(self.host, self.port)
+            with urlopen(request) as response:
+                result = json.loads(response.read().decode(response.headers.get_content_charset('utf-8')))
+            self.memory = result
             if self.memory["success"]:
                 self.take_sample()
                 self.get_song_details()
