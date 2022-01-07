@@ -135,12 +135,23 @@ def put_the_song_into_the_setlist():
 def update_game_information():
     if sniffer.enabled:
         try:
-            if not sniffer.memory or sniffer.memory is None:
+            sniffer_not_loaded_before = sniffer_data_not_loaded()
+            if sniffer_not_loaded_before:
                 logger.warning("Try to connect to RockSniffer to get the information from Rocksmith...")
             sniffer.update()
+            if sniffer_not_loaded_before and sniffer_data_loaded():
+                logger.warning("...connected to RockSniffer...sniffing")
         except RocksnifferConnectionError as rce:
             sniffer.memory = None
             raise rce
+
+
+def sniffer_data_loaded():
+    return sniffer.memory and sniffer.memory is not None
+
+
+def sniffer_data_not_loaded():
+    return not sniffer_data_loaded()
 
 
 # Main 'endless' loop
