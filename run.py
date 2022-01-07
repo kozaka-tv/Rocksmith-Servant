@@ -131,7 +131,6 @@ def put_the_song_into_the_setlist():
         setlist_logger.log_a_song(sniffer.artistName + " - " + sniffer.songName)
 
 
-# TODO rename
 def update_game_information():
     if sniffer.enabled:
         try:
