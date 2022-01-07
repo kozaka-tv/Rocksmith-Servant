@@ -44,15 +44,18 @@ class Rocksniffer:
         Get the content of Rocksniffer. In case of success, take a sample of the song time
         """
         try:
-            request = "http://{}:{}/".format(self.host, self.port)
-            with urlopen(request) as response:
-                result = json.loads(response.read().decode(response.headers.get_content_charset('utf-8')))
-            self.memory = result
+            self.memory = self.get_sniffer_data()
             if self.memory["success"]:
                 self.take_sample()
                 self.get_song_details()
         except Exception:
             raise RocksnifferConnectionError(self.host, self.port)
+
+    def get_sniffer_data(self):
+        request = "http://{}:{}/".format(self.host, self.port)
+        with urlopen(request) as response:
+            result = json.loads(response.read().decode(response.headers.get_content_charset('utf-8')))
+        return result
 
     def get_song_details(self):
         self.artistName = self.memory['songDetails']['artistName']
