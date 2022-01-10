@@ -17,8 +17,6 @@ class FileManager:
         self.destination_directory = destination_directory
         self.using_cfsm = using_cfsm
 
-        logger.warning("FileManager is initialised!")
-
     def run(self):
         if self.enabled:
             self.move_cdlc_files(self.scan_cdlc_files_in_source_dirs())

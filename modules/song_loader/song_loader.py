@@ -20,7 +20,7 @@ class SongLoader:
     def load(self):
         if self.enabled:
             # TODO or maybe this should be configurable?
-            # else:  # load songs only in case we are not in game to avoid lagg in game
+            # else:  # load songs only in case we are not in game to avoid lagging in game
             self.get_playlist()
 
     def get_playlist(self):
