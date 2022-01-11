@@ -17,7 +17,8 @@ class SetlistLogger:
         """
         # Init setlist directory and file
         self.enabled = enabled
-        create_setlist_directory()
+        # TODO this should be maybe in run?
+        self.create_setlist_directory()
         self.file_name = setlist_file_name()
         self.write_to_setlist_file(
             "--------------------------------" + os.linesep +
@@ -29,9 +30,14 @@ class SetlistLogger:
         self.setlist = []
         self.last_song = None
 
+    def create_setlist_directory(self):
+        if self.enabled:
+            logger.warning("Creating setlist directory to: {}".format(os.path.join(SETLIST_DIR)))
+            pathlib.Path(os.path.join(SETLIST_DIR)).mkdir(parents=True, exist_ok=True)
+
     def log_a_song(self, song):
         if song not in self.setlist:
-            logger.warning("Song was added to setlist: " + song)
+            logger.log("Song was added to setlist: " + song)
             self.setlist.append(song)
             self.write_to_setlist_file(song)
 
@@ -49,8 +55,3 @@ def setlist_file_name():
     date = datetime.date.today()
     join = os.path.join(SETLIST_DIR, 'setlist_{}-{}-{}.txt')
     return join.format(date.year, str(date.month).zfill(2), str(date.day).zfill(2))
-
-
-def create_setlist_directory():
-    logger.log("Creating setlist director to: {}".format(os.path.join(SETLIST_DIR)))
-    pathlib.Path(os.path.join(SETLIST_DIR)).mkdir(parents=True, exist_ok=True)

@@ -6,9 +6,11 @@ from distutils import util
 from config.config_ini_template import serialized
 from utils import logger
 
-ERROR_MSG = "Error retrieving value from {} for section [{}] with key [{}]."
-PATH_CONFIG = os.path.join(os.path.dirname(__file__), "config.ini")
+CONFIG_FILE_NAME = "config.ini"
+PATH_CONFIG = os.path.join(os.path.dirname(__file__), CONFIG_FILE_NAME)
 PATH_CONFIG_TEMPLATE = os.path.join(os.path.dirname(__file__), "config_ini_template.py")
+
+ERROR_MSG = "Error retrieving value from {} for section [{}] with key [{}]."
 
 
 class ConfigTemplateError(Exception):
@@ -19,18 +21,25 @@ class ConfigTemplateError(Exception):
 class ConfigReader:
     def __init__(self):
 
-        logger.warning('Initialising ' + PATH_CONFIG + ' ...')
+        logger.warning('Initialising ' + CONFIG_FILE_NAME + ' from ' + PATH_CONFIG + ' ...')
+
+        self.last_modified = None
 
         # TODO remove content later and use variables only?
         self.content = self.load()
+
+        self.create_config_from_template_if_not_exists_and_stop()
+
         self.log_config()
 
-        self.last_modified = self.last_modification_time
+    def create_config_from_template_if_not_exists_and_stop(self):
         if self.last_modification_time == 0:
             self.save()
-            logger.warning('A config.ini file was created for you from a template in: ' + PATH_CONFIG)
-            logger.warning('Please change the values according to your needs, and then relaunch Rocksmith Servant!')
-            logger.warning('...now please press any key to exit this program.')
+            logger.error('Because this is the first run, and no ' + CONFIG_FILE_NAME +
+                         ' file was found, I created a configuration file for you from a template in: ' + PATH_CONFIG)
+            logger.log('Please change the values in the ' + CONFIG_FILE_NAME +
+                       ' file according to your needs, and then relaunch Rocksmith Servant!')
+            logger.warning('...press any key to exit this program.')
             input()
             sys.exit()
 
@@ -43,20 +52,24 @@ class ConfigReader:
         config.read(PATH_CONFIG, encoding="UTF-8")
         self.last_modified = self.last_modification_time
 
-        logger.warning(PATH_CONFIG + ' has been loaded!')
+        if self.last_modified != 0:
+            logger.warning(PATH_CONFIG + ' has been loaded!')
 
         return config
 
     # TODO actually this should be used by all the modules to log config out. Config, Debug, Run.
     # TODO enhance with other values? Or mage a debug part in the module itself? Would be better!
     def log_config(self):
+        logger.warning('')
         logger.warning('------- CONFIG ------------------------------------------------')
         self.log_enabled_modules()
-        logger.warning('RockSniffer.host=' + str(self.get('RockSniffer', 'host')))
-        logger.warning('RockSniffer.port=' + str(self.get('RockSniffer', 'port')))
-        logger.warning('Debugging.debug=' + str(self.get_bool('Debugging', 'debug')))
-        logger.warning('Debugging.debug_log_interval=' + str(self.get_int_value('Debugging', 'debug_log_interval')))
+        logger.warning('------- SOME IMPORTANT CONFIG VALUES --------------------------')
+        logger.log('RockSniffer.host=' + str(self.get('RockSniffer', 'host')))
+        logger.log('RockSniffer.port=' + str(self.get('RockSniffer', 'port')))
+        logger.log('Debugging.debug=' + str(self.get_bool('Debugging', 'debug')))
+        logger.log('Debugging.debug_log_interval=' + str(self.get_int_value('Debugging', 'debug_log_interval')))
         logger.warning('---------------------------------------------------------------')
+        logger.warning('')
 
     def log_enabled_modules(self):
         logger.error('--- Enabled Modules ---')
@@ -65,7 +78,7 @@ class ConfigReader:
         self.log_module_if_enabled('SongLoader')
         self.log_module_if_enabled('SceneSwitcher')
         self.log_module_if_enabled('FileManager')
-        logger.warning('---------------')
+        logger.error('---------------')
 
     def log_module_if_enabled(self, feature_name):
         if self.get_bool(feature_name, 'enabled'):

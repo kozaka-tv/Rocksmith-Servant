@@ -75,10 +75,14 @@ def update_config():
         # Updating Setlist Configurations
         setlist_logger.enabled = conf.get_bool(SECTION_SETLIST_LOGGER, KEY_ENABLED)
         setlist_logger.setlist_path = conf.get(SECTION_SETLIST_LOGGER, "setlist_path")
+        # TODO this should be maybe in run or in song_loader?
+        setlist_logger.create_setlist_directory()
 
         # Updating Song Loader Configurations
         song_loader.enabled = conf.get_bool(SECTION_SONG_LOADER, KEY_ENABLED)
         song_loader.allow_load_when_in_game = conf.get_bool(SECTION_SONG_LOADER, "allow_load_when_in_game")
+        # TODO this should be maybe in run or in song_loader?
+        song_loader.create_import_directory()
 
         # Updating Scene Switcher Configurations
         scene_switcher.enabled = conf.get_bool(SECTION_SCENE_SWITCHER, KEY_ENABLED)
@@ -136,7 +140,7 @@ def update_game_information():
         try:
             sniffer_not_loaded_before = sniffer_data_not_loaded()
             if sniffer_not_loaded_before:
-                logger.warning("Try to connect to RockSniffer to get the information from Rocksmith...")
+                logger.warning("Trying to connect to RockSniffer to get the information from Rocksmith...")
             sniffer.update()
             if sniffer_not_loaded_before and sniffer_data_loaded():
                 logger.warning("...connected to RockSniffer...sniffing")
