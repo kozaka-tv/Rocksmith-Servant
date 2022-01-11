@@ -26,7 +26,7 @@ class ConfigReader:
         self.last_modified = None
 
         # TODO remove content later and use variables only?
-        self.content = self.load()
+        self.content = self.load_content_from_config()
 
         self.create_config_from_template_if_not_exists_and_stop()
 
@@ -43,7 +43,7 @@ class ConfigReader:
             input()
             sys.exit()
 
-    def load(self):
+    def load_content_from_config(self):
         """
         Loads the default config and overwrites it with the config file
         :return: Config Object
@@ -64,10 +64,16 @@ class ConfigReader:
         logger.warning('------- CONFIG ------------------------------------------------')
         self.log_enabled_modules()
         logger.warning('------- SOME IMPORTANT CONFIG VALUES --------------------------')
-        logger.log('RockSniffer.host=' + str(self.get('RockSniffer', 'host')))
-        logger.log('RockSniffer.port=' + str(self.get('RockSniffer', 'port')))
-        logger.log('Debugging.debug=' + str(self.get_bool('Debugging', 'debug')))
-        logger.log('Debugging.debug_log_interval=' + str(self.get_int_value('Debugging', 'debug_log_interval')))
+
+        logger.log('RockSniffer.host = ' + str(self.get('RockSniffer', 'host')))
+        logger.log('RockSniffer.port = ' + str(self.get('RockSniffer', 'port')))
+
+        logger.log('SongLoader.cfsm_file_name = ' + str(self.get('SongLoader', 'cfsm_file_name')))
+        logger.log('SongLoader.allow_load_when_in_game = ' + str(self.get('SongLoader', 'allow_load_when_in_game')))
+
+        logger.log('Debugging.debug = ' + str(self.get_bool('Debugging', 'debug')))
+        logger.log('Debugging.debug_log_interval = ' + str(self.get_int_value('Debugging', 'debug_log_interval')))
+
         logger.warning('---------------------------------------------------------------')
         logger.warning('')
 
@@ -84,16 +90,15 @@ class ConfigReader:
         if self.get_bool(feature_name, 'enabled'):
             logger.warning(feature_name)
 
-    def reload(self):
+    def config_changed_and_reloaded(self):
         """
         Reload only if the config file has been changed
         :return: True if config file has been changed and it is reloaded else False
         """
-
-        if self.last_modification_time == self.last_modified:
+        if self.last_modified == self.last_modification_time:
             return False
         else:
-            self.content = self.load()
+            self.content = self.load_content_from_config()
             return True
 
     def save(self):
@@ -177,7 +182,7 @@ class ConfigReader:
             logger.log("For this type of key, please use either False, No, 0 or True, Yes, 1")
 
     def reload_if_changed(self):
-        if self.reload():
+        if self.config_changed_and_reloaded():
             logger.warning("Configuration has been reloaded!")
             self.log_config()
             return True

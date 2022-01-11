@@ -31,17 +31,16 @@ conf = ConfigReader()
 sniffer = Rocksniffer(
     conf.get_bool(SECTION_ROCK_SNIFFER, KEY_ENABLED),
     conf.get(SECTION_ROCK_SNIFFER, "host"),
-    conf.get(SECTION_ROCK_SNIFFER, "port"),
+    conf.get(SECTION_ROCK_SNIFFER, "port")
 )
 setlist_logger = SetlistLogger(
     conf.get_bool(SECTION_SETLIST_LOGGER, KEY_ENABLED),
-    conf.get(SECTION_SETLIST_LOGGER, "setlist_path"),
+    conf.get(SECTION_SETLIST_LOGGER, "setlist_path")
 )
 song_loader = SongLoader(
     conf.get_bool(SECTION_SONG_LOADER, KEY_ENABLED),
     conf.get_bool(SECTION_SONG_LOADER, "allow_load_when_in_game"),
-    # TODO
-    # conf.get(SongLoader, "setlist_path"),
+    conf.get(SECTION_SONG_LOADER, "cfsm_file_name")
 )
 scene_switcher = SceneSwitcher(
     conf.get_bool(SECTION_SCENE_SWITCHER, KEY_ENABLED)
@@ -81,6 +80,7 @@ def update_config():
         # Updating Song Loader Configurations
         song_loader.enabled = conf.get_bool(SECTION_SONG_LOADER, KEY_ENABLED)
         song_loader.allow_load_when_in_game = conf.get_bool(SECTION_SONG_LOADER, "allow_load_when_in_game")
+        song_loader.cfsm_file_name = conf.get(SECTION_SONG_LOADER, "cfsm_file_name")
         # TODO this should be maybe in run or in song_loader?
         song_loader.create_import_directory()
 

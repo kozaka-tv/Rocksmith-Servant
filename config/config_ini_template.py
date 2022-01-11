@@ -10,6 +10,7 @@ serialized = {
     },
     "SongLoader": {
         "enabled": False,
+        "cfsm_file_name": "SongsMasterGrid.json",
         "allow_load_when_in_game": True,
     },
     "SceneSwitcher": {

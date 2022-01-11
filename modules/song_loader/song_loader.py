@@ -11,15 +11,14 @@ DEFAULT_CFSM_FILE_NAME = 'SongsMasterGrid.json'
 
 
 class SongLoader:
-    def __init__(self, enabled, allow_load_when_in_game):
-        """
-        Song Loader
-        :param enabled: Is the Module enabled?
-        """
+    def __init__(self, enabled, allow_load_when_in_game, cfsm_file_name):
         self.enabled = enabled
         self.allow_load_when_in_game = allow_load_when_in_game
+        self.cfsm_file_name = cfsm_file_name
+
         # TODO maybe call this different...do we need this?
         self.raw_playlist = None
+
         # TODO this should be maybe in run?
         self.create_import_directory()
 
@@ -32,7 +31,8 @@ class SongLoader:
     def load(self):
         if self.enabled:
             # TODO remove this log
-            logger.log("Song Loader is running...")
+            logger.log("Song Loader is running... " + self.cfsm_file_name)
+            pass
             # TODO or maybe this should be configurable?
             # else:  # load songs only in case we are not in game to avoid lagging in game
             # self.get_playlist()
