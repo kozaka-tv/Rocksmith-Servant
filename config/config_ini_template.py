@@ -10,6 +10,7 @@ serialized = {
     },
     "SongLoader": {
         "enabled": False,
+        "cdlc_dir": "import",
         "cfsm_file_name": "SongsMasterGrid.json",
         "allow_load_when_in_game": True,
     },

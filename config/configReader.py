@@ -60,7 +60,6 @@ class ConfigReader:
     # TODO actually this should be used by all the modules to log config out. Config, Debug, Run.
     # TODO enhance with other values? Or mage a debug part in the module itself? Would be better!
     def log_config(self):
-        logger.warning('')
         logger.warning('------- CONFIG ------------------------------------------------')
         self.log_enabled_modules()
         logger.warning('------- SOME IMPORTANT CONFIG VALUES --------------------------')
@@ -75,7 +74,6 @@ class ConfigReader:
         logger.log('Debugging.debug_log_interval = ' + str(self.get_int_value('Debugging', 'debug_log_interval')))
 
         logger.warning('---------------------------------------------------------------')
-        logger.warning('')
 
     def log_enabled_modules(self):
         logger.error('--- Enabled Modules ---')

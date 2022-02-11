@@ -1,0 +1,36 @@
+Create the first song database structure in MongoDB.
+
+Columns needed:
+------------------- From CFSM -----------------
+name: dgvSongsMaster
+- id
+- Artist": "Volbeat",
+- Title": " Guitar Gangsters & Cadillac Blood",
+- Album": " Guitar Gangsters & Cadillac Blood",
+- Key": "GuitarGangstersCadillacBlood",
+- Arrangements": "Bass, Lead, Rhythm, Vocals",
+- Tunings": "DGCFBE, D Standard, D Standard",
+- SongLength": "191,826",
+- RepairStatus": "Repaired",
+- SongYear": "2008",
+- SongVolume": "0",
+- FileName": "cdlc\\Volbeat_Guitar-Gangsters--Cadillac-Blood_p.psarc",
+- FileDate": "2020. 07. 18. 20:07:13",
+- AppID": "248750",
+- PackageAuthor": "Custom Song Creator",
+- PackageVersion": "1",
+- Tagged": "False",
+- IgnitionID": null,
+- IgnitionDate": null,
+- IgnitionVersion": null,
+- IgnitionAuthor": null,
+- ArtistTitleAlbum": "Volbeat;Guitar Gangsters & Cadillac Blood;Guitar Gangsters & Cadillac Blood",
+- ArtistTitleAlbumDate": "Volbeat;Guitar Gangsters & Cadillac Blood;Guitar Gangsters & Cadillac Blood;2015-01-06T17:57:00",
+- ArtistSort": "Volbeat"
+
+--------- From RS Playlist ---------------
+name: playlist
+
+
+
+--------- From CF

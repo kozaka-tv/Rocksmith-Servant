@@ -1,0 +1,171 @@
+{
+  "playlist": [
+    {
+      "id": 1203830,
+      "vip": false,
+      "position": 1,
+      "string": "Rammstein Der Meist",
+      "tags": [],
+      "request_timestamp": 1640050331,
+      "viewer": {
+        "username": "kozaka",
+        "twitch_id": 113757471,
+        "badges": [
+          "broadcaster\/1",
+          "subscriber\/3012"
+        ],
+        "present": true,
+        "inactive": true,
+        "inactive_time": -16935
+      },
+      "dlc_set": [
+        {
+          "id": 8089,
+          "cdlc_id": 29708,
+          "artist": "Rammstein",
+          "artist_id": 716,
+          "title": "Der Meister",
+          "album": "Herzeleid",
+          "tuning": 8,
+          "parts": null,
+          "dd": true,
+          "official": 0,
+          "creator": "Bojar",
+          "estimated_length": 250,
+          "trr_url": null,
+          "updated": 1497854729,
+          "downloads": 1466,
+          "tuning_name": "DROP D",
+          "paths": 15,
+          "paths_string": "L,R,B,V"
+        },
+        {
+          "id": 89460,
+          "cdlc_id": 58565,
+          "artist": "Rammstein",
+          "artist_id": 716,
+          "title": "Der Meister Live at Koln",
+          "album": "Herzeleid",
+          "tuning": 8,
+          "parts": null,
+          "dd": false,
+          "official": 0,
+          "creator": "Ziplob",
+          "estimated_length": 0,
+          "trr_url": null,
+          "updated": 1619083345,
+          "downloads": 119,
+          "tuning_name": "DROP D",
+          "paths": 3,
+          "paths_string": "L,R"
+        },
+        {
+          "id": 92397,
+          "cdlc_id": 61456,
+          "artist": "Rammstein",
+          "artist_id": 716,
+          "title": "Der Meister Backing track",
+          "album": "Herzeleid",
+          "tuning": 8,
+          "parts": null,
+          "dd": false,
+          "official": 0,
+          "creator": "Ziplob",
+          "estimated_length": 0,
+          "trr_url": null,
+          "updated": 1629405009,
+          "downloads": 83,
+          "tuning_name": "DROP D",
+          "paths": 2,
+          "paths_string": "R"
+        }
+      ]
+    }
+  ],
+  "channel_tags": {
+    "nomatch": {
+      "name": "NO MATCHES",
+      "icon": "fas fa-exclamation-triangle",
+      "color": "#ffa500",
+      "user": false
+    },
+    "official": {
+      "name": "OFFICIAL",
+      "icon": "fas fa-certificate",
+      "color": "#7ecc8b",
+      "user": false
+    },
+    "notowned": {
+      "name": "NOT OWNED",
+      "icon": "fas fa-dollar-sign",
+      "color": "#f3253f",
+      "user": false
+    },
+    "ondisc": {
+      "name": "ON DISC",
+      "icon": "fas fa-certificate",
+      "color": "#6c74e2",
+      "user": false
+    },
+    "guitar": {
+      "name": "GUITAR",
+      "icon": "fas fa-microchip",
+      "color": "#fe8141",
+      "user": false
+    },
+    "lead": {
+      "name": "LEAD",
+      "icon": "fas fa-microchip",
+      "color": "#fe8141",
+      "user": false
+    },
+    "rhythm": {
+      "name": "RHYTHM",
+      "icon": "fas fa-microchip",
+      "color": "#29d745",
+      "user": false
+    },
+    "bass": {
+      "name": "BASS",
+      "icon": "fas fa-fish",
+      "color": "#04abed",
+      "user": false
+    },
+    "random": {
+      "name": "RANDOM",
+      "icon": "fas fa-dice",
+      "color": "#dd68a8",
+      "user": false
+    },
+    "choice": {
+      "name": "STREAMERS CHOICE",
+      "icon": "fas fa-broadcast-tower",
+      "color": "#bf8be0",
+      "user": false
+    },
+    "5039d42b": {
+      "name": "\u00daJ N\u00c9Z\u0150 K\u00c9R\u00c9SE",
+      "icon": "fas fa-child",
+      "color": "#faff00",
+      "user": true
+    },
+    "23bc8be2": {
+      "name": "RAID K\u00c9R\u00c9S",
+      "icon": "fas fa-book-dead",
+      "color": "#003fff",
+      "user": true
+    },
+    "8c8c2924": {
+      "name": "LE KELL T\u00d6LTENI!",
+      "icon": "fas fa-exclamation-triangle",
+      "color": "#ff0000",
+      "user": true
+    },
+    "f152751e": {
+      "name": "LET\u00d6LTVE",
+      "icon": "fas fa-check-circle",
+      "color": "#0eff00",
+      "user": true
+    }
+  }
+}

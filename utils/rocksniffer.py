@@ -2,13 +2,13 @@ import json
 import os
 from urllib.request import urlopen
 
-SNIFFER_ERROR_MSG = "Could not connect to Rocksniffer!" + os.linesep + os.linesep + os.linesep + \
+SNIFFER_ERROR_MSG = "--- Could not connect to Rocksniffer!" + os.linesep + \
                     "--------------------------------------------------" + os.linesep + \
                     "Please check that is Rocksniffer running or not!" + os.linesep + \
                     "Please check host and port defined in config:" + os.linesep + \
                     "host={}" + os.linesep + \
                     "port={}" + os.linesep + \
-                    "--------------------------------------------------" + os.linesep + os.linesep
+                    "--------------------------------------------------"
 
 
 class RocksnifferConnectionError(Exception):

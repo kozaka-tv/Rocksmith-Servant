@@ -134,5 +134,4 @@ dmypy.json
 /log_*.txt
 /log/
 /setlist/
-/temp/
 /import/

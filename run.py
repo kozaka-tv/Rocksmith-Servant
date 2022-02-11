@@ -10,6 +10,10 @@ from utils import logger
 from utils.debug import Debugger
 from utils.rocksniffer import Rocksniffer, RocksnifferConnectionError
 
+logger.warning("------------------------------------------------------------------------")
+logger.warning("----- SERVANT IS STARTING ----------------------------------------------")
+logger.warning("------------------------------------------------------------------------")
+
 # TODO move this to config.py and use it everywhere? Also in config reader we could use them!
 # Section name definitions
 SECTION_ROCK_SNIFFER = "RockSniffer"
@@ -39,8 +43,9 @@ setlist_logger = SetlistLogger(
 )
 song_loader = SongLoader(
     conf.get_bool(SECTION_SONG_LOADER, KEY_ENABLED),
-    conf.get_bool(SECTION_SONG_LOADER, "allow_load_when_in_game"),
-    conf.get(SECTION_SONG_LOADER, "cfsm_file_name")
+    conf.get(SECTION_SONG_LOADER, "cdlc_dir"),
+    conf.get(SECTION_SONG_LOADER, "cfsm_file_name"),
+    conf.get_bool(SECTION_SONG_LOADER, "allow_load_when_in_game")
 )
 scene_switcher = SceneSwitcher(
     conf.get_bool(SECTION_SCENE_SWITCHER, KEY_ENABLED)
@@ -79,17 +84,18 @@ def update_config():
 
         # Updating Song Loader Configurations
         song_loader.enabled = conf.get_bool(SECTION_SONG_LOADER, KEY_ENABLED)
-        song_loader.allow_load_when_in_game = conf.get_bool(SECTION_SONG_LOADER, "allow_load_when_in_game")
+        song_loader.cdlc_dir = conf.get(SECTION_SONG_LOADER, "cdlc_dir")
         song_loader.cfsm_file_name = conf.get(SECTION_SONG_LOADER, "cfsm_file_name")
+        song_loader.allow_load_when_in_game = conf.get_bool(SECTION_SONG_LOADER, "allow_load_when_in_game")
         # TODO this should be maybe in run or in song_loader?
-        song_loader.create_import_directory()
+        song_loader.create_cdlc_directory()
 
         # Updating Scene Switcher Configurations
         scene_switcher.enabled = conf.get_bool(SECTION_SCENE_SWITCHER, KEY_ENABLED)
 
         # Updating FileManager Configurations
         file_manager.enabled = conf.get_bool(SECTION_FILE_MANAGER, KEY_ENABLED)
-        file_manager.source_directories = conf.get_list(SECTION_FILE_MANAGER, "source_directories")
+        file_manager.source_directories = conf.get_list(SECTION_FILE_MANAGER, "directories")
         file_manager.destination_directory = conf.get(SECTION_FILE_MANAGER, "destination_directory")
         file_manager.using_cfsm = conf.get(SECTION_FILE_MANAGER, "using_cfsm")
 
