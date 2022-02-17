@@ -6,8 +6,8 @@ from datetime import datetime, timedelta
 
 from utils import logger
 
+FILE_AGE = 15
 LOG_DIR = 'log'
-
 CDLC_FILE_EXT = '*.psarc'
 
 
@@ -51,7 +51,8 @@ def get_files(cdlc_files, directory, module_name, pattern, older=False):
 
 def is_file_old(filename):
     file_datetime = datetime.fromtimestamp(os.path.getmtime(filename))
-    cutoff = datetime.now() - timedelta(seconds=10)
+    # TODO maybe this FILE_AGE should come from the module. To define in the module what is an aged file!?
+    cutoff = datetime.now() - timedelta(seconds=FILE_AGE)
     if file_datetime < cutoff:
         return True
     return False
@@ -66,6 +67,11 @@ def move_files(files, destination, module_name):
         logger.log('Moving {} files to: {}'.format(len(files), destination), module_name)
         for file in files:
             logger.log('Moving: {}'.format(file), module_name)
+            destination_file = os.path.join(destination, os.path.basename(file))
+            if os.path.isfile(destination_file):
+                logger.warning('File already exists, removing: {}'.format(destination_file), module_name)
+                os.remove(destination_file)
+
             shutil.move(file, destination)
 
 

@@ -10,6 +10,8 @@ from utils import logger
 from utils.debug import Debugger
 from utils.rocksniffer import Rocksniffer, RocksnifferConnectionError
 
+HEARTBEAT = 0.1
+
 logger.warning("------------------------------------------------------------------------")
 logger.warning("----- SERVANT IS STARTING ----------------------------------------------")
 logger.warning("------------------------------------------------------------------------")
@@ -95,7 +97,7 @@ def update_config():
 
         # Updating FileManager Configurations
         file_manager.enabled = conf.get_bool(SECTION_FILE_MANAGER, KEY_ENABLED)
-        file_manager.source_directories = conf.get_list(SECTION_FILE_MANAGER, "directories")
+        file_manager.source_directories = conf.get_list(SECTION_FILE_MANAGER, "source_directories")
         file_manager.destination_directory = conf.get(SECTION_FILE_MANAGER, "destination_directory")
         file_manager.using_cfsm = conf.get(SECTION_FILE_MANAGER, "using_cfsm")
 
@@ -111,14 +113,18 @@ def update_config():
 def get_debug_message():
     # TODO OBS
     # TODO Behaviour
-    modules_str = "--- Modules ---" + os.linesep + \
-                  SECTION_ROCK_SNIFFER + ": {sniffer.enabled}" + os.linesep + \
-                  SECTION_SETLIST_LOGGER + ": {setlist_logger.enabled}" + os.linesep + \
-                  SECTION_SONG_LOADER + ": {song_loader.enabled}" + os.linesep + \
-                  SECTION_SCENE_SWITCHER + ": {scene_switcher.enabled}" + os.linesep + \
-                  SECTION_FILE_MANAGER + ": {file_manager.enabled}" + os.linesep + \
-                  "".format(sniffer=sniffer, setlist_logger=setlist_logger, song_loader=song_loader) + os.linesep + \
-                  "---------------" + os.linesep
+    modules_str = "--- Enabled modules ---" + os.linesep
+    if sniffer.enabled:
+        modules_str += SECTION_ROCK_SNIFFER + os.linesep
+    if setlist_logger.enabled:
+        modules_str += SECTION_SETLIST_LOGGER + os.linesep
+    if song_loader.enabled:
+        modules_str += SECTION_SONG_LOADER + os.linesep
+    if scene_switcher.enabled:
+        modules_str += SECTION_SCENE_SWITCHER + os.linesep
+    if file_manager.enabled:
+        modules_str += SECTION_FILE_MANAGER + os.linesep
+    modules_str += "---------------" + os.linesep
 
     sniffer_str = "Song: {sniffer.artistName} - {sniffer.songName} " \
                   "({sniffer.albumYear}, {sniffer.albumName}), " \
@@ -167,8 +173,8 @@ def sniffer_data_not_loaded():
 while True:
 
     try:
-        # Sleep a bit
-        sleep(0.1)
+        # Sleep a bit to avoid too fast processing
+        sleep(HEARTBEAT)
 
         update_config()
 
@@ -182,5 +188,5 @@ while True:
         debugger.log_on_interval(get_debug_message())
 
     # Catch and log all the known exceptions, but keep app alive.
-    except RocksnifferConnectionError as error:
-        logger.error(error)
+    except Exception as ex:
+        logger.error(ex)

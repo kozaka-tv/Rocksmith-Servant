@@ -1,7 +1,9 @@
-from time import sleep
+from time import time, sleep
 
 from definitions import ROOT_DIR
 from utils import logger, file_utils
+
+HEARTBEAT = 15
 
 MODULE_NAME = "FileManager"
 
@@ -12,21 +14,30 @@ class FileManager:
         File manager to manage CDLC files
         """
         self.enabled = enabled
+        self.last_run = time()
         self.source_directories = source_directories
         self.destination_directory = destination_directory
         self.using_cfsm = using_cfsm
 
     def run(self):
         if self.enabled:
-            files_to_move_from_destination_dir = self.scan_cdlc_files_in_destination_dir()
-            self.move_not_enumerated_cdlc_files(files_to_move_from_destination_dir)
-            sleep(5)  # TODO remove
+            if time() - self.last_run >= HEARTBEAT:
+                self.move_not_parsed_files()
+
             files_to_move_in_source_dir = self.scan_cdlc_files_in_root()
             self.move_downloaded_cdlc_files(files_to_move_in_source_dir)
-            sleep(5)  # TODO remove
+
             files_to_move_in_source_dir = self.scan_cdlc_files_in_source_dirs()
             self.move_downloaded_cdlc_files(files_to_move_in_source_dir)
-            sleep(5)  # TODO remove
+
+    def move_not_parsed_files(self):
+        files_to_move_from_destination_dir = self.scan_cdlc_files_in_destination_dir()
+
+        if len(files_to_move_from_destination_dir) > 0:
+            self.move_not_enumerated_cdlc_files(files_to_move_from_destination_dir)
+            sleep(2)  # wait a bit
+
+        self.last_run = time()
 
     @staticmethod
     def scan_cdlc_files_in_root():
