@@ -3,10 +3,11 @@ import os
 import sqlite3
 from datetime import datetime
 
-JSON_FILE = 'SongsMasterGrid.json'
-# JSON_FILE = 'SongsMasterGrid_BIG.json'
+# JSON_FILE = '../../import/SongsMasterGrid.json'
+JSON_FILE = '../../import/SongsMasterGrid_BIG.json'
+# JSON_FILE = '../../import/SongsMasterGrid_SMALL.json'
 
-db = sqlite3.connect('servant.db')
+db = sqlite3.connect('../../servant.db')
 
 
 def file_datetime(filename):
@@ -44,7 +45,7 @@ with open(JSON_FILE, encoding='utf-8-sig') as json_file:
 
     # Time to generate the create and insert queries and apply it to the sqlite3 database
     drop_query = "drop table if exists songs"
-    create_query = "create table if not exists songs ({0})".format(" text,".join(columns))
+    create_query = "create table if not exists songs ({0}, 'dlc_id')".format(" text,".join(columns))
     insert_query = "insert into songs ({0}) values (?{1})".format(",".join(columns), ",?" * (len(columns) - 1))
     print("insert has started at " + str(datetime.now()))
     c = db.cursor()
