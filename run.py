@@ -8,7 +8,7 @@ from modules.setlist.setlist_logger import SetlistLogger
 from modules.song_loader.song_loader import SongLoader
 from utils import logger
 from utils.debug import Debugger
-from utils.rocksniffer import Rocksniffer, RocksnifferConnectionError
+from utils.rocksniffer import Rocksniffer, RocksnifferConnectionError, RSPlaylistNotLoggedInError
 
 HEARTBEAT = 0.1
 
@@ -188,5 +188,6 @@ while True:
         debugger.log_on_interval(get_debug_message())
 
     # Catch and log all the known exceptions, but keep app alive.
-    except Exception as ex:
-        logger.error(ex)
+    except (RocksnifferConnectionError, RSPlaylistNotLoggedInError) as error:
+        logger.error(error)
+        sleep(5)

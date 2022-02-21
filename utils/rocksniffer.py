@@ -10,10 +10,21 @@ SNIFFER_ERROR_MSG = "--- Could not connect to Rocksniffer!" + os.linesep + \
                     "port={}" + os.linesep + \
                     "--------------------------------------------------"
 
+RSPL_LOGIN_ERROR_MSG = "--- PHPSESSID in from the cookies in the config is not valid anymore!" + os.linesep + \
+                       "--------------------------------------------------" + os.linesep + \
+                       "Please login on RS Playlist page and get the PHPSESSID from the cookies!" + os.linesep + \
+                       "Then add it to the config and restart!" + os.linesep + \
+                       "--------------------------------------------------"
+
 
 class RocksnifferConnectionError(Exception):
     def __init__(self, host, port):
         super().__init__(SNIFFER_ERROR_MSG.format(host, port))
+
+
+class RSPlaylistNotLoggedInError(Exception):
+    def __init__(self):
+        super().__init__(RSPL_LOGIN_ERROR_MSG)
 
 
 class Rocksniffer:

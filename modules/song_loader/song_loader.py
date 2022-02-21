@@ -6,6 +6,7 @@ from time import sleep
 import requests
 
 from utils import logger, file_utils
+from utils.rocksniffer import RSPlaylistNotLoggedInError
 
 MODULE_NAME = "SongLoader"
 CDLC_DIR = '../../import'
@@ -75,11 +76,15 @@ class SongLoader:
 
         for sr in playlist["playlist"]:
             for cdlc in sr["dlc_set"]:
-                id_ = cdlc["id"]
+                try:
+                    rspl_id = cdlc['id']
+                except TypeError:
+                    raise RSPlaylistNotLoggedInError
+
                 cdlc_id = cdlc["cdlc_id"]
                 artist = cdlc["artist"]
                 title = cdlc["title"]
-                # logger.log(str(id_) + " - " + str(cdlc_id) + " - " + artist + " - " + title)
+                # logger.log(str(rspl_id) + " - " + str(cdlc_id) + " - " + artist + " - " + title)
 
                 with con:
                     cur = con.cursor()
