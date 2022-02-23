@@ -17,6 +17,7 @@ def file_datetime(filename):
     return formatted_time
 
 
+# TODO this is ment to check that the file is new/changed or not. Means do we need to import it or not.
 file_datetime(JSON_FILE)
 
 with open(JSON_FILE, encoding='utf-8-sig') as json_file:
@@ -39,7 +40,10 @@ with open(JSON_FILE, encoding='utf-8-sig') as json_file:
     values = []
     for data in json_data:
         for i in columns:
-            value.append(str(dict(data).get(i)).strip())
+            if i == 'colFileName':
+                value.append(str(dict(data).get(i)).strip().replace('cdlc\\', ''))
+            else:
+                value.append(str(dict(data).get(i)).strip())
         values.append(list(value))
         value.clear()
 
@@ -47,13 +51,20 @@ with open(JSON_FILE, encoding='utf-8-sig') as json_file:
     drop_query = "drop table if exists songs"
     create_query = "create table if not exists songs ({0}, 'dlc_id')".format(" text,".join(columns))
     insert_query = "insert into songs ({0}) values (?{1})".format(",".join(columns), ",?" * (len(columns) - 1))
+
     print("insert has started at " + str(datetime.now()))
+
     c = db.cursor()
     c.execute(drop_query)
     db.commit()
+
     c.execute(create_query)
+
     c.executemany(insert_query, values)
     values.clear()
+
     db.commit()
+
     c.close()
+
     print("insert has completed at " + str(datetime.now()))

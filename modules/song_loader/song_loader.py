@@ -69,7 +69,7 @@ class SongLoader:
 
         rs_playlist_url = "https://rsplaylist.com/ajax/playlist.php?channel=kozaka"
         # TODO get the PHPSESSID from config!
-        cookies = {'PHPSESSID': '4hsjtoq26pvtavh062jdsplfp8'}
+        cookies = {'PHPSESSID': 'sd97asd9879as79d79as7d97as'}
 
         playlist = requests.get(rs_playlist_url, cookies=cookies).json()
         # logger.log(playlist)

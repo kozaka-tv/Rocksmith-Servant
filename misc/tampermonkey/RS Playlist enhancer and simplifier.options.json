@@ -1,0 +1,43 @@
+{
+  "options": {
+    "check_for_updates": false,
+    "comment": "",
+    "compatopts_for_requires": true,
+    "compat_wrappedjsobject": false,
+    "compat_metadata": false,
+    "compat_foreach": false,
+    "compat_prototypes": false,
+    "noframes": null,
+    "unwrap": null,
+    "run_at": null,
+    "tab_types": null,
+    "override": {
+      "merge_connects": true,
+      "merge_excludes": true,
+      "merge_includes": true,
+      "merge_matches": true,
+      "orig_connects": [],
+      "orig_excludes": [],
+      "orig_includes": [],
+      "orig_matches": [
+        "https://rsplaylist.com/playlist/*"
+      ],
+      "orig_noframes": null,
+      "orig_run_at": "document-idle",
+      "use_blockers": [],
+      "use_connects": [],
+      "use_excludes": [],
+      "use_includes": [],
+      "use_matches": []
+    }
+  },
+  "settings": {
+    "enabled": true,
+    "position": 6
+  },
+  "meta": {
+    "name": "RS Playlist enhancer and simplifier",
+    "uuid": "1898e28f-ee3b-4b21-92b8-dd646d3dda31",
+    "modified": 1645626093123
+  }
+}
