@@ -16,15 +16,20 @@ con = sqlite3.connect('./servant.db')
 
 
 class SongLoader:
-    def __init__(self, enabled, cdlc_dir='import', cfsm_file_name=DEFAULT_CFSM_FILE_NAME,
+    def __init__(self, enabled, phpsessid: str, cdlc_dir='import', cfsm_file_name=DEFAULT_CFSM_FILE_NAME,
                  allow_load_when_in_game=True):
         self.enabled = enabled
+        self.phpsessid = phpsessid
         self.cdlc_dir = os.path.join(cdlc_dir)
         self.cfsm_file_name = cfsm_file_name
         self.songs_to_load = os.path.join(cdlc_dir, cfsm_file_name)
         self.allow_load_when_in_game = allow_load_when_in_game
 
         self.first_run = True
+
+        if self.phpsessid is None or self.phpsessid.startswith('<Enter your'):
+            raise RuntimeError("Please set your PHP Session ID from the cookie "
+                               "of the RS Playlist after login in the config before you use the Song Loader!")
 
         # TODO maybe call this different...do we need this?
         self.raw_playlist = None
@@ -68,11 +73,9 @@ class SongLoader:
         # sleep(3)
 
         rs_playlist_url = "https://rsplaylist.com/ajax/playlist.php?channel=kozaka"
-        # TODO get the PHPSESSID from config!
-        cookies = {'PHPSESSID': 'sd97asd9879as79d79as7d97as'}
+        cookies = {'PHPSESSID': self.phpsessid}
 
         playlist = requests.get(rs_playlist_url, cookies=cookies).json()
-        # logger.log(playlist)
 
         for sr in playlist["playlist"]:
             for cdlc in sr["dlc_set"]:

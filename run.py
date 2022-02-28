@@ -45,6 +45,7 @@ setlist_logger = SetlistLogger(
 )
 song_loader = SongLoader(
     conf.get_bool(SECTION_SONG_LOADER, KEY_ENABLED),
+    conf.get(SECTION_SONG_LOADER, "PHPSESSID"),
     conf.get(SECTION_SONG_LOADER, "cdlc_dir"),
     conf.get(SECTION_SONG_LOADER, "cfsm_file_name"),
     conf.get_bool(SECTION_SONG_LOADER, "allow_load_when_in_game")
