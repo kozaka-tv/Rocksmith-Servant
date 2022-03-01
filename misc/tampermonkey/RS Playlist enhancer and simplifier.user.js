@@ -4,22 +4,50 @@
 // @version      0.1
 // @description  Removes unnecessary elements from the page like Logo and footer and reads out from the cookies the PHPSESSID value and puts it to the bottom of the list.
 // @author       kozaka
-// @match        https://rsplaylist.com/playlist/*
+// @match        https://rsplaylist.com/*
 // @icon         https://rsplaylist.com/favicon-32x32.png
 // @grant        none
-// @require      @require http://code.jquery.com/jquery-3.6.0.min.js
+// @require      file://c:\work\kozaka-tv\Rocksmith-Servant\misc\tampermonkey\RS Playlist enhancer and simplifier.user.js
 // ==/UserScript==
+/* globals jQuery, $, waitForKeyElements */
 
+(
+    function () {
+        'use strict';
 
-(function () {
-    'use strict';
+        $("div.logo").remove();
+        $("div.footer").remove();
 
-    $("div.logo").remove();
-    $("div.footer").remove();
+        $('div.content').attr('style', 'width: 95%');
+        $('div.request-header-columns').attr('style', 'display: flex; align-items: stretch; flex-direction: row; margin-bottom: 00px;');
 
-    $('div.content').attr('style', 'width: 95%');
-    $('div.request-header-columns').attr('style', 'display: flex; align-items: stretch; flex-direction: row; margin-bottom: 00px;');
+        $("div.playlist").append(`
+            <div class="cookie" style="color: white; text-align: center; padding: 10px">
+                <input type="hidden" name="PHPSESSID" value="` + extractPHPSESSIDFromCookie() + `" id="myInput">
+                <button id="copyButton">Copy your PHPSESSID to clipboard</button>
+            </div>
+        `);
 
-    $("div.playlist").append(`<div class="cookie" style="color: white; text-align: center"><p>` + document.cookie + `</p></div>`);
+        $('#copyButton').click(function (event) {
+            copyToClipboard();
+        });
 
-})();
+        function extractPHPSESSIDFromCookie() {
+            if (document.cookie.split(';').some((item) => item.trim().startsWith('PHPSESSID='))) {
+                return document.cookie
+                    .split('; ')
+                    .find(row => row.startsWith('PHPSESSID='))
+                    .split('=')[1];
+            }
+            return "";
+        }
+
+        function copyToClipboard() {
+            let phpsessidElement = document.getElementsByName("PHPSESSID")[0];
+            phpsessidElement.select();
+            navigator.clipboard.writeText(phpsessidElement.value);
+            alert("Your PHPSESSID has been copied to the clipboard!\n(PHPSESSID = " + phpsessidElement.value + ")");
+        }
+
+    }
+)();
