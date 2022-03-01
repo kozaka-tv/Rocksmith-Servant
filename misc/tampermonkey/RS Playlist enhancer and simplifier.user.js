@@ -1,13 +1,18 @@
 // ==UserScript==
 // @name         RS Playlist enhancer and simplifier
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      0.2
 // @description  Removes unnecessary elements from the page like Logo and footer and reads out from the cookies the PHPSESSID value and puts it to the bottom of the list.
 // @author       kozaka
 // @match        https://rsplaylist.com/*
 // @icon         https://rsplaylist.com/favicon-32x32.png
 // @grant        none
 // @require      file://c:\work\kozaka-tv\Rocksmith-Servant\misc\tampermonkey\RS Playlist enhancer and simplifier.user.js
+// @homepage     https://github.com/kozaka-tv/Rocksmith-Servant
+// @homepageURL  https://github.com/kozaka-tv/Rocksmith-Servant
+// @downloadURL  https://github.com/kozaka-tv/Rocksmith-Servant/blob/main/misc/tampermonkey/RS%20Playlist%20enhancer%20and%20simplifier.user.js
+// @updateURL    https://github.com/kozaka-tv/Rocksmith-Servant/blob/main/misc/tampermonkey/RS%20Playlist%20enhancer%20and%20simplifier.user.js
+// @supportURL   https://github.com/kozaka-tv/Rocksmith-Servant/issues
 // ==/UserScript==
 /* globals jQuery, $, waitForKeyElements */
 
