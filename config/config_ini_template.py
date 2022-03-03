@@ -12,7 +12,8 @@ serialized = {
         "enabled": False,
         "cdlc_dir": "import",
         "cfsm_file_name": "SongsMasterGrid.json",
-        "cdlc_archive_dir": "<Enter your CDLC archive directory, where you normally store all of your downloaded CDLCs>",
+        "cdlc_archive_dir": "<Enter your CDLC archive directory, where you store all of your downloaded CDLCs>",
+        "rocksmith_cdlc_dir": "<Enter your Rocksmith CDLC directory, where you have all the loaded CDLC songs>",
         "allow_load_when_in_game": True,
         "phpsessid": "<Enter your PHP Session ID from the cookie of the RS Playlist after login>"
     },

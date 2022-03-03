@@ -69,6 +69,7 @@ class ConfigReader:
 
         logger.log('SongLoader.cfsm_file_name = ' + str(self.get('SongLoader', 'cfsm_file_name')))
         logger.log('SongLoader.cdlc_archive_dir = ' + str(self.get('SongLoader', 'cdlc_archive_dir')))
+        logger.log('SongLoader.rocksmith_cdlc_dir = ' + str(self.get('SongLoader', 'rocksmith_cdlc_dir')))
         logger.log('SongLoader.allow_load_when_in_game = ' + str(self.get('SongLoader', 'allow_load_when_in_game')))
 
         logger.log('Debugging.debug = ' + str(self.get_bool('Debugging', 'debug')))

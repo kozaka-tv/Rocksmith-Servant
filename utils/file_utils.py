@@ -19,6 +19,9 @@ def create_cdlc_dir():
     pathlib.Path(os.path.join(LOG_DIR)).mkdir(parents=True, exist_ok=True)
 
 
+# TODO refactor all this:
+# cdlc_files = [] >> get_files(cdlc_files, directory) >> why like this? This method should just return the new set.
+# or was it not recursive? And that's the why it is like that?
 def get_files_from_directory(directory):
     cdlc_files = []
     get_files(cdlc_files, directory)
@@ -49,6 +52,14 @@ def get_files(cdlc_files, directory, older=False):
                 cdlc_files.append(file)
 
 
+def get_file_names_from(directory):
+    cdlc_files = set()
+    for root, dir_names, filenames in os.walk(directory):
+        for filename in fnmatch.filter(filenames, CDLC_FILE_EXT):
+            cdlc_files.add(filename)
+    return cdlc_files
+
+
 def is_file_old(filename):
     file_datetime = datetime.fromtimestamp(os.path.getmtime(filename))
     # TODO maybe this FILE_AGE should come from the module. To define in the module what is an aged file!?
@@ -71,7 +82,7 @@ def move_files(files, destination, module_name):
 
 def move_file(file, destination, module_name):
     # TODO remove this logs? Or change to debug?
-    logger.log("Moving file '{}' if exists!".format(file), module_name)
+    # logger.log("Moving file '{}' if exists!".format(file), module_name)
     if os.path.exists(file):
         destination_file = os.path.join(destination, os.path.basename(file))
         if os.path.isfile(destination_file) and os.path.exists(destination_file):
@@ -80,7 +91,7 @@ def move_file(file, destination, module_name):
         shutil.move(file, destination)
         return True
     else:
-        logger.log("File '{}' does not exists, so can not move!".format(file), module_name)
+        # logger.log("File '{}' does not exists, so can not move!".format(file), module_name)
         return False
 
 
