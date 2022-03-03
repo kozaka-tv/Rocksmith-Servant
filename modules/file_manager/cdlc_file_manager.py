@@ -41,7 +41,7 @@ class FileManager:
 
     @staticmethod
     def scan_cdlc_files_in_root():
-        cdlc_files = file_utils.get_files_from_directory(ROOT_DIR, MODULE_NAME, file_utils.CDLC_FILE_EXT)
+        cdlc_files = file_utils.get_files_from_directory(ROOT_DIR)
 
         if len(cdlc_files) > 0:
             logger.log('Found {} new CDLC files in root.'.format(len(cdlc_files)), MODULE_NAME)
@@ -49,8 +49,7 @@ class FileManager:
         return cdlc_files
 
     def scan_cdlc_files_in_source_dirs(self):
-        cdlc_files = file_utils.get_files_from_directories(self.source_directories, MODULE_NAME,
-                                                           file_utils.CDLC_FILE_EXT)
+        cdlc_files = file_utils.get_files_from_directories(self.source_directories)
 
         if len(cdlc_files) > 0:
             logger.log('Found {} new CDLC files.'.format(len(cdlc_files)), MODULE_NAME)
@@ -58,8 +57,7 @@ class FileManager:
         return cdlc_files
 
     def scan_cdlc_files_in_destination_dir(self):
-        cdlc_files = file_utils.get_not_parsed_files_from_directory(self.destination_directory, MODULE_NAME,
-                                                                    file_utils.CDLC_FILE_EXT)
+        cdlc_files = file_utils.get_not_parsed_files_from_directory(self.destination_directory)
 
         if len(cdlc_files) > 0:
             logger.log('Found {} not loaded CDLC files.'.format(len(cdlc_files)), MODULE_NAME)

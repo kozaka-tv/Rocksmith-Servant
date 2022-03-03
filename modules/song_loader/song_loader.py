@@ -105,9 +105,6 @@ class SongLoader:
     # - get filenames from DB
     # - move files
     def get_requests_from_playlist(self):
-        # TODO sleep to avoid too much requests
-        # sleep(3)
-
         # TODO rs_playlist_url and cookies could be set at init, and then just call it many times here
         rs_playlist_url = "https://rsplaylist.com/ajax/playlist.php?channel=kozaka"
         cookies = {'PHPSESSID': self.phpsessid}

@@ -19,28 +19,28 @@ def create_cdlc_dir():
     pathlib.Path(os.path.join(LOG_DIR)).mkdir(parents=True, exist_ok=True)
 
 
-def get_files_from_directory(directory, module_name, pattern):
+def get_files_from_directory(directory):
     cdlc_files = []
-    get_files(cdlc_files, directory, module_name, pattern)
+    get_files(cdlc_files, directory)
     return cdlc_files
 
 
-def get_not_parsed_files_from_directory(directory, module_name, pattern):
+def get_not_parsed_files_from_directory(directory):
     cdlc_files = []
-    get_files(cdlc_files, directory, module_name, pattern, True)
+    get_files(cdlc_files, directory, True)
     return cdlc_files
 
 
-def get_files_from_directories(directories, module_name, pattern):
+def get_files_from_directories(directories):
     cdlc_files = []
     for directory in directories:
-        get_files(cdlc_files, directory, module_name, pattern)
+        get_files(cdlc_files, directory)
     return cdlc_files
 
 
-def get_files(cdlc_files, directory, module_name, pattern, older=False):
+def get_files(cdlc_files, directory, older=False):
     for root, dir_names, filenames in os.walk(directory):
-        for filename in fnmatch.filter(filenames, pattern):
+        for filename in fnmatch.filter(filenames, CDLC_FILE_EXT):
             file = os.path.join(root, filename)
             if older:
                 if is_file_old(file):
