@@ -3,9 +3,9 @@ from time import time, sleep
 from definitions import ROOT_DIR
 from utils import logger, file_utils
 
-HEARTBEAT = 15
-
 MODULE_NAME = "FileManager"
+
+HEARTBEAT = 15
 
 
 class FileManager:

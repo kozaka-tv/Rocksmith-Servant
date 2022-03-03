@@ -66,13 +66,22 @@ def move_files(files, destination, module_name):
     if len(files) > 0:
         logger.log('Moving {} files to: {}'.format(len(files), destination), module_name)
         for file in files:
-            logger.log('Moving: {}'.format(file), module_name)
-            destination_file = os.path.join(destination, os.path.basename(file))
-            if os.path.isfile(destination_file):
-                logger.warning('File already exists, removing: {}'.format(destination_file), module_name)
-                os.remove(destination_file)
+            move_file(file, destination, module_name)
 
-            shutil.move(file, destination)
+
+def move_file(file, destination, module_name):
+    # TODO remove this logs? Or change to debug?
+    logger.log("Moving file '{}' if exists!".format(file), module_name)
+    if os.path.exists(file):
+        destination_file = os.path.join(destination, os.path.basename(file))
+        if os.path.isfile(destination_file) and os.path.exists(destination_file):
+            logger.warning('File already exists, removing: {}'.format(destination_file), module_name)
+            os.remove(destination_file)
+        shutil.move(file, destination)
+        return True
+    else:
+        logger.log("File '{}' does not exists, so can not move!".format(file), module_name)
+        return False
 
 
 def file_datetime_formatted(filename):
@@ -80,3 +89,9 @@ def file_datetime_formatted(filename):
     formatted_time = datetime.fromtimestamp(file_time)
     print("File datetime: {0}".format(formatted_time))  # TODO remove
     return formatted_time
+
+
+# @staticmethod
+def create_directory(directory_to_create):
+    logger.warning("Creating directory '{}' if not exists!".format(directory_to_create))
+    pathlib.Path(directory_to_create).mkdir(parents=True, exist_ok=True)

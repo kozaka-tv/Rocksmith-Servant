@@ -12,8 +12,9 @@ serialized = {
         "enabled": False,
         "cdlc_dir": "import",
         "cfsm_file_name": "SongsMasterGrid.json",
+        "cdlc_archive_dir": "<Enter your CDLC archive directory, where you normally store all of your downloaded CDLCs>",
         "allow_load_when_in_game": True,
-        "PHPSESSID": "<Enter your PHP Session ID from the cookie of the RS Playlist after login>"
+        "phpsessid": "<Enter your PHP Session ID from the cookie of the RS Playlist after login>"
     },
     "SceneSwitcher": {
         "enabled": False,
