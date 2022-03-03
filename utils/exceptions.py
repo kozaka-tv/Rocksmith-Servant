@@ -11,7 +11,7 @@ SNIFFER_ERROR_MSG = "--- Could not connect to Rocksniffer!" + os.linesep + \
 RSPL_LOGIN_ERROR_MSG = "--- PHPSESSID in from the cookies in the config is not valid anymore!" + os.linesep + \
                        "--------------------------------------------------" + os.linesep + \
                        "Please login on RS Playlist page and get the PHPSESSID from the cookies!" + os.linesep + \
-                       "Then add it to the config and restart!" + os.linesep + \
+                       "Then add/change it in the config and restart Servant if needed!" + os.linesep + \
                        "--------------------------------------------------"
 
 
