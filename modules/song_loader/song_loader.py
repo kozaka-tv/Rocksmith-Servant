@@ -2,21 +2,13 @@ import os
 import sqlite3
 from time import sleep
 
-import requests
-
-from utils import logger, file_utils
+from utils import logger, file_utils, rs_playlist
 from utils.exceptions import ConfigError, RSPlaylistNotLoggedInError
+from utils.rs_playlist import get_playlist
 
 MODULE_NAME = "SongLoader"
 
 NL = os.linesep
-ERR_MSG_PHPSESSID = "Please set your PHP Session ID into the config!" + NL + \
-                    "The PHPSESSID is needed to get data from your RS Playlist request page." + NL + \
-                    "You can have the PHPSESSID from the cookie of your browser " \
-                    "after you logged in into the RS Playlist page." + NL + \
-                    "Optionally, use the Tampermonkey script, what could be found under /misc/tampermonkey " \
-                    "with the name: 'RS Playlist enhancer and simplifier.user.js'" + NL + \
-                    "or install it from https://greasyfork.org/en/scripts/440738-rs-playlist-enhancer-and-simplifier"
 
 ERR_MSG_CDLC_ARCHIVE_DIR = "Please set your CDLC archive directory in the config!" + NL + \
                            "This is the directory, where you normally store all of your downloaded CDLC files."
@@ -48,7 +40,7 @@ class SongLoader:
             self.destination_directory = destination_directory
             self.rocksmith_cdlc_dir = self.check_rocksmith_cdlc_dir(rocksmith_cdlc_dir)
             self.allow_load_when_in_game = allow_load_when_in_game
-            self.phpsessid = self.check_phpsessid(phpsessid)
+            self.phpsessid = rs_playlist.check_phpsessid(phpsessid)
 
             self.songs_to_load = os.path.join(cdlc_dir, cfsm_file_name)
             self.first_run = True
@@ -59,12 +51,6 @@ class SongLoader:
 
         self.loaded_songs = set()
         self.missing_songs = set()
-
-    @staticmethod
-    def check_phpsessid(phpsessid):
-        if phpsessid is None or phpsessid.startswith('<Enter your'):
-            raise ConfigError(ERR_MSG_PHPSESSID)
-        return phpsessid
 
     @staticmethod
     def check_cdlc_archive_dir(cdlc_archive_dir):
@@ -127,11 +113,7 @@ class SongLoader:
     # - get filenames from DB
     # - move files
     def move_requested_cdlcs_to_destination(self):
-        # TODO rs_playlist_url and cookies could be set at init, and then just call it many times here
-        rs_playlist_url = "https://rsplaylist.com/ajax/playlist.php?channel=kozaka"
-        cookies = {'PHPSESSID': self.phpsessid}
-
-        playlist = requests.get(rs_playlist_url, cookies=cookies).json()
+        playlist = get_playlist(self.phpsessid)
 
         requested_songs = set()
 

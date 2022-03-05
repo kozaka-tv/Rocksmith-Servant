@@ -6,7 +6,7 @@ from modules.file_manager.cdlc_file_manager import FileManager
 from modules.scene_switcher.scene_switcher import SceneSwitcher
 from modules.setlist.setlist_logger import SetlistLogger
 from modules.song_loader.song_loader import SongLoader
-from utils import logger
+from utils import logger, rs_playlist
 from utils.debug import Debugger
 from utils.exceptions import RocksnifferConnectionError, RSPlaylistNotLoggedInError, ConfigError
 from utils.rocksniffer import Rocksniffer
@@ -40,7 +40,7 @@ KEY_ENABLED = "enabled"
 # Initializing configuration
 conf = ConfigReader()
 
-# Initializing Modules
+# Initializing modules and utils
 sniffer = Rocksniffer(
     conf.get_bool(SECTION_ROCK_SNIFFER, KEY_ENABLED),
     conf.get(SECTION_ROCK_SNIFFER, "host"),
@@ -106,7 +106,7 @@ def update_config():
         song_loader.rocksmith_cdlc_dir = song_loader.check_cdlc_archive_dir(
             conf.get(SECTION_SONG_LOADER, "rocksmith_cdlc_dir"))
         song_loader.allow_load_when_in_game = conf.get_bool(SECTION_SONG_LOADER, "allow_load_when_in_game")
-        song_loader.phpsessid = song_loader.check_phpsessid(conf.get(SECTION_SONG_LOADER, "phpsessid"))
+        song_loader.phpsessid = rs_playlist.check_phpsessid(conf.get(SECTION_SONG_LOADER, "phpsessid"))
         # TODO all this props should be maybe in run or in song_loader?
         song_loader.songs_to_load = os.path.join(song_loader.cdlc_dir, song_loader.cfsm_file_name)
         # TODO this first run is not round here...is it really first run? This info should be in DB or somewhere.
