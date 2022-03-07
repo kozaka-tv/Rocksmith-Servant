@@ -3,8 +3,8 @@ import os
 import sqlite3
 from datetime import datetime
 
-# JSON_FILE = '../../import/SongsMasterGrid.json'
-JSON_FILE = '../../import/SongsMasterGrid_BIG.json'
+JSON_FILE = '../../import/SongsMasterGrid.json'
+# JSON_FILE = '../../import/SongsMasterGrid_BIG.json'
 # JSON_FILE = '../../import/SongsMasterGrid_SMALL.json'
 
 db = sqlite3.connect('../../servant.db')

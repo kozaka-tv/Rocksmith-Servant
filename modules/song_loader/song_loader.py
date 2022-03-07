@@ -72,8 +72,6 @@ class SongLoader:
     def load(self):
         if self.enabled:
             # TODO remove this log
-            logger.warning("---------------------- ")
-            logger.warning("Song Loader is running... ")
 
             if self.first_run:
                 # TODO this must be done
@@ -88,7 +86,7 @@ class SongLoader:
             self.move_requested_cdlcs_to_destination()
 
             # TODO remove this sleep?
-            sleep(4)
+            sleep(3)
 
     def update_under_rs_loaded_cdlc_files(self):
         loaded_cdlc_files = self.scan_cdlc_files_under_rs_dir()
@@ -144,7 +142,11 @@ class SongLoader:
 
                     con.commit()
 
-        logger.warning("---- Files to move from archive according to the requests: " + str(requested_songs))
+        if len(requested_songs) > 0:
+            logger.warning("---- Files to move from archive according to the requests: " + str(requested_songs))
+        else:
+            logger.warning("---- The playlist is empty, nothing to move!")
+
         actually_loaded_songs = set()
         for requested_song in requested_songs:
             if requested_song not in self.loaded_songs:
@@ -153,7 +155,10 @@ class SongLoader:
                 if moved:
                     self.loaded_songs.add(requested_song)
                     actually_loaded_songs.add(requested_song)
+                    # TODO add tag 'loaded'
+                    # rs_playlist.tag_set(self.phpsessid)
                 else:
+                    # TODO add tag 'must download'
                     self.missing_songs.add(requested_song)
         if len(actually_loaded_songs) > 0:
             logger.warning("---- Files newly moved and will be parsed: " + str(actually_loaded_songs))

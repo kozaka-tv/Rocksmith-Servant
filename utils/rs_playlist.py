@@ -4,6 +4,17 @@ import requests
 
 from utils.exceptions import ConfigError
 
+# TODO get from the config
+CHANNEL = "kozaka"
+
+RS_PLAYLIST_HOME = "https://rsplaylist.com/ajax"
+URL_PLAYLIST = RS_PLAYLIST_HOME + "/playlist.php?channel=%s"
+URL_REQUESTS = RS_PLAYLIST_HOME + "/requests.php?channel=%s"
+URL_TAG_SET = URL_REQUESTS + "&action=set-tag&id=%s&tag=%s&value=true"
+URL_TAG_UNSET = URL_REQUESTS + "&action=set-tag&id=%s&tag=%s&value=false"
+# https://rsplaylist.com/ajax/requests.php?channel=kozaka&action=set-tag&id=1305252&tag=8c8c2924&value=true
+# https://rsplaylist.com/ajax/requests.php?channel=kozaka&action=set-tag&id=1305252&tag=8c8c2924&value=false
+
 NL = os.linesep
 ERR_MSG_PHPSESSID = "Please set your PHP Session ID into the config!" + NL + \
                     "The PHPSESSID is needed to get data from your RS Playlist request page." + NL + \
@@ -21,7 +32,11 @@ def check_phpsessid(phpsessid):
 
 
 def get_playlist(phpsessid):
-    rs_playlist_url = "https://rsplaylist.com/ajax/playlist.php?channel=kozaka"
+    return requests.get(URL_PLAYLIST % CHANNEL, cookies={'PHPSESSID': phpsessid}).json()
+
+
+def tag_set(phpsessid):
+    url = URL_TAG_SET % (CHANNEL, "1305252", "8c8c2924")
     cookies = {'PHPSESSID': phpsessid}
-    playlist = requests.get(rs_playlist_url, cookies=cookies).json()
+    playlist = requests.get(url, cookies=cookies).json()
     return playlist
