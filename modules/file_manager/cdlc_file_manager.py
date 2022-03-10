@@ -5,7 +5,7 @@ from utils import logger, file_utils
 
 MODULE_NAME = "FileManager"
 
-HEARTBEAT = 15
+HEARTBEAT = 10
 
 
 class FileManager:
@@ -35,6 +35,7 @@ class FileManager:
 
         if len(files_to_move_from_destination_dir) > 0:
             self.move_not_enumerated_cdlc_files(files_to_move_from_destination_dir)
+            # TODO use heartbeat (outside) maybe? Not a sleep?
             sleep(2)  # wait a bit
 
         self.last_run = time()
@@ -45,6 +46,7 @@ class FileManager:
 
         if len(cdlc_files) > 0:
             logger.log('Found {} new CDLC files in root.'.format(len(cdlc_files)), MODULE_NAME)
+            logger.debug(cdlc_files)
 
         return cdlc_files
 
@@ -52,7 +54,8 @@ class FileManager:
         cdlc_files = file_utils.get_files_from_directories(self.source_directories)
 
         if len(cdlc_files) > 0:
-            logger.log('Found {} new CDLC files.'.format(len(cdlc_files)), MODULE_NAME)
+            logger.log('Found {} new CDLC file under source dirs.'.format(len(cdlc_files)), MODULE_NAME)
+            logger.debug(cdlc_files)
 
         return cdlc_files
 

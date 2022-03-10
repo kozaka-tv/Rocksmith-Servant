@@ -1,6 +1,6 @@
 import os
 import sqlite3
-from time import sleep
+from time import time
 
 import unicodedata
 
@@ -20,6 +20,7 @@ ERR_MSG_ROCKSMITH_CDLC_DIR = "Please set your Rocksmith CDLC directory!" + NL + 
                              "in the game."
 
 DEFAULT_CDLC_DIR = 'import'
+HEARTBEAT = 5
 
 con = sqlite3.connect('./servant.db')
 
@@ -51,6 +52,8 @@ class SongLoader:
 
             self.create_directories()
 
+            self.last_run = time()
+
         self.loaded_songs = set()
         self.missing_songs = set()
 
@@ -73,22 +76,21 @@ class SongLoader:
 
     def load(self):
         if self.enabled:
-            # TODO remove this log
-
             if self.first_run:
                 # TODO this must be done
                 logger.log("Try to load new songs for the CFSM file: {}".format(self.songs_to_load))
                 self.first_run = False
                 self.get_file_to_import()
 
-            self.update_under_rs_loaded_cdlc_files()
+            if time() - self.last_run >= HEARTBEAT:
+                logger.warning("Load songs according to the requests!")
+                self.update_under_rs_loaded_cdlc_files()
 
-            # TODO or maybe this should be configurable?
-            # else:  # load songs only in case we are not in game to avoid lagging in game
-            self.move_requested_cdlcs_to_destination()
+                # TODO or maybe this should be configurable?
+                # else:  # load songs only in case we are not in game to avoid lagging in game
+                self.move_requested_cdlcs_to_destination()
 
-            # TODO remove this sleep?
-            sleep(3)
+                self.last_run = time()
 
     def update_under_rs_loaded_cdlc_files(self):
         loaded_cdlc_files = self.scan_cdlc_files_under_rs_dir()
@@ -105,6 +107,7 @@ class SongLoader:
 
         if len(cdlc_files) > 0:
             logger.log('Found {} into Rocksmith loaded CDLC files.'.format(len(cdlc_files)), MODULE_NAME)
+            logger.debug(cdlc_files)
 
         return cdlc_files
 
@@ -142,9 +145,9 @@ class SongLoader:
                         rows = self.get_song_from_db(artist_norm, title_norm)
 
                     if len(rows) > 0:
-                        # logger.debug("---- sr " + str(sr["position"]) + " -------")
+                        logger.debug("---- sr " + str(sr["position"]) + " -------")
                         for element in rows:
-                            # logger.debug("row=" + str(element[0]))
+                            logger.debug("row=" + str(element[0]))
                             requested_songs.add(str(element[0]))
 
                     con.commit()
@@ -160,12 +163,14 @@ class SongLoader:
                 song_to_move = os.path.join(self.cdlc_archive_dir, requested_song)
                 moved = file_utils.move_file(song_to_move, self.destination_directory, MODULE_NAME)
                 if moved:
+                    logger.debug("The song were moved from the archive under RS. Moved file: {}".format(song_to_move))
                     self.loaded_songs.add(requested_song)
                     actually_loaded_songs.add(requested_song)
                     # TODO add tag 'loaded'
                     # rs_playlist.tag_set(self.phpsessid)
                 else:
                     # TODO add tag 'must download'
+                    logger.debug("Could not move file: {}".format(song_to_move))
                     self.missing_songs.add(requested_song)
         if len(actually_loaded_songs) > 0:
             logger.warning("---- Files newly moved and will be parsed: " + str(actually_loaded_songs))

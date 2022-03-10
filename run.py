@@ -197,6 +197,9 @@ def sniffer_data_not_loaded():
 # Main 'endless' loop
 while True:
 
+    # TODO comment out this!
+    # logger.debug("Serving...")
+
     try:
         # Sleep a bit to avoid too fast processing
         sleep(HEARTBEAT)
