@@ -36,16 +36,18 @@ with open(JSON_FILE, encoding='utf-8-sig') as json_file:
                 columns.append(col)
 
     # Here we get values of the columns in the JSON file in the right order.
+    count = 0
     value = []
     values = []
     for data in json_data:
         for i in columns:
             if i == 'colFileName':
-                value.append(str(dict(data).get(i)).strip().replace('cdlc\\', ''))
+                value.append(str(dict(data).get(i)).strip().replace('cdlc\\', '').replace('dlc\\', ''))
             else:
                 value.append(str(dict(data).get(i)).strip())
         values.append(list(value))
         value.clear()
+        count += 1
 
     # Time to generate the create and insert queries and apply it to the sqlite3 database
     drop_query = "drop table if exists songs"
@@ -67,4 +69,4 @@ with open(JSON_FILE, encoding='utf-8-sig') as json_file:
 
     c.close()
 
-    print("insert has completed at " + str(datetime.now()))
+    print("inserted " + str(count) + " songs and completed at " + str(datetime.now()))

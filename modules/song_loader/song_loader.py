@@ -2,6 +2,8 @@ import os
 import sqlite3
 from time import sleep
 
+import unicodedata
+
 from utils import logger, file_utils, rs_playlist
 from utils.exceptions import ConfigError, RSPlaylistNotLoggedInError
 from utils.rs_playlist import get_playlist
@@ -122,17 +124,22 @@ class SongLoader:
                 except TypeError:
                     raise RSPlaylistNotLoggedInError
 
+                if cdlc["official"] == 4:
+                    continue
+
                 cdlc_id = cdlc["cdlc_id"]
                 artist = cdlc["artist"]
                 title = cdlc["title"]
                 # logger.log(str(rspl_id) + " - " + str(cdlc_id) + " - " + artist + " - " + title)
 
                 with con:
-                    cur = con.cursor()
-                    execute = cur.execute("SELECT colFileName FROM songs where colArtist like ? and colTitle like ?",
-                                          ("%" + artist + "%", "%" + title + "%"))
+                    rows = self.get_song_from_db(artist, title)
 
-                    rows = execute.fetchall()
+                    if len(rows) <= 0:
+                        # remove special chars
+                        artist_norm = self.remove_special_chars(artist)
+                        title_norm = self.remove_special_chars(title)
+                        rows = self.get_song_from_db(artist_norm, title_norm)
 
                     if len(rows) > 0:
                         # logger.debug("---- sr " + str(sr["position"]) + " -------")
@@ -164,3 +171,16 @@ class SongLoader:
             logger.warning("---- Files newly moved and will be parsed: " + str(actually_loaded_songs))
         if len(self.missing_songs) > 0:
             logger.error("---- Missing files but found in Database: " + str(self.missing_songs))
+
+    @staticmethod
+    def remove_special_chars(text):
+        # return unicodedata.normalize('NFD', text).encode('ascii', 'ignore')
+        return ''.join(c for c in unicodedata.normalize('NFKD', text) if unicodedata.category(c) != 'Mn')
+
+    @staticmethod
+    def get_song_from_db(artist, title):
+        cur = con.cursor()
+        execute = cur.execute("SELECT colFileName FROM songs where colArtist like ? and colTitle like ?",
+                              ("%" + artist + "%", "%" + title + "%"))
+        rows = execute.fetchall()
+        return rows
