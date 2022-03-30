@@ -106,10 +106,17 @@ class SongLoader:
         cdlc_files = file_utils.get_file_names_from(self.rocksmith_cdlc_dir)
 
         if len(cdlc_files) > 0:
-            logger.log('Found {} into Rocksmith loaded CDLC files.'.format(len(cdlc_files)), MODULE_NAME)
-            logger.debug(cdlc_files)
+            self.log_loaded_cdlc_files(cdlc_files)
 
         return cdlc_files
+
+    @staticmethod
+    def log_loaded_cdlc_files(cdlc_files):
+        logger.log('Found {} into Rocksmith loaded CDLC files.'.format(len(cdlc_files)), MODULE_NAME)
+        logger.debug("---------- loaded CDLC files:")
+        for cdlc_file in cdlc_files:
+            logger.debug(cdlc_file)
+        logger.debug("-----------------------------")
 
     # TODO refactor this. it should be like
     # - get_requests from RS playlist
@@ -127,6 +134,7 @@ class SongLoader:
                 except TypeError:
                     raise RSPlaylistNotLoggedInError
 
+                # Do not load official DLC files
                 if cdlc["official"] == 4:
                     continue
 
@@ -163,7 +171,8 @@ class SongLoader:
                 song_to_move = os.path.join(self.cdlc_archive_dir, requested_song)
                 moved = file_utils.move_file(song_to_move, self.destination_directory, MODULE_NAME)
                 if moved:
-                    logger.debug("The song were moved from the archive under RS. Moved file: {}".format(song_to_move))
+                    logger.debug(
+                        "The song were moved from the archive to under RS. Moved file: {}".format(song_to_move))
                     self.loaded_songs.add(requested_song)
                     actually_loaded_songs.add(requested_song)
                     # TODO add tag 'loaded'
