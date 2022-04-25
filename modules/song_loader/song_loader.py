@@ -26,15 +26,8 @@ con = sqlite3.connect('./servant.db')
 
 
 class SongLoader:
-    def __init__(self,
-                 enabled,
-                 phpsessid: str,
-                 cdlc_dir,
-                 cfsm_file_name,
-                 cdlc_archive_dir,
-                 destination_directory,
-                 rocksmith_cdlc_dir,
-                 allow_load_when_in_game=True):
+    def __init__(self, enabled, phpsessid: str, cdlc_dir, cfsm_file_name, cdlc_archive_dir, destination_directory,
+                 rocksmith_cdlc_dir, cdlc_import_json_file, allow_load_when_in_game=True):
         self.enabled = enabled
         if enabled:
             self.cdlc_dir = os.path.join(cdlc_dir)
@@ -44,6 +37,7 @@ class SongLoader:
             self.rocksmith_cdlc_dir = self.check_rocksmith_cdlc_dir(rocksmith_cdlc_dir)
             self.allow_load_when_in_game = allow_load_when_in_game
             self.phpsessid = rs_playlist.check_phpsessid(phpsessid)
+            self.cdlc_import_json_file = cdlc_import_json_file
 
             self.songs_to_load = os.path.join(cdlc_dir, cfsm_file_name)
             self.first_run = True
@@ -113,10 +107,11 @@ class SongLoader:
     @staticmethod
     def log_loaded_cdlc_files(cdlc_files):
         logger.log('Found {} into Rocksmith loaded CDLC files.'.format(len(cdlc_files)), MODULE_NAME)
-        logger.debug("---------- loaded CDLC files:")
-        for cdlc_file in cdlc_files:
-            logger.debug(cdlc_file)
-        logger.debug("-----------------------------")
+
+        # logger.debug("---------- loaded CDLC files:")
+        # for cdlc_file in cdlc_files:
+        #     logger.debug(cdlc_file)
+        # logger.debug("-----------------------------")
 
     # TODO refactor this. it should be like
     # - get_requests from RS playlist
@@ -141,7 +136,7 @@ class SongLoader:
                 cdlc_id = cdlc["cdlc_id"]
                 artist = cdlc["artist"]
                 title = cdlc["title"]
-                # logger.log(str(rspl_id) + " - " + str(cdlc_id) + " - " + artist + " - " + title)
+                logger.log(str(rspl_id) + " - " + str(cdlc_id) + " - " + artist + " - " + title)
 
                 with con:
                     rows = self.get_song_from_db(artist, title)

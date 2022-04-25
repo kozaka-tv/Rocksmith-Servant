@@ -3,9 +3,9 @@ import os
 import sqlite3
 from datetime import datetime
 
-JSON_FILE = '../../import/SongsMasterGrid.json'
-# JSON_FILE = '../../import/SongsMasterGrid_BIG.json'
-# JSON_FILE = '../../import/SongsMasterGrid_SMALL.json'
+CDLC_IMPORT_JSON_FILE = '../../import/SongsMasterGrid.json'
+# CDLC_IMPORT_JSON_FILE = '../../import/SongsMasterGrid_BIG.json'
+# CDLC_IMPORT_JSON_FILE = '../../import/SongsMasterGrid_SMALL.json'
 
 db = sqlite3.connect('../../servant.db')
 
@@ -18,10 +18,11 @@ def file_datetime(filename):
 
 
 # TODO this is ment to check that the file is new/changed or not. Means do we need to import it or not.
-file_datetime(JSON_FILE)
+file_datetime(CDLC_IMPORT_JSON_FILE)
 
-with open(JSON_FILE, encoding='utf-8-sig') as json_file:
+with open(CDLC_IMPORT_JSON_FILE, encoding='utf-8-sig') as json_file:
     # TODO extract to a method the load of the file
+    print("File to import: {0}".format(json_file.name))
     json_file_data = json.loads(json_file.read())
     songs = dict(json_file_data)
     json_data = songs['dgvSongsMaster']

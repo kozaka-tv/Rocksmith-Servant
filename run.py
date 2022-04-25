@@ -8,7 +8,7 @@ from modules.setlist.setlist_logger import SetlistLogger
 from modules.song_loader.song_loader import SongLoader
 from utils import logger, rs_playlist
 from utils.debug import Debugger
-from utils.exceptions import RocksnifferConnectionError, RSPlaylistNotLoggedInError, ConfigError
+from utils.exceptions import RocksnifferConnectionError, ConfigError
 from utils.rocksniffer import Rocksniffer
 
 
@@ -64,6 +64,7 @@ song_loader = SongLoader(
     conf.get(SECTION_SONG_LOADER, "cdlc_archive_dir"),
     file_manager.destination_directory,
     conf.get(SECTION_SONG_LOADER, "rocksmith_cdlc_dir"),
+    conf.get(SECTION_SONG_LOADER, "cdlc_import_json_file"),
     conf.get_bool(SECTION_SONG_LOADER, "allow_load_when_in_game")
 )
 scene_switcher = SceneSwitcher(
@@ -105,6 +106,7 @@ def update_config():
         song_loader.destination_directory = file_manager.destination_directory
         song_loader.rocksmith_cdlc_dir = song_loader.check_cdlc_archive_dir(
             conf.get(SECTION_SONG_LOADER, "rocksmith_cdlc_dir"))
+        song_loader.cdlc_import_json_file = conf.get(SECTION_SONG_LOADER, "cdlc_import_json_file")
         song_loader.allow_load_when_in_game = conf.get_bool(SECTION_SONG_LOADER, "allow_load_when_in_game")
         song_loader.phpsessid = rs_playlist.check_phpsessid(conf.get(SECTION_SONG_LOADER, "phpsessid"))
         # TODO all this props should be maybe in run or in song_loader?
@@ -215,7 +217,6 @@ while True:
         # Interval debugging
         debugger.log_on_interval(get_debug_message())
 
-    # Catch and log all the known exceptions, but keep app alive.
-    except (RocksnifferConnectionError, RSPlaylistNotLoggedInError) as error:
-        logger.error(error)
-        sleep(5)
+    # Catch and log all the exceptions, but keep app alive.
+    except Exception as e:
+        logger.error(e)
