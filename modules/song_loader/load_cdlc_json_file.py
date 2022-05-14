@@ -3,7 +3,8 @@ import os
 import sqlite3
 from datetime import datetime
 
-CDLC_IMPORT_JSON_FILE = '../../import/SongsMasterGrid.json'
+CDLC_IMPORT_JSON_FILE = 'c:/Google Drive Kozaka/Kozaka - Live Stream/SongsMasterGrid.json'
+# CDLC_IMPORT_JSON_FILE = '../../import/SongsMasterGrid.json'
 # CDLC_IMPORT_JSON_FILE = '../../import/SongsMasterGrid_BIG.json'
 # CDLC_IMPORT_JSON_FILE = '../../import/SongsMasterGrid_SMALL.json'
 

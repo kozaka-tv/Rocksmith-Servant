@@ -4,6 +4,7 @@ from time import time
 
 import unicodedata
 
+from modules.song_loader.song_data import SongData
 from utils import logger, file_utils, rs_playlist
 from utils.exceptions import ConfigError, RSPlaylistNotLoggedInError
 from utils.rs_playlist import get_playlist
@@ -120,9 +121,10 @@ class SongLoader:
     def move_requested_cdlcs_to_destination(self):
         playlist = get_playlist(self.phpsessid)
 
-        requested_songs = set()
+        song_data_set = set()
 
         for sr in playlist["playlist"]:
+            sr_id = sr['id']
             for cdlc in sr["dlc_set"]:
                 try:
                     rspl_id = cdlc['id']
@@ -150,28 +152,29 @@ class SongLoader:
                     if len(rows) > 0:
                         logger.debug("---- sr " + str(sr["position"]) + " -------")
                         for element in rows:
-                            logger.debug("row=" + str(element[0]))
-                            requested_songs.add(str(element[0]))
+                            song_file_name = str(element[0])
+                            logger.debug("row=" + song_file_name)
+                            song_data_set.add(SongData(sr_id, cdlc_id, song_file_name))
 
                     con.commit()
 
-        if len(requested_songs) > 0:
-            logger.warning("---- Files to move from archive according to the requests: " + str(requested_songs))
+        if len(song_data_set) > 0:
+            logger.warning("---- Files to move from archive according to the requests: " + str(song_data_set))
         else:
             logger.warning("---- The playlist is empty, nothing to move!")
 
         actually_loaded_songs = set()
-        for requested_song in requested_songs:
-            if requested_song not in self.loaded_songs:
-                song_to_move = os.path.join(self.cdlc_archive_dir, requested_song)
+        for song_data in song_data_set:
+            if song_data.song_file_name not in self.loaded_songs:
+                song_to_move = os.path.join(self.cdlc_archive_dir, song_data.song_file_name)
                 moved = file_utils.move_file(song_to_move, self.destination_directory, MODULE_NAME)
                 if moved:
                     logger.debug(
                         "The song were moved from the archive to under RS. Moved file: {}".format(song_to_move))
-                    self.loaded_songs.add(requested_song)
-                    actually_loaded_songs.add(requested_song)
-                    # TODO add tag 'loaded'
-                    # rs_playlist.tag_set(self.phpsessid)
+                    self.loaded_songs.add(song_data.song_file_name)
+                    actually_loaded_songs.add(song_data.song_file_name)
+
+                    rs_playlist.set_tag_loaded(self.phpsessid, song_data.sr_id)
                 else:
                     # TODO add tag 'must download'
                     logger.debug("Could not move file: {}".format(song_to_move))
