@@ -178,7 +178,7 @@ class SongLoader:
                 else:
                     # TODO add tag 'must download'
                     logger.debug("Could not move file: {}".format(song_to_move))
-                    self.missing_songs.add(requested_song)
+                    self.missing_songs.add(song_data.song_file_name)
         if len(actually_loaded_songs) > 0:
             logger.warning("---- Files newly moved and will be parsed: " + str(actually_loaded_songs))
         if len(self.missing_songs) > 0:
