@@ -2,7 +2,7 @@ import os
 
 
 class SongData:
-    def __init__(self, sr_id, cdlc_id, song_file_name):
+    def __init__(self, sr_id, cdlc_id, song_file_name=None):
         self.sr_id = sr_id
         self.cdlc_id = cdlc_id
         self.song_file_name = song_file_name

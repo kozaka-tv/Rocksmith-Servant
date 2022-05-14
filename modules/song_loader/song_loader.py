@@ -140,6 +140,8 @@ class SongLoader:
                 title = cdlc["title"]
                 logger.log(str(rspl_id) + " - " + str(cdlc_id) + " - " + artist + " - " + title)
 
+                song_data = SongData(sr_id, cdlc_id)
+
                 with con:
                     rows = self.get_song_from_db(artist, title)
 
@@ -153,10 +155,14 @@ class SongLoader:
                         logger.debug("---- sr " + str(sr["position"]) + " -------")
                         for element in rows:
                             song_file_name = str(element[0])
+                            song_data.song_file_name = song_file_name;
                             logger.debug("row=" + song_file_name)
-                            song_data_set.add(SongData(sr_id, cdlc_id, song_file_name))
+                            song_data_set.add(song_data)
+                    else:
+                        logger.debug("User must download the song: cdlc_id={} - {} - {}".format(cdlc_id, artist, title))
+                        rs_playlist.set_tag_to_download(self.phpsessid, song_data.sr_id)
 
-                    con.commit()
+                con.commit()
 
         if len(song_data_set) > 0:
             logger.warning("---- Files to move from archive according to the requests: " + str(song_data_set))
@@ -165,7 +171,9 @@ class SongLoader:
 
         actually_loaded_songs = set()
         for song_data in song_data_set:
-            if song_data.song_file_name not in self.loaded_songs:
+            if song_data.song_file_name in self.loaded_songs:
+                rs_playlist.set_tag_loaded(self.phpsessid, song_data.sr_id)
+            else:
                 song_to_move = os.path.join(self.cdlc_archive_dir, song_data.song_file_name)
                 moved = file_utils.move_file(song_to_move, self.destination_directory, MODULE_NAME)
                 if moved:
