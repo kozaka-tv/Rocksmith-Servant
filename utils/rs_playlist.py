@@ -52,9 +52,11 @@ def unset_tag(phpsessid, sr_id, tag_id):
 
 def set_tag_loaded(phpsessid, sr_id):
     set_tag(phpsessid, sr_id, TAG_LOADED)
-    # TODO remove tag to download?
+    # TODO remove tag 'to download'?
     unset_tag(phpsessid, sr_id, TAG_TO_DOWNLOAD)
 
 
 def set_tag_to_download(phpsessid, sr_id):
     set_tag(phpsessid, sr_id, TAG_TO_DOWNLOAD)
+    # TODO remove tag 'loaded'?
+    unset_tag(phpsessid, sr_id, TAG_LOADED)

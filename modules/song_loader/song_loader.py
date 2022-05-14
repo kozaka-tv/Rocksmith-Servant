@@ -173,12 +173,12 @@ class SongLoader:
                         "The song were moved from the archive to under RS. Moved file: {}".format(song_to_move))
                     self.loaded_songs.add(song_data.song_file_name)
                     actually_loaded_songs.add(song_data.song_file_name)
-
                     rs_playlist.set_tag_loaded(self.phpsessid, song_data.sr_id)
                 else:
-                    # TODO add tag 'must download'
                     logger.debug("Could not move file: {}".format(song_to_move))
                     self.missing_songs.add(song_data.song_file_name)
+                    rs_playlist.set_tag_to_download(self.phpsessid, song_data.sr_id)
+
         if len(actually_loaded_songs) > 0:
             logger.warning("---- Files newly moved and will be parsed: " + str(actually_loaded_songs))
         if len(self.missing_songs) > 0:
