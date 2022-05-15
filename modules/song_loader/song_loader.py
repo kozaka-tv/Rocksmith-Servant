@@ -160,7 +160,7 @@ class SongLoader:
                             song_data_set.add(song_data)
                     else:
                         logger.debug("User must download the song: cdlc_id={} - {} - {}".format(cdlc_id, artist, title))
-                        rs_playlist.set_tag_to_download(self.phpsessid, song_data.sr_id)
+                        # rs_playlist.set_tag_to_download(self.phpsessid, song_data.sr_id)
 
                 con.commit()
 
