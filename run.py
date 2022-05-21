@@ -1,7 +1,9 @@
 import os
+import sqlite3
 from time import sleep
 
 from config.configReader import ConfigReader
+from modules.cdlc_importer.load_cdlc_json_file import CDLCImporter
 from modules.file_manager.cdlc_file_manager import FileManager
 from modules.scene_switcher.scene_switcher import SceneSwitcher
 from modules.setlist.setlist_logger import SetlistLogger
@@ -11,6 +13,7 @@ from utils.debug import Debugger
 from utils.exceptions import RocksnifferConnectionError, ConfigError
 from utils.rocksniffer import Rocksniffer
 
+db = sqlite3.connect('servant.db')
 
 def check_enabled_module_dependencies():
     if song_loader.enabled and not file_manager.enabled:
@@ -27,6 +30,7 @@ logger.warning("----------------------------------------------------------------
 # Section name definitions
 SECTION_ROCK_SNIFFER = "RockSniffer"
 SECTION_SETLIST_LOGGER = "SetlistLogger"
+SECTION_CDLC_IMPORTER = "CDLCImporter"
 SECTION_SONG_LOADER = "SongLoader"
 SECTION_SCENE_SWITCHER = "SceneSwitcher"
 SECTION_FILE_MANAGER = "FileManager"
@@ -56,6 +60,7 @@ file_manager = FileManager(
     conf.get(SECTION_FILE_MANAGER, "destination_directory"),
     conf.get(SECTION_FILE_MANAGER, "using_cfsm")
 )
+cdlc_importer = CDLCImporter(db)
 song_loader = SongLoader(
     conf.get_bool(SECTION_SONG_LOADER, KEY_ENABLED),
     conf.get(SECTION_SONG_LOADER, "PHPSESSID"),
@@ -146,6 +151,7 @@ def get_debug_message():
     if setlist_logger.enabled:
         modules_str += SECTION_SETLIST_LOGGER + os.linesep
     if song_loader.enabled:
+        modules_str += SECTION_CDLC_IMPORTER + os.linesep
         modules_str += SECTION_SONG_LOADER + os.linesep
     if scene_switcher.enabled:
         modules_str += SECTION_SCENE_SWITCHER + os.linesep
@@ -195,6 +201,8 @@ def sniffer_data_loaded():
 def sniffer_data_not_loaded():
     return not sniffer_data_loaded()
 
+
+cdlc_importer.load()
 
 # Main 'endless' loop
 while True:
