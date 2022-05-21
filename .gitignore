@@ -133,7 +133,9 @@ dmypy.json
 /config/config.ini
 /log_*.txt
 /log/
+**/log/
 /setlist/
 /import/
 /temp/
 /cdlc_archive/
+/modules/song_loader/log/

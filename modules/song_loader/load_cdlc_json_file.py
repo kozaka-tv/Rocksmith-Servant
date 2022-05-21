@@ -3,12 +3,39 @@ import os
 import sqlite3
 from datetime import datetime
 
+from munch import DefaultMunch
+
+from modules.song_loader import song_loader_helper
+from utils import logger
+
 CDLC_IMPORT_JSON_FILE = 'c:/Google Drive Kozaka/Kozaka - Live Stream/SongsMasterGrid.json'
 # CDLC_IMPORT_JSON_FILE = '../../import/SongsMasterGrid.json'
 # CDLC_IMPORT_JSON_FILE = '../../import/SongsMasterGrid_BIG.json'
 # CDLC_IMPORT_JSON_FILE = '../../import/SongsMasterGrid_SMALL.json'
 
 db = sqlite3.connect('../../servant.db')
+
+columns = ['rowId', 'colArtist', 'colTitle', 'colAlbum', 'colKey', 'colArrangements', 'colTunings', 'colSongLength',
+           'colRepairStatus', 'colSongYear', 'colSongVolume', 'colFileName', 'colFileDate', 'colAppID',
+           'colPackageAuthor', 'colPackageVersion', 'colTagged', 'colIgnitionID', 'colIgnitionDate',
+           'colIgnitionVersion', 'colIgnitionAuthor', 'colArtistTitleAlbum', 'colArtistTitleAlbumDate', 'colArtistSort']
+
+
+def create_tables():
+    cursor = db.cursor()
+    read = open("create_table_songs.sql").read()
+    cursor.executescript(read)
+
+
+def init_db():
+    cursor = db.cursor()
+    cursor.execute("SELECT count(name) FROM sqlite_master WHERE type='table' AND name='songs'")
+    if cursor.fetchone()[0] == 1:
+        logger.debug("Songs Table exists.")
+    else:
+        logger.warning("Songs Table does not exists! Creating...")
+        create_tables()
+    db.commit()
 
 
 def file_datetime(filename):
@@ -18,57 +45,83 @@ def file_datetime(filename):
     return formatted_time
 
 
-# TODO this is ment to check that the file is new/changed or not. Means do we need to import it or not.
+# TODO the datetime check is not necessary probably, if we merge the data into the database and
+#  do not create a new one at every start. This means, that if the song is already in the Database,
+#  then we do not insert.
 file_datetime(CDLC_IMPORT_JSON_FILE)
 
-with open(CDLC_IMPORT_JSON_FILE, encoding='utf-8-sig') as json_file:
-    # TODO extract to a method the load of the file
-    print("File to import: {0}".format(json_file.name))
-    json_file_data = json.loads(json_file.read())
+
+def load_cfsm_song_data(json_file):
+    json_file_read = json_file.read()
+    json_file_data = json.loads(json_file_read)
     songs = dict(json_file_data)
     json_data = songs['dgvSongsMaster']
+    return DefaultMunch.fromDict(json_data)
 
-    # Aim of this block is to get the list of the columns in the JSON file.
-    columns = []
-    column = []
-    for data in json_data:
-        column = list(data.keys())
-        for col in column:
-            if col not in columns:
-                columns.append(col)
 
-    # Here we get values of the columns in the JSON file in the right order.
-    count = 0
+def get_song_from_db_via_file_name(file_name):
+    cur = db.cursor()
+    # TODO maybe add internal ID for each song and get that ID here?
+    execute = cur.execute("SELECT distinct colFileName FROM songs where colFileName like (?)", (file_name,))
+    rows = execute.fetchall()
+    return rows
+
+
+def insert_songs_to_db(songs):
+    logger.debug("Start insert {} songs ...".format(len(songs)))
+
     value = []
     values = []
-    for data in json_data:
-        for i in columns:
-            if i == 'colFileName':
-                value.append(str(dict(data).get(i)).strip().replace('cdlc\\', '').replace('dlc\\', ''))
+    for song in songs:
+        for column in columns:
+            if column == 'colFileName':
+                value.append(
+                    str(song.get(column)).strip().replace('cdlc\\', '').replace('dlc\\', ''))
             else:
-                value.append(str(dict(data).get(i)).strip())
+                value.append(str(song.get(column)).strip())
         values.append(list(value))
         value.clear()
-        count += 1
 
-    # Time to generate the create and insert queries and apply it to the sqlite3 database
-    drop_query = "drop table if exists songs"
-    create_query = "create table if not exists songs ({0}, 'dlc_id')".format(" text,".join(columns))
     insert_query = "insert into songs ({0}) values (?{1})".format(",".join(columns), ",?" * (len(columns) - 1))
 
-    print("insert has started at " + str(datetime.now()))
-
     c = db.cursor()
-    c.execute(drop_query)
-    db.commit()
-
-    c.execute(create_query)
-
     c.executemany(insert_query, values)
     values.clear()
-
     db.commit()
-
     c.close()
 
-    print("inserted " + str(count) + " songs and completed at " + str(datetime.now()))
+    logger.debug("... {} songs inserted.".format(len(songs)))
+
+
+def import_cdlc_files():
+    with open(CDLC_IMPORT_JSON_FILE, encoding='utf-8-sig') as json_file:
+        logger.log("File to import: {}".format(json_file.name))
+
+        # TODO what exactly identifies a song in the DB? colFileName? colKey? colArtistTitleAlbumDate? All?
+        count_songs_to_import = 0
+        songs_to_import = []
+        for cfsm_song_data in load_cfsm_song_data(json_file):
+            count_songs_to_import += 1
+
+            with db:
+                songs_from_db = get_song_from_db_via_file_name(
+                    song_loader_helper.replace_dlc_and_cdlc(cfsm_song_data.colFileName))
+
+                if len(songs_from_db) == 0:
+                    logger.debug("New CDLC found: {}".format(cfsm_song_data.colFileName))
+                    songs_to_import.append(cfsm_song_data)
+
+        if len(songs_to_import) == 0:
+            logger.log(
+                "All {} songs from the import file is already exists in the Database, so nothing must be imported! "
+                "File: {}".format(count_songs_to_import, json_file.name))
+        else:
+            logger.log("Will import {} new CDLC files into the DB.".format(len(songs_to_import)))
+            insert_songs_to_db(songs_to_import)
+            logger.log(
+                "From {} songs, {} new CDLC were imported into the DB.".format(count_songs_to_import,
+                                                                               len(songs_to_import)))
+
+
+init_db()
+import_cdlc_files()

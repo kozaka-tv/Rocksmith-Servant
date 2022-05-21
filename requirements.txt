@@ -1,4 +1,4 @@
 colorama~=0.4.4
 setuptools~=57.0.0
 requests~=2.24.0
-pymongo~=4.0.1
+munch~=2.5.0
