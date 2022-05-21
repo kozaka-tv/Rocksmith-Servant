@@ -26,11 +26,11 @@ class CDLCImporter:
         self.db = db
 
     def load(self):
-        logger.log("-----------------------------------")
-        logger.warning("Importing CDLC files from CFSM json file...")
+        logger.log("-----------------------------------", MODULE_NAME)
+        logger.warning("Importing CDLC files from CFSM json file...", MODULE_NAME)
         self.init_db()
         self.import_cdlc_files()
-        logger.log("-----------------------------------")
+        logger.log("-----------------------------------", MODULE_NAME)
 
     def create_tables(self):
         cursor = self.db.cursor()
@@ -41,9 +41,9 @@ class CDLCImporter:
         cursor = self.db.cursor()
         cursor.execute("SELECT count(name) FROM sqlite_master WHERE type='table' AND name='songs'")
         if cursor.fetchone()[0] == 1:
-            logger.debug("Songs Table exists.")
+            logger.debug("Songs Table exists.", MODULE_NAME)
         else:
-            logger.warning("Songs Table does not exists! Creating...")
+            logger.warning("Songs Table does not exists! Creating...", MODULE_NAME)
             self.create_tables()
         self.db.commit()
 
@@ -74,7 +74,7 @@ class CDLCImporter:
         return rows
 
     def insert_songs_to_db(self, songs):
-        logger.debug("Start insert {} songs ...".format(len(songs)))
+        logger.debug("Start insert {} songs ...".format(len(songs)), MODULE_NAME)
 
         value = []
         values = []
@@ -96,11 +96,11 @@ class CDLCImporter:
         self.db.commit()
         c.close()
 
-        logger.debug("... {} songs inserted.".format(len(songs)))
+        logger.debug("... {} songs inserted.".format(len(songs)), MODULE_NAME)
 
     def import_cdlc_files(self):
         with open(CDLC_IMPORT_JSON_FILE, encoding='utf-8-sig') as json_file:
-            logger.log("File to import: {}".format(json_file.name))
+            logger.log("File to import: {}".format(json_file.name), MODULE_NAME)
 
             # TODO what exactly identifies a song in the DB? colFileName? colKey? colArtistTitleAlbumDate? All?
             count_songs_to_import = 0
@@ -113,16 +113,16 @@ class CDLCImporter:
                         song_loader_helper.replace_dlc_and_cdlc(cfsm_song_data.colFileName))
 
                     if len(songs_from_db) == 0:
-                        logger.debug("New CDLC found: {}".format(cfsm_song_data.colFileName))
+                        logger.debug("New CDLC found: {}".format(cfsm_song_data.colFileName), MODULE_NAME)
                         songs_to_import.append(cfsm_song_data)
 
             if len(songs_to_import) == 0:
                 logger.log(
                     "All {} songs from the import file is already exists in the Database, so nothing must be imported! "
-                    "File: {}".format(count_songs_to_import, json_file.name))
+                    "File: {}".format(count_songs_to_import, json_file.name), MODULE_NAME)
             else:
-                logger.log("Will import {} new CDLC files into the DB.".format(len(songs_to_import)))
+                logger.log("Will import {} new CDLC files into the DB.".format(len(songs_to_import)), MODULE_NAME)
                 self.insert_songs_to_db(songs_to_import)
                 logger.log(
                     "From {} songs, {} new CDLC were imported into the DB.".format(count_songs_to_import,
-                                                                                   len(songs_to_import)))
+                                                                                   len(songs_to_import)), MODULE_NAME)
