@@ -75,7 +75,8 @@ class SongLoader:
 
                 # TODO or maybe this should be configurable?
                 # else:  # load songs only in case we are not in game to avoid lagging in game
-                self.move_requested_cdlcs_to_destination()
+
+                self.move_requested_cdlc_files_to_destination()
 
                 self.last_run = time()
 
@@ -107,7 +108,8 @@ class SongLoader:
     # - get_requests from RS playlist
     # - get filenames from DB
     # - move files
-    def move_requested_cdlcs_to_destination(self):
+    def move_requested_cdlc_files_to_destination(self):
+
         playlist = get_playlist(self.phpsessid)
 
         for sr in playlist["playlist"]:
@@ -118,16 +120,24 @@ class SongLoader:
                 except TypeError:
                     raise RSPlaylistNotLoggedInError
 
-                # Do not load official DLC files
-                if cdlc["official"] == 4:
-                    continue
-
                 cdlc_id = cdlc["cdlc_id"]
                 artist = cdlc["artist"]
                 title = cdlc["title"]
-                logger.log(str(rspl_id) + " - " + str(cdlc_id) + " - " + artist + " - " + title, MODULE_NAME)
+                artist_title = str(rspl_id) + " - " + str(cdlc_id) + " - " + artist + " - " + title
+                logger.log("Request " + artist_title + " will be managed.", MODULE_NAME)
 
+                # TODO if it is possible, do not create always a new SongData. If it is already exists, just reuse it!
+                #   search in a list
                 song_data = SongData(sr_id, cdlc_id)
+                self.update_tags(song_data, sr)
+
+                # Do not load official DLC files
+                if cdlc["official"] == 4:
+                    logger.debug(
+                        "Skipping ODLC " + artist_title
+                        ,
+                        MODULE_NAME)
+                    continue
 
                 with con:
                     rows = self.search_song_in_the_db(artist, title)
@@ -137,6 +147,7 @@ class SongLoader:
                         for element in rows:
                             song_file_name = str(element[0])
                             song_data.song_file_name = song_file_name
+
                             logger.debug("row=" + song_file_name, MODULE_NAME)
                             self.songs.song_data_set.add(song_data)
                     else:
@@ -151,12 +162,18 @@ class SongLoader:
                 "---- Files to move from archive according to the requests: " + str(self.songs.song_data_set),
                 MODULE_NAME)
         else:
+            # TODO if nothing to move, why not exit and do nothing more here?
             logger.warning("---- The playlist is empty, nothing to move!", MODULE_NAME)
 
         actually_loaded_songs = set()
         for song_data in self.songs.song_data_set:
             if song_data.song_file_name in self.songs.loaded:
-                rs_playlist.set_tag_loaded(self.phpsessid, song_data.sr_id)
+                # TODO this takes 1 sec for each call. If we have a list of 30 songs, it could take 30 seconds!
+                #   Do it only once!
+                if 'afea46a9' not in song_data.tags:
+                    rs_playlist.set_tag_loaded(self.phpsessid, song_data.sr_id)
+                    song_data.tags.add('afea46a9')
+                    # song_data.tags.discard('need to download')  # TODO
             else:
                 song_to_move = os.path.join(self.cdlc_archive_dir, song_data.song_file_name)
                 moved = file_utils.move_file(song_to_move, self.destination_directory, MODULE_NAME)
@@ -166,16 +183,26 @@ class SongLoader:
                         MODULE_NAME)
                     self.songs.loaded.add(song_data.song_file_name)
                     actually_loaded_songs.add(song_data.song_file_name)
+                    # TODO this takes 1 sec for each call. If we have a list of 30 songs, it could take 30 seconds!
+                    #   Do it only once!
                     rs_playlist.set_tag_loaded(self.phpsessid, song_data.sr_id)
                 else:
                     logger.debug("Could not move file: {}".format(song_to_move), MODULE_NAME)
                     self.songs.missing.add(song_data.song_file_name)
+                    # TODO this takes 1 sec for each call. If we have a list of 30 songs, it could take 30 seconds!
+                    #   Do it only once!
                     rs_playlist.set_tag_to_download(self.phpsessid, song_data.sr_id)
 
         if len(actually_loaded_songs) > 0:
             logger.warning("---- Files newly moved and will be parsed: " + str(actually_loaded_songs), MODULE_NAME)
         if len(self.songs.missing) > 0:
             logger.error("---- Missing files but found in Database: " + str(self.songs.missing), MODULE_NAME)
+
+    @staticmethod
+    def update_tags(song_data, sr):
+        song_data.tags.clear()
+        for tag in sr['tags']:
+            song_data.tags.add(tag)
 
     def search_song_in_the_db(self, artist, title):
         rows = self.get_song_from_db(artist, title)

@@ -15,6 +15,7 @@ from utils.rocksniffer import Rocksniffer
 
 db = sqlite3.connect('servant.db')
 
+
 def check_enabled_module_dependencies():
     if song_loader.enabled and not file_manager.enabled:
         raise ConfigError("Please enable FileManager if you wanna use the SongLoader!")
@@ -204,9 +205,6 @@ cdlc_importer.load()
 
 # Main 'endless' loop
 while True:
-
-    # TODO comment out this!
-    # logger.debug("Serving...")
 
     try:
         # Sleep a bit to avoid too fast processing

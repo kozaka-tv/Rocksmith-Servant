@@ -75,7 +75,7 @@ def get_file_path(directory, file_name):
 
 def move_files(files, destination, module_name):
     if len(files) > 0:
-        logger.log('Moving {} files to: {}'.format(len(files), destination), module_name)
+        logger.debug('Moving {} files to: {} | files: {}'.format(len(files), destination, files), module_name)
         for file in files:
             move_file(file, destination, module_name)
 

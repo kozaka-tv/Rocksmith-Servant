@@ -33,6 +33,7 @@ class SongData:
         self.song_file_name = song_file_name
         # --
         self.state = State.NEW_REQUEST
+        self.tags = set()
         # --
         self.found_in_db = False
         self.loaded_under_the_game = False
