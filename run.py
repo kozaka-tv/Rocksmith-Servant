@@ -116,8 +116,6 @@ def update_config():
         song_loader.phpsessid = rs_playlist.check_phpsessid(conf.get(SECTION_SONG_LOADER, "phpsessid"))
         # TODO all this props should be maybe in run or in song_loader?
         song_loader.songs_to_load = os.path.join(song_loader.cdlc_dir, song_loader.cfsm_file_name)
-        # TODO this first run is not round here...is it really first run? This info should be in DB or somewhere.
-        song_loader.first_run = True
         # TODO maybe call this different...do we need this?
         song_loader.raw_playlist = None
         song_loader.create_directories()

@@ -1,4 +1,29 @@
 import os
+from enum import unique, Enum
+
+
+class Songs:
+    def __init__(self):
+        self.archive = set()
+        self.requests = set()
+        self.loaded = set()
+        self.missing = set()
+        # TODO this set is maybe not needed!
+        self.song_data_set = set()
+
+
+@unique
+class State(Enum):
+    # -- New request on the playlist
+    NEW_REQUEST = 10
+    # -- Could not found in the archive and not loaded in the game
+    TO_DOWNLOAD = 20
+    # --
+    FOUND_IN_ARCHIVE = 30
+    MOVED_FROM_ARCHIVE = 31
+    LOADED = 32
+    # --
+    OUT_FROM_THE_PLAYLIST = 40
 
 
 class SongData:
@@ -6,6 +31,11 @@ class SongData:
         self.sr_id = sr_id
         self.cdlc_id = cdlc_id
         self.song_file_name = song_file_name
+        # --
+        self.state = State.NEW_REQUEST
+        # --
+        self.found_in_db = False
+        self.loaded_under_the_game = False
 
     # TODO sr_id? or cdlc_id? or something else?
     def __eq__(self, other):
