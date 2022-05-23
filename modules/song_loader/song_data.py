@@ -16,7 +16,7 @@ class Songs:
 class State(Enum):
     # -- New request on the playlist
     NEW_REQUEST = 10
-    # -- Could not found in the archive and not loaded in the game
+    # -- Could not be found in the archive and not loaded in the game
     TO_DOWNLOAD = 20
     # --
     FOUND_IN_ARCHIVE = 30
@@ -46,9 +46,8 @@ class SongData:
         return hash(self.sr_id)
 
     def __repr__(self):
-        return os.linesep + '<SongData: sr_id={}, cdlc_id={}, song_file_name={}>'.format(self.sr_id,
-                                                                                         self.cdlc_id,
-                                                                                         self.song_file_name)
+        return os.linesep + '<SongData: sr_id={}, cdlc_id={}, song_file_name={}>'.format(
+            self.sr_id, self.cdlc_id, self.song_file_name)
 
 
 # TODO remove this later if the eq is decided!
@@ -58,4 +57,7 @@ s3 = SongData(1, 777, '123')
 
 song_data_set = {s1, s2, s3}
 print(song_data_set)
-# output: {<Person tom>, <Person mary>}
+# output:
+# {
+# <SongData: sr_id=1, cdlc_id=555, song_file_name=asd>,
+# <SongData: sr_id=2, cdlc_id=666, song_file_name=qwe>}

@@ -1,8 +1,9 @@
 import os
 import sqlite3
-from time import time
 
 import unicodedata
+from deepdiff import DeepDiff
+from time import time
 
 from modules.song_loader.song_data import SongData, Songs
 from utils import logger, file_utils, rs_playlist
@@ -31,6 +32,8 @@ class SongLoader:
                  rocksmith_cdlc_dir, cdlc_import_json_file, allow_load_when_in_game=True):
         self.enabled = enabled
         if enabled:
+            self.playlist = None
+            self.playlist_updated = True
             self.cdlc_dir = os.path.join(cdlc_dir)
             self.cfsm_file_name = cfsm_file_name
             self.cdlc_archive_dir = self.check_cdlc_archive_dir(cdlc_archive_dir)
@@ -70,15 +73,41 @@ class SongLoader:
     def load(self):
         if self.enabled:
             if time() - self.last_run >= HEARTBEAT:
-                logger.warning("Load songs according to the requests!", MODULE_NAME)
-                self.update_under_rs_loaded_cdlc_files()
+                logger.log("Load songs according to the requests!", MODULE_NAME)
 
-                # TODO or maybe this should be configurable?
-                # else:  # load songs only in case we are not in game to avoid lagging in game
+                if self.update_playlist():
+                    logger.log("Playlist has been changed, update songs!")
+                    self.update_under_rs_loaded_cdlc_files()
 
-                self.move_requested_cdlc_files_to_destination()
+                    # TODO or maybe this should be configurable?
+                    # else:  # load songs only in case we are not in game to avoid lagging in game
+
+                    self.move_requested_cdlc_files_to_destination()
+                else:
+                    # TODO Maybe, this is not completely true! If the file is not parsed, then it will be not checked.
+                    #   I think, the logic must be separated.
+                    #   1) rs playlist NOT updated --> Just check dirs and move files
+                    #   2) rs playlist UPDATED --> check DB and move files
+                    logger.log("No playlist change, nothing to do...", MODULE_NAME)
 
                 self.last_run = time()
+
+    def update_playlist(self):
+        new_playlist = get_playlist(self.phpsessid)
+        if self.playlist is None:
+            logger.debug("Initial load of the playlist done...", MODULE_NAME)
+            self.playlist = new_playlist
+            return True
+
+        diff = DeepDiff(self.playlist, new_playlist, exclude_regex_paths="\\['inactive_time'\\]")
+
+        if str(diff) == "{}":
+            return False
+
+        logger.debug("Playlist has been changed! Diffs: {}".format(diff), MODULE_NAME)
+        self.playlist = new_playlist
+
+        return True
 
     def update_under_rs_loaded_cdlc_files(self):
         loaded_cdlc_files = self.scan_cdlc_files_under_rs_dir()
@@ -109,10 +138,7 @@ class SongLoader:
     # - get filenames from DB
     # - move files
     def move_requested_cdlc_files_to_destination(self):
-
-        playlist = get_playlist(self.phpsessid)
-
-        for sr in playlist["playlist"]:
+        for sr in self.playlist["playlist"]:
             sr_id = sr['id']
             for cdlc in sr["dlc_set"]:
                 try:
