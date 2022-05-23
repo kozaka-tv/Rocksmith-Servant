@@ -1,17 +1,24 @@
 import os
 
-SNIFFER_ERROR_MSG = "--- Could not connect to Rocksniffer!" + os.linesep + \
-                    "--------------------------------------------------" + os.linesep + \
-                    "Please check that is Rocksniffer running or not!" + os.linesep + \
-                    "Please check host and port defined in config:" + os.linesep + \
-                    "host={}" + os.linesep + \
-                    "port={}" + os.linesep + \
+NL = os.linesep
+
+SNIFFER_ERROR_MSG = "--- Could not connect to Rocksniffer!" + NL + \
+                    "--------------------------------------------------" + NL + \
+                    "Please check that is Rocksniffer running or not!" + NL + \
+                    "Please check host and port defined in config:" + NL + \
+                    "host={}" + NL + \
+                    "port={}" + NL + \
                     "--------------------------------------------------"
 
-RSPL_LOGIN_ERROR_MSG = "--- PHPSESSID in from the cookies in the config is not valid anymore!" + os.linesep + \
-                       "--------------------------------------------------" + os.linesep + \
-                       "Please login on RS Playlist page and get the PHPSESSID from the cookies!" + os.linesep + \
-                       "Then add/change it in the config and restart Servant if needed!" + os.linesep + \
+RSPL_LOGIN_ERROR_MSG = "--- PHPSESSID in from the cookies in the config is not valid anymore!" + NL + \
+                       "--------------------------------------------------" + NL + \
+                       "Please login on RS Playlist page and get the PHPSESSID from the cookies!" + NL + \
+                       "Then add/change it in the config and restart Servant if needed!" + NL + \
+                       "--- " + \
+                       "Or optionally, use the Tampermonkey script, what could be found under /misc/tampermonkey " \
+                       "with the name: 'RS Playlist enhancer and simplifier.user.js'" + NL + \
+                       "or install it from " \
+                       "https://greasyfork.org/en/scripts/440738-rs-playlist-enhancer-and-simplifier" + NL + \
                        "--------------------------------------------------"
 
 

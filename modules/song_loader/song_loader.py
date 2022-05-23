@@ -141,11 +141,7 @@ class SongLoader:
         for sr in self.playlist["playlist"]:
             sr_id = sr['id']
             for cdlc in sr["dlc_set"]:
-                try:
-                    rspl_id = cdlc['id']
-                except TypeError:
-                    raise RSPlaylistNotLoggedInError
-
+                rspl_id = self.get_rspl_id(cdlc)
                 cdlc_id = cdlc["cdlc_id"]
                 artist = cdlc["artist"]
                 title = cdlc["title"]
@@ -159,10 +155,7 @@ class SongLoader:
 
                 # Do not load official DLC files
                 if cdlc["official"] == 4:
-                    logger.debug(
-                        "Skipping ODLC " + artist_title
-                        ,
-                        MODULE_NAME)
+                    logger.debug("Skipping ODLC " + artist_title, MODULE_NAME)
                     continue
 
                 with con:
@@ -183,13 +176,13 @@ class SongLoader:
 
                 con.commit()
 
-        if len(self.songs.song_data_set) > 0:
-            logger.warning(
-                "---- Files to move from archive according to the requests: " + str(self.songs.song_data_set),
-                MODULE_NAME)
-        else:
-            # TODO if nothing to move, why not exit and do nothing more here?
+        if len(self.songs.song_data_set) <= 0:
             logger.warning("---- The playlist is empty, nothing to move!", MODULE_NAME)
+            return
+
+        logger.warning(
+            "---- Files to move from archive according to the requests: " + str(self.songs.song_data_set),
+            MODULE_NAME)
 
         actually_loaded_songs = set()
         for song_data in self.songs.song_data_set:
@@ -223,6 +216,14 @@ class SongLoader:
             logger.warning("---- Files newly moved and will be parsed: " + str(actually_loaded_songs), MODULE_NAME)
         if len(self.songs.missing) > 0:
             logger.error("---- Missing files but found in Database: " + str(self.songs.missing), MODULE_NAME)
+
+    @staticmethod
+    def get_rspl_id(cdlc):
+        try:
+            rspl_id = cdlc['id']
+        except TypeError:
+            raise RSPlaylistNotLoggedInError
+        return rspl_id
 
     @staticmethod
     def update_tags(song_data, sr):
