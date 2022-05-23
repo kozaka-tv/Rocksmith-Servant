@@ -70,7 +70,7 @@ class SongLoader:
         file_utils.create_directory(self.cdlc_archive_dir)
         file_utils.create_directory(self.rocksmith_cdlc_dir)
 
-    def load(self):
+    def run(self):
         if self.enabled:
             if time() - self.last_run >= HEARTBEAT:
                 logger.log("Load songs according to the requests!", MODULE_NAME)
@@ -94,6 +94,9 @@ class SongLoader:
 
     def update_playlist(self):
         new_playlist = get_playlist(self.phpsessid)
+
+        self.exit_if_user_not_logged_in(new_playlist)
+
         if self.playlist is None:
             logger.debug("Initial load of the playlist done...", MODULE_NAME)
             self.playlist = new_playlist
@@ -108,6 +111,16 @@ class SongLoader:
         self.playlist = new_playlist
 
         return True
+
+    def exit_if_user_not_logged_in(self, new_playlist):
+        for sr in new_playlist["playlist"]:
+            for cdlc in sr["dlc_set"]:
+                if self.is_user_not_logged_in(cdlc):
+                    self.playlist = None
+                    self.last_run = time()
+                    raise RSPlaylistNotLoggedInError
+                else:
+                    return
 
     def update_under_rs_loaded_cdlc_files(self):
         loaded_cdlc_files = self.scan_cdlc_files_under_rs_dir()
@@ -141,7 +154,7 @@ class SongLoader:
         for sr in self.playlist["playlist"]:
             sr_id = sr['id']
             for cdlc in sr["dlc_set"]:
-                rspl_id = self.get_rspl_id(cdlc)
+                rspl_id = cdlc['id']
                 cdlc_id = cdlc["cdlc_id"]
                 artist = cdlc["artist"]
                 title = cdlc["title"]
@@ -218,12 +231,12 @@ class SongLoader:
             logger.error("---- Missing files but found in Database: " + str(self.songs.missing), MODULE_NAME)
 
     @staticmethod
-    def get_rspl_id(cdlc):
+    def is_user_not_logged_in(cdlc):
         try:
-            rspl_id = cdlc['id']
+            cdlc['id']
         except TypeError:
-            raise RSPlaylistNotLoggedInError
-        return rspl_id
+            return True
+        return False
 
     @staticmethod
     def update_tags(song_data, sr):

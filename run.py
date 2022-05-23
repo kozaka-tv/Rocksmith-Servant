@@ -1,5 +1,6 @@
 import os
 import sqlite3
+
 from time import sleep
 
 from config.configReader import ConfigReader
@@ -214,7 +215,7 @@ while True:
 
         scene_switcher.run()
         file_manager.run()
-        song_loader.load()
+        song_loader.run()
         update_game_information()
         put_the_song_into_the_setlist()
 

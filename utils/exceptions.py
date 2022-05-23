@@ -14,7 +14,7 @@ RSPL_LOGIN_ERROR_MSG = "--- PHPSESSID in from the cookies in the config is not v
                        "--------------------------------------------------" + NL + \
                        "Please login on RS Playlist page and get the PHPSESSID from the cookies!" + NL + \
                        "Then add/change it in the config and restart Servant if needed!" + NL + \
-                       "--- " + \
+                       "" + NL + \
                        "Or optionally, use the Tampermonkey script, what could be found under /misc/tampermonkey " \
                        "with the name: 'RS Playlist enhancer and simplifier.user.js'" + NL + \
                        "or install it from " \
