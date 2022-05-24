@@ -32,8 +32,8 @@ class SongLoader:
                  rocksmith_cdlc_dir, cdlc_import_json_file, allow_load_when_in_game=True):
         self.enabled = enabled
         if enabled:
-            self.playlist = None
-            self.playlist_updated = True
+            self.rsplaylist = None
+            self.rsplaylist_updated = True
             self.cdlc_dir = os.path.join(cdlc_dir)
             self.cfsm_file_name = cfsm_file_name
             self.cdlc_archive_dir = self.check_cdlc_archive_dir(cdlc_archive_dir)
@@ -86,7 +86,7 @@ class SongLoader:
                     #   I think, the logic must be separated.
                     #   1) rs playlist NOT updated --> Just check dirs and move files
                     #   2) rs playlist UPDATED --> check DB and move files
-                    logger.log("No playlist change, nothing to do...", MODULE_NAME)
+                    logger.log("No rsplaylist change, nothing to do...", MODULE_NAME)
 
                 self.last_run = time()
 
@@ -95,18 +95,18 @@ class SongLoader:
 
         self.exit_if_user_not_logged_in(new_playlist)
 
-        if self.playlist is None:
-            logger.debug("Initial load of the playlist done...", MODULE_NAME)
-            self.playlist = new_playlist
+        if self.rsplaylist is None:
+            logger.debug("Initial load of the rsplaylist done...", MODULE_NAME)
+            self.rsplaylist = new_playlist
             return True
 
-        diff = DeepDiff(self.playlist, new_playlist, exclude_regex_paths="\\['inactive_time'\\]")
+        diff = DeepDiff(self.rsplaylist, new_playlist, exclude_regex_paths="\\['inactive_time'\\]")
 
         if str(diff) == "{}":
             return False
 
         logger.debug("Playlist has been changed! Diffs: {}".format(diff), MODULE_NAME)
-        self.playlist = new_playlist
+        self.rsplaylist = new_playlist
 
         return True
 
@@ -114,7 +114,7 @@ class SongLoader:
         for sr in new_playlist["playlist"]:
             for cdlc in sr["dlc_set"]:
                 if self.is_user_not_logged_in(cdlc):
-                    self.playlist = None
+                    self.rsplaylist = None
                     self.last_run = time()
                     raise RSPlaylistNotLoggedInError
                 else:
@@ -149,7 +149,7 @@ class SongLoader:
     # - get filenames from DB
     # - move files
     def move_requested_cdlc_files_to_destination(self):
-        for sr in self.playlist["playlist"]:
+        for sr in self.rsplaylist["playlist"]:
             sr_id = sr['id']
             for cdlc in sr["dlc_set"]:
                 rspl_id = cdlc['id']
@@ -188,7 +188,7 @@ class SongLoader:
                 con.commit()
 
         if len(self.songs.song_data_set) <= 0:
-            logger.warning("---- The playlist is empty, nothing to move!", MODULE_NAME)
+            logger.warning("---- The rsplaylist is empty, nothing to move!", MODULE_NAME)
             return
 
         logger.warning(
