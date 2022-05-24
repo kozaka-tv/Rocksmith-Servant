@@ -118,8 +118,6 @@ def update_config():
         song_loader.phpsessid = rs_playlist.check_phpsessid(conf.get(SECTION_SONG_LOADER, "phpsessid"))
         # TODO all this props should be maybe in run or in song_loader?
         song_loader.songs_to_load = os.path.join(song_loader.cdlc_dir, song_loader.cfsm_file_name)
-        # TODO maybe call this different...do we need this?
-        song_loader.raw_playlist = None
         song_loader.create_directories()
 
         # Updating Scene Switcher Configurations

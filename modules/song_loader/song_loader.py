@@ -44,14 +44,12 @@ class SongLoader:
             self.cdlc_import_json_file = cdlc_import_json_file
 
             self.songs_to_load = os.path.join(cdlc_dir, cfsm_file_name)
-            # TODO maybe call this different...do we need this?
-            self.raw_playlist = None
 
             self.create_directories()
 
             self.last_run = time()
 
-        self.songs = Songs()
+            self.songs = Songs()
 
     @staticmethod
     def check_cdlc_archive_dir(cdlc_archive_dir):
@@ -125,9 +123,9 @@ class SongLoader:
     def update_under_rs_loaded_cdlc_files(self):
         loaded_cdlc_files = self.scan_cdlc_files_under_rs_dir()
         for loaded_cdlc_file in loaded_cdlc_files:
-            self.songs.loaded.add(loaded_cdlc_file)
-            if len(self.songs.missing) > 0:
-                self.songs.missing.discard(loaded_cdlc_file)
+            self.songs.loaded_into_rs.add(loaded_cdlc_file)
+            if len(self.songs.missing_from_archive) > 0:
+                self.songs.missing_from_archive.discard(loaded_cdlc_file)
 
     def scan_cdlc_files_under_rs_dir(self):
         cdlc_files = file_utils.get_file_names_from(self.rocksmith_cdlc_dir)
@@ -199,7 +197,7 @@ class SongLoader:
 
         actually_loaded_songs = set()
         for song_data in self.songs.song_data_set:
-            if song_data.song_file_name in self.songs.loaded:
+            if song_data.song_file_name in self.songs.loaded_into_rs:
                 # TODO this takes 1 sec for each call. If we have a list of 30 songs, it could take 30 seconds!
                 #   Do it only once!
                 if 'afea46a9' not in song_data.tags:
@@ -213,22 +211,23 @@ class SongLoader:
                     logger.debug(
                         "The song were moved from the archive to under RS. Moved file: {}".format(song_to_move),
                         MODULE_NAME)
-                    self.songs.loaded.add(song_data.song_file_name)
+                    self.songs.loaded_into_rs.add(song_data.song_file_name)
                     actually_loaded_songs.add(song_data.song_file_name)
                     # TODO this takes 1 sec for each call. If we have a list of 30 songs, it could take 30 seconds!
                     #   Do it only once!
                     rs_playlist.set_tag_loaded(self.phpsessid, song_data.sr_id)
                 else:
                     logger.debug("Could not move file: {}".format(song_to_move), MODULE_NAME)
-                    self.songs.missing.add(song_data.song_file_name)
+                    self.songs.missing_from_archive.add(song_data.song_file_name)
                     # TODO this takes 1 sec for each call. If we have a list of 30 songs, it could take 30 seconds!
                     #   Do it only once!
                     rs_playlist.set_tag_to_download(self.phpsessid, song_data.sr_id)
 
         if len(actually_loaded_songs) > 0:
             logger.warning("---- Files newly moved and will be parsed: " + str(actually_loaded_songs), MODULE_NAME)
-        if len(self.songs.missing) > 0:
-            logger.error("---- Missing files but found in Database: " + str(self.songs.missing), MODULE_NAME)
+        if len(self.songs.missing_from_archive) > 0:
+            logger.error("---- Missing files but found in Database: " + str(self.songs.missing_from_archive),
+                         MODULE_NAME)
 
     @staticmethod
     def is_user_not_logged_in(cdlc):

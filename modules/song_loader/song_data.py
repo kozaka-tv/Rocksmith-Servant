@@ -4,10 +4,12 @@ from enum import unique, Enum
 
 class Songs:
     def __init__(self):
-        self.archive = set()
-        self.requests = set()
-        self.loaded = set()
-        self.missing = set()
+        self.playlist = set()
+        self.loaded_into_rs = set()
+        # self.archive = set() # TODO needed?
+        self.need_to_download = set()
+        self.moved_from_archive = set()
+        self.missing_from_archive = set()
         # TODO this set is maybe not needed!
         self.song_data_set = set()
 
