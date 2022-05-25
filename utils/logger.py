@@ -30,9 +30,9 @@ def create_message_and_save_to_log(name, string):
     date = datetime.date.today()
 
     if name:
-        string = get_date_formatted() + "(" + name + ") - " + string
+        string = get_now_formatted() + "(" + name + ") - " + string
     else:
-        string = get_date_formatted() + string
+        string = get_now_formatted() + string
 
     try:
         join = os.path.join(file_utils.LOG_DIR, 'log_{}_{}.txt')
@@ -64,8 +64,12 @@ def third_party(text, name=''):
     print('\033[92m', create_message_and_save_to_log(name, str(text)), '\033[0m', sep='')
 
 
-def get_date_formatted():
+def get_now_formatted():
     return datetime.datetime.now().strftime("[%Y-%m-%d - %H:%M:%S.%f] - ")
+
+
+def format_datetime(to_format):
+    return datetime.datetime.fromtimestamp(to_format)
 
 
 class Logger:

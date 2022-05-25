@@ -80,9 +80,18 @@ def move_files(files, destination, module_name):
             move_file(file, destination, module_name)
 
 
+def last_modification_time(self, path):
+    """ Return last modified time of the config """
+    try:
+        return os.stat(path).st_mtime
+    except FileNotFoundError:
+        return 0
+
+
 def move_file(file, destination, module_name):
     # TODO remove this logs? Or change to debug?
     # logger.log("Moving file '{}' if exists!".format(file), module_name)
+
     if os.path.exists(file):
         destination_file = os.path.join(destination, os.path.basename(file))
         if os.path.isfile(destination_file) and os.path.exists(destination_file):
@@ -91,7 +100,7 @@ def move_file(file, destination, module_name):
         shutil.move(file, destination)
         return True
     else:
-        # logger.log("File '{}' does not exists, so can not move!".format(file), module_name)
+        logger.debug("File '{}' does not exists, so can not move!".format(file), module_name)
         return False
 
 

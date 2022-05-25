@@ -71,7 +71,7 @@ class SongLoader:
     def run(self):
         if self.enabled:
             if time() - self.last_run >= HEARTBEAT:
-                logger.log("Load songs according to the requests!", MODULE_NAME)
+                # logger.log("Load songs according to the requests!", MODULE_NAME)
 
                 if self.update_playlist():
                     logger.log("Playlist has been changed, update songs!")
