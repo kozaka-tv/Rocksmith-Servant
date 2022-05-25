@@ -80,8 +80,8 @@ def move_files(files, destination, module_name):
             move_file(file, destination, module_name)
 
 
-def last_modification_time(self, path):
-    """ Return last modified time of the config """
+def last_modification_time(path):
+    """ Return last modified time of the path """
     try:
         return os.stat(path).st_mtime
     except FileNotFoundError:
