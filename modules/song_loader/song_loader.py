@@ -188,6 +188,7 @@ class SongLoader:
                 con.commit()
 
         if len(self.songs.song_data_set) <= 0:
+            # TODO actually this is not true. Only, there is no file moved from archive into the game.
             logger.warning("---- The rsplaylist is empty, nothing to move!", MODULE_NAME)
             return
 
