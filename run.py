@@ -60,7 +60,7 @@ setlist_logger = SetlistLogger(
 )
 file_manager = FileManager(
     conf.get_bool(SECTION_FILE_MANAGER, KEY_ENABLED),
-    conf.get_list(SECTION_FILE_MANAGER, "source_directories"),
+    conf.get_set(SECTION_FILE_MANAGER, "source_directories"),
     conf.get(SECTION_FILE_MANAGER, "destination_directory"),
     conf.get(SECTION_FILE_MANAGER, "using_cfsm")
 )
@@ -127,7 +127,7 @@ def update_config():
 
         # Updating FileManager Configurations
         file_manager.enabled = conf.get_bool(SECTION_FILE_MANAGER, KEY_ENABLED)
-        file_manager.source_directories = conf.get_list(SECTION_FILE_MANAGER, "source_directories")
+        file_manager.source_directories = conf.get_set(SECTION_FILE_MANAGER, "source_directories")
         file_manager.destination_directory = conf.get(SECTION_FILE_MANAGER, "destination_directory")
         file_manager.using_cfsm = conf.get(SECTION_FILE_MANAGER, "using_cfsm")
 

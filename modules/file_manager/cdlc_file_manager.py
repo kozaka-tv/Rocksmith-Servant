@@ -4,6 +4,7 @@ import math
 
 from definitions import ROOT_DIR
 from utils import logger, file_utils
+from utils.exceptions import BadDirectoryError
 
 MODULE_NAME = "FileManager"
 
@@ -42,12 +43,8 @@ class FileManager:
 
             elif self.beat_last_run():
                 logger.debug("Scan and move files from root and source dirs...", MODULE_NAME)
-
-                files_to_move_in_source_dir = self.scan_cdlc_files_in_root()
-                self.move_downloaded_cdlc_files(files_to_move_in_source_dir)
-
-                files_to_move_in_source_dir = self.scan_cdlc_files_in_source_dirs()
-                self.move_downloaded_cdlc_files(files_to_move_in_source_dir)
+                self.move_downloaded_cdlc_files(self.scan_cdlc_files_in_root())
+                self.move_downloaded_cdlc_files(self.scan_cdlc_files_in_source_dirs())
 
                 self.last_run = datetime.datetime.now()
 
@@ -88,7 +85,18 @@ class FileManager:
         return cdlc_files
 
     def scan_cdlc_files_in_source_dirs(self):
-        cdlc_files = file_utils.get_files_from_directories(self.source_directories)
+
+        try:
+            cdlc_files = file_utils.get_files_from_directories(self.source_directories)
+        except BadDirectoryError as bde:
+            logger.error("---------------------------------------", MODULE_NAME)
+            logger.error("Bad definition of the section FileManager of key source_directories!", MODULE_NAME)
+            logger.error("Directory {} is bad or could not be reached, "
+                         "therefore it will be not checked anymore.".format(bde.directory), MODULE_NAME)
+            logger.error("Please fix the configuration!", MODULE_NAME)
+            logger.error("---------------------------------------", MODULE_NAME)
+            self.source_directories.discard(bde.directory)
+            return
 
         if len(cdlc_files) > 0:
             logger.log('Found {} new CDLC file under source dirs.'.format(len(cdlc_files)), MODULE_NAME)
@@ -105,5 +113,5 @@ class FileManager:
             file_utils.move_files(files, ROOT_DIR, MODULE_NAME)
 
     def move_downloaded_cdlc_files(self, files):
-        if len(files) > 0:
+        if files and len(files) > 0:
             file_utils.move_files(files, self.destination_directory, MODULE_NAME)

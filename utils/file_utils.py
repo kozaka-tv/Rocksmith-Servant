@@ -5,6 +5,9 @@ import shutil
 from datetime import datetime, timedelta
 
 from utils import logger
+from utils.exceptions import BadDirectoryError
+
+MODULE_NAME = "Utils::FileUtils"
 
 DEFAULT_FILE_AGE_SECONDS = 9
 LOG_DIR = 'log'
@@ -37,7 +40,13 @@ def get_not_parsed_files_from_directory(directory, file_age_seconds=DEFAULT_FILE
 def get_files_from_directories(directories):
     cdlc_files = []
     for directory in directories:
-        get_files(cdlc_files, directory)
+        if os.path.isdir(directory):
+            get_files(cdlc_files, directory)
+        else:
+            error_msg = "Bad directory! Directory {} is not exists or could not be reached.".format(directory)
+            logger.error(error_msg, MODULE_NAME)
+            raise BadDirectoryError(error_msg, directory)
+
     return cdlc_files
 
 
@@ -110,7 +119,6 @@ def file_datetime_formatted(filename):
     return formatted_time
 
 
-# @staticmethod
 def create_directory(directory_to_create):
-    logger.warning("Creating directory '{}' if not exists!".format(directory_to_create))
+    logger.warning("Creating directory '{}' if not exists!".format(directory_to_create), MODULE_NAME)
     pathlib.Path(directory_to_create).mkdir(parents=True, exist_ok=True)

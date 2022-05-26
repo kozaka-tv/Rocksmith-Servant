@@ -40,3 +40,9 @@ class RocksnifferConnectionError(Exception):
 class RSPlaylistNotLoggedInError(Exception):
     def __init__(self):
         super().__init__(RSPL_LOGIN_ERROR_MSG)
+
+
+class BadDirectoryError(Exception):
+    def __init__(self, error_msg, directory):
+        super().__init__(error_msg)
+        self.directory = directory

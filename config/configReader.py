@@ -1,7 +1,8 @@
 import configparser
 import os
-import sys
 from distutils import util
+
+import sys
 
 from config.config_ini_template import serialized
 from utils import logger
@@ -139,12 +140,17 @@ class ConfigReader:
     def get_list(self, section, key) -> list:
         return self.get(section, key, list)
 
+    def get_set(self, section, key) -> set:
+        return self.get(section, key, set)
+
     def get(self, section, key, cast=str):
 
         try:
             # List in config are separated with ";". Leading and trailing whitespaces will be removed
             if cast == list:
                 return [v.strip() for v in self.content[section][key].split(";")]
+            if cast == set:
+                return set([v.strip() for v in self.content[section][key].split(";")])
 
             # Cast to bool
             if cast == bool:
