@@ -74,7 +74,7 @@ class SongLoader:
                 # logger.log("Load songs according to the requests!", MODULE_NAME)
 
                 if self.update_playlist():
-                    logger.log("Playlist has been changed, update songs!")
+                    logger.warning("Playlist has been changed, update songs!", MODULE_NAME)
                     self.update_under_rs_loaded_cdlc_files()
 
                     # TODO or maybe this should be configurable?
@@ -86,7 +86,7 @@ class SongLoader:
                     #   I think, the logic must be separated.
                     #   1) rs playlist NOT updated --> Just check dirs and move files
                     #   2) rs playlist UPDATED --> check DB and move files
-                    logger.log("No rsplaylist change, nothing to do...", MODULE_NAME)
+                    logger.warning("No rsplaylist change, nothing to do...", MODULE_NAME)
 
                 self.last_run = time()
 

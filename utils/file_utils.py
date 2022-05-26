@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 from utils import logger
 
-FILE_AGE = 15
+DEFAULT_FILE_AGE_SECONDS = 9
 LOG_DIR = 'log'
 CDLC_FILE_EXT = '*.psarc'
 
@@ -28,9 +28,9 @@ def get_files_from_directory(directory):
     return cdlc_files
 
 
-def get_not_parsed_files_from_directory(directory):
+def get_not_parsed_files_from_directory(directory, file_age_seconds=DEFAULT_FILE_AGE_SECONDS):
     cdlc_files = []
-    get_files(cdlc_files, directory, True)
+    get_files(cdlc_files, directory, True, file_age_seconds)
     return cdlc_files
 
 
@@ -41,12 +41,12 @@ def get_files_from_directories(directories):
     return cdlc_files
 
 
-def get_files(cdlc_files, directory, older=False):
+def get_files(cdlc_files, directory, older=False, file_age_seconds=DEFAULT_FILE_AGE_SECONDS):
     for root, dir_names, filenames in os.walk(directory):
         for filename in fnmatch.filter(filenames, CDLC_FILE_EXT):
             file = os.path.join(root, filename)
             if older:
-                if is_file_old(file):
+                if is_file_old(file, file_age_seconds):
                     cdlc_files.append(file)
             else:
                 cdlc_files.append(file)
@@ -60,11 +60,10 @@ def get_file_names_from(directory):
     return cdlc_files
 
 
-def is_file_old(filename):
-    file_datetime = datetime.fromtimestamp(os.path.getmtime(filename))
-    # TODO maybe this FILE_AGE should come from the module. To define in the module what is an aged file!?
-    cutoff = datetime.now() - timedelta(seconds=FILE_AGE)
-    if file_datetime < cutoff:
+def is_file_old(filename, old_file_age):
+    file_birthday = datetime.fromtimestamp(os.path.getatime(filename))
+    old_file_border = datetime.now() - timedelta(seconds=old_file_age)
+    if file_birthday < old_file_border:
         return True
     return False
 

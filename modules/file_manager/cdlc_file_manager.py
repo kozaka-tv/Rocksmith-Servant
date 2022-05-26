@@ -10,6 +10,8 @@ MODULE_NAME = "FileManager"
 HEARTBEAT = 1
 HEARTBEAT_NOT_PARSED = 5
 
+NON_PARSED_FILE_AGE_SECONDS = 9
+
 
 class FileManager:
     def __init__(self, enabled, source_directories, destination_directory, using_cfsm):
@@ -27,25 +29,19 @@ class FileManager:
         if self.enabled:
             if self.beat_last_run_not_parsed():
                 logger.debug("Scan and move not parsed files... ", MODULE_NAME)
-                self.log_warning_times()
                 moved = self.move_not_parsed_files()
 
                 if moved:
                     logger.debug("Files were moved... ", MODULE_NAME)
-                    self.log_warning_times()
                     self.last_run = datetime.datetime.now()
                     self.last_run_not_parsed = self.last_run
-                    self.log_warning_times()
                 else:
                     logger.debug("Nothing moved... ", MODULE_NAME)
-                    self.log_warning_times()
                     self.last_run = datetime.datetime.now()
                     self.last_run_not_parsed = self.last_run
-                    self.log_warning_times()
 
             elif self.beat_last_run():
                 logger.debug("Scan and move files from root and source dirs...", MODULE_NAME)
-                self.log_warning_times()
 
                 files_to_move_in_source_dir = self.scan_cdlc_files_in_root()
                 self.move_downloaded_cdlc_files(files_to_move_in_source_dir)
@@ -55,12 +51,13 @@ class FileManager:
 
                 self.last_run = datetime.datetime.now()
 
-    def log_warning_times(self):
-        logger.warning(
-            "time()={} self.last_run={} self.last_run_not_parsed={}".format(
-                datetime.datetime.now().second,
-                self.last_run.second,
-                self.last_run_not_parsed.second), MODULE_NAME)
+    # TODO remove this later
+    # def log_warning_times(self):
+    #     logger.warning(
+    #         "time()={} self.last_run={} self.last_run_not_parsed={}".format(
+    #             datetime.datetime.now().second,
+    #             self.last_run.second,
+    #             self.last_run_not_parsed.second), MODULE_NAME)
 
     def beat_last_run(self):
         return math.floor((datetime.datetime.now() - self.last_run).seconds) >= HEARTBEAT
@@ -100,7 +97,7 @@ class FileManager:
         return cdlc_files
 
     def scan_cdlc_files_in_destination_dir(self):
-        return file_utils.get_not_parsed_files_from_directory(self.destination_directory)
+        return file_utils.get_not_parsed_files_from_directory(self.destination_directory, NON_PARSED_FILE_AGE_SECONDS)
 
     @staticmethod
     def move_not_enumerated_cdlc_files(files):

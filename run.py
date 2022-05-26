@@ -16,6 +16,8 @@ from utils.rocksniffer import Rocksniffer
 
 db = sqlite3.connect('servant.db')
 
+debug_log_level = True
+
 
 def check_enabled_module_dependencies():
     if song_loader.enabled and not file_manager.enabled:
