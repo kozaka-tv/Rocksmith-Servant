@@ -116,6 +116,7 @@ class SongLoader:
                 if self.is_user_not_logged_in(cdlc):
                     self.rsplaylist = None
                     self.last_run = time()
+                    logger.error("User must be logged in into RS playlist to be able to use the module!", MODULE_NAME)
                     raise RSPlaylistNotLoggedInError
                 else:
                     return
