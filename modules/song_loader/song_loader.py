@@ -105,7 +105,8 @@ class SongLoader:
         if str(diff) == "{}":
             return False
 
-        logger.debug("Playlist has been changed! Diffs: {}".format(diff), MODULE_NAME)
+        logger.log("Playlist has been changed, lets update!", MODULE_NAME)
+        # logger.debug("Playlist has been changed! Diffs: {}".format(diff), MODULE_NAME)
         self.rsplaylist = new_playlist
 
         return True
@@ -151,30 +152,32 @@ class SongLoader:
     # - move files
     def move_requested_cdlc_files_to_destination(self):
         for sr in self.rsplaylist["playlist"]:
-            sr_id = sr['id']
-            for cdlc in sr["dlc_set"]:
-                rspl_id = cdlc['id']
-                cdlc_id = cdlc["cdlc_id"]
-                artist = cdlc["artist"]
-                title = cdlc["title"]
-                artist_title = str(rspl_id) + " - " + str(cdlc_id) + " - " + artist + " - " + title
-                logger.log("Request " + artist_title + " will be managed.", MODULE_NAME)
+            rspl_request_id = sr['id']
+            for dlc_set in sr["dlc_set"]:
+                rspl_song_id = dlc_set['id']
+                cdlc_id = dlc_set["cdlc_id"]
+                artist = dlc_set["artist"]
+                title = dlc_set["title"]
 
                 # TODO if it is possible, do not create always a new SongData. If it is already exists, just reuse it!
                 #   search in a list
-                song_data = SongData(sr_id, cdlc_id)
+                song_data = SongData(rspl_request_id, cdlc_id, rspl_song_id, artist, title)
+                song_data.rspl_official = dlc_set["official"]
+                song_data.rspl_position = str(sr["position"])
+                logger.log("Request: {}".format(song_data), MODULE_NAME)
+
                 self.update_tags(song_data, sr)
 
                 # Do not load official DLC files
-                if cdlc["official"] == 4:
-                    logger.debug("Skipping ODLC " + artist_title, MODULE_NAME)
+                if song_data.is_official:  # TODO #113 some ODLC-s were here not skipped! Maybe different official id?
+                    logger.debug("Skipping ODLC: {}".format(song_data), MODULE_NAME)
                     continue
 
                 with con:
                     rows = self.search_song_in_the_db(artist, title)
 
                     if len(rows) > 0:
-                        logger.debug("---- sr " + str(sr["position"]) + " -------", MODULE_NAME)
+                        logger.debug("---- sr " + song_data.rspl_position + " -------", MODULE_NAME)
                         for element in rows:
                             song_file_name = str(element[0])
                             song_data.song_file_name = song_file_name
@@ -184,7 +187,7 @@ class SongLoader:
                     else:
                         logger.debug("User must download the song: cdlc_id={} - {} - {}".format(cdlc_id, artist, title),
                                      MODULE_NAME)
-                        # rs_playlist.set_tag_to_download(self.phpsessid, song_data.sr_id)
+                        # rs_playlist.set_tag_to_download(self.phpsessid, song_data.rspl_request_id)
 
                 con.commit()
 
@@ -203,7 +206,7 @@ class SongLoader:
                 # TODO this takes 1 sec for each call. If we have a list of 30 songs, it could take 30 seconds!
                 #   Do it only once!
                 if 'afea46a9' not in song_data.tags:
-                    rs_playlist.set_tag_loaded(self.phpsessid, song_data.sr_id)
+                    rs_playlist.set_tag_loaded(self.phpsessid, song_data.rspl_request_id)
                     song_data.tags.add('afea46a9')
                     # song_data.tags.discard('need to download')  # TODO
             else:
@@ -217,13 +220,13 @@ class SongLoader:
                     actually_loaded_songs.add(song_data.song_file_name)
                     # TODO this takes 1 sec for each call. If we have a list of 30 songs, it could take 30 seconds!
                     #   Do it only once!
-                    rs_playlist.set_tag_loaded(self.phpsessid, song_data.sr_id)
+                    rs_playlist.set_tag_loaded(self.phpsessid, song_data.rspl_request_id)
                 else:
                     logger.debug("Could not move file: {}".format(song_to_move), MODULE_NAME)
                     self.songs.missing_from_archive.add(song_data.song_file_name)
                     # TODO this takes 1 sec for each call. If we have a list of 30 songs, it could take 30 seconds!
                     #   Do it only once!
-                    rs_playlist.set_tag_to_download(self.phpsessid, song_data.sr_id)
+                    rs_playlist.set_tag_to_download(self.phpsessid, song_data.rspl_request_id)
 
         if len(actually_loaded_songs) > 0:
             logger.warning("---- Files newly moved and will be parsed: " + str(actually_loaded_songs), MODULE_NAME)

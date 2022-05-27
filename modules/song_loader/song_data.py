@@ -30,9 +30,18 @@ class State(Enum):
 
 
 class SongData:
-    def __init__(self, sr_id, cdlc_id, song_file_name=None):
-        self.sr_id = sr_id
+    def __init__(self, rspl_request_id, cdlc_id, rspl_song_id, artist=None, title=None, song_file_name=None):
+        self.rspl_request_id = rspl_request_id  # id of the request on RSPL
+        self.rspl_song_id = rspl_song_id  # id of the request on RSPL
         self.cdlc_id = cdlc_id
+        self.artist = artist
+        self.title = title
+        self.artist_title = None
+        if artist and title:
+            self.artist_title = artist + " - " + title
+
+        self.rspl_official = None
+        self.rspl_position = None
         self.song_file_name = song_file_name
         # --
         self.state = State.NEW_REQUEST
@@ -41,16 +50,44 @@ class SongData:
         self.found_in_db = False
         self.loaded_under_the_game = False
 
-    # TODO sr_id? or cdlc_id? or something else?
+    @property
+    def is_official(self):
+        # TODO is there any other official numbers? Maybe only 0 means non official?
+        return self.rspl_official and (self.rspl_official == 3 or self.rspl_official == 4)
+
+    # @property
+    # def rspl_official(self):
+    #     return self.rspl_official
+
+    # @__rspl_official.setter
+    # def rspl_official(self, value):
+    #     self.rspl_official = value
+
+    # TODO rspl_request_id? or cdlc_id? or something else?
     def __eq__(self, other):
-        return self.sr_id == other.sr_id
+        return self.rspl_request_id == other.rspl_request_id
 
     def __hash__(self):
-        return hash(self.sr_id)
+        return hash(self.rspl_request_id)
 
     def __repr__(self):
-        return os.linesep + '<SongData: sr_id={}, cdlc_id={}, song_file_name={}>'.format(
-            self.sr_id, self.cdlc_id, self.song_file_name)
+        return os.linesep + '<SongData: ' \
+                            'rspl_request_id={}, ' \
+                            'rspl_song_id={}, ' \
+                            'cdlc_id={}, ' \
+                            'artist={}, ' \
+                            'title={}, ' \
+                            'artist_title={}, ' \
+                            'rspl_official={}, ' \
+                            'song_file_name={}' \
+                            '>'.format(self.rspl_request_id,
+                                       self.rspl_song_id,
+                                       self.cdlc_id,
+                                       self.artist,
+                                       self.title,
+                                       self.artist_title,
+                                       self.rspl_official,
+                                       self.song_file_name)
 
 
 # TODO remove this later if the eq is decided!
@@ -62,5 +99,5 @@ song_data_set = {s1, s2, s3}
 print(song_data_set)
 # output:
 # {
-# <SongData: sr_id=1, cdlc_id=555, song_file_name=asd>,
-# <SongData: sr_id=2, cdlc_id=666, song_file_name=qwe>}
+# <SongData: rspl_request_id=1, cdlc_id=555, song_file_name=asd>,
+# <SongData: rspl_request_id=2, cdlc_id=666, song_file_name=qwe>}

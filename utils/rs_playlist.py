@@ -38,25 +38,25 @@ def get_playlist(phpsessid):
     return requests.get(URL_PLAYLIST % CHANNEL, cookies={'PHPSESSID': phpsessid}).json()
 
 
-def set_tag(phpsessid, sr_id, tag_id):
-    url = URL_TAG_SET % (CHANNEL, sr_id, tag_id)
+def set_tag(phpsessid, rspl_request_id, tag_id):
+    url = URL_TAG_SET % (CHANNEL, rspl_request_id, tag_id)
     cookies = {'PHPSESSID': phpsessid}
     requests.put(url, cookies=cookies).json()
 
 
-def unset_tag(phpsessid, sr_id, tag_id):
-    url = URL_TAG_UNSET % (CHANNEL, sr_id, tag_id)
+def unset_tag(phpsessid, rspl_request_id, tag_id):
+    url = URL_TAG_UNSET % (CHANNEL, rspl_request_id, tag_id)
     cookies = {'PHPSESSID': phpsessid}
     requests.put(url, cookies=cookies).json()
 
 
-def set_tag_loaded(phpsessid, sr_id):
-    set_tag(phpsessid, sr_id, TAG_LOADED)
+def set_tag_loaded(phpsessid, rspl_request_id):
+    set_tag(phpsessid, rspl_request_id, TAG_LOADED)
     # TODO remove tag 'to download'?
-    unset_tag(phpsessid, sr_id, TAG_TO_DOWNLOAD)
+    unset_tag(phpsessid, rspl_request_id, TAG_TO_DOWNLOAD)
 
 
-def set_tag_to_download(phpsessid, sr_id):
-    set_tag(phpsessid, sr_id, TAG_TO_DOWNLOAD)
+def set_tag_to_download(phpsessid, rspl_request_id):
+    set_tag(phpsessid, rspl_request_id, TAG_TO_DOWNLOAD)
     # TODO remove tag 'loaded'?
-    unset_tag(phpsessid, sr_id, TAG_LOADED)
+    unset_tag(phpsessid, rspl_request_id, TAG_LOADED)
