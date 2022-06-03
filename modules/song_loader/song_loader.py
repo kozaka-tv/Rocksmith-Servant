@@ -5,7 +5,8 @@ import unicodedata
 from deepdiff import DeepDiff
 from time import time
 
-from modules.song_loader.song_data import SongData, Songs
+from modules.song_loader.song_data import SongData
+from modules.song_loader.songs import Songs
 from utils import logger, file_utils, rs_playlist
 from utils.exceptions import ConfigError, RSPlaylistNotLoggedInError
 from utils.rs_playlist import get_playlist
