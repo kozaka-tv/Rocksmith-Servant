@@ -94,7 +94,7 @@ class ConfigReader:
     def config_changed_and_reloaded(self):
         """
         Reload only if the config file has been changed
-        :return: True if config file has been changed and it is reloaded else False
+        :return: True if config file has been changed and reloaded, otherwise False
         """
         if self.last_modified == self.last_modification_time:
             return False
