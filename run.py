@@ -31,14 +31,6 @@ logger.warning("----------------------------------------------------------------
 logger.warning("----- SERVANT IS STARTING ----------------------------------------------")
 logger.warning("------------------------------------------------------------------------")
 
-# TODO move this to config.py and use it everywhere? Also in config reader we could use them!
-# Section name definitions
-SECTION_ROCK_SNIFFER = "RockSniffer"
-SECTION_SETLIST_LOGGER = "SetlistLogger"
-SECTION_CDLC_IMPORTER = "CDLCImporter"
-SECTION_SONG_LOADER = "SongLoader"
-SECTION_SCENE_SWITCHER = "SceneSwitcher"
-SECTION_FILE_MANAGER = "FileManager"
 # OBS
 # Behaviour
 SECTION_DEBUGGING = "Debugging"
@@ -81,20 +73,19 @@ def update_config():
 
 # TODO move to debug Class?
 def get_debug_message():
-    # TODO OBS
-    # TODO Behaviour
     modules_str = "--- Enabled modules ---" + os.linesep
     if sniffer.enabled:
-        modules_str += SECTION_ROCK_SNIFFER + os.linesep
+        modules_str += sniffer.__class__.__name__ + os.linesep
     if setlist_logger.enabled:
-        modules_str += SECTION_SETLIST_LOGGER + os.linesep
+        modules_str += setlist_logger.__class__.__name__ + os.linesep
     if song_loader.enabled:
-        modules_str += SECTION_CDLC_IMPORTER + os.linesep
-        modules_str += SECTION_SONG_LOADER + os.linesep
+        modules_str += song_loader.__class__.__name__ + os.linesep
     if scene_switcher.enabled:
-        modules_str += SECTION_SCENE_SWITCHER + os.linesep
+        modules_str += scene_switcher.__class__.__name__ + os.linesep
     if file_manager.enabled:
-        modules_str += SECTION_FILE_MANAGER + os.linesep
+        modules_str += file_manager.__class__.__name__ + os.linesep
+    # TODO OBS
+    # TODO Behaviour
     modules_str += "---------------" + os.linesep
 
     sniffer_str = "Song: {sniffer.artistName} - {sniffer.songName} " \
