@@ -15,7 +15,9 @@ serialized = {
         "cdlc_archive_dir": "<Enter your CDLC archive directory, where you store all of your downloaded CDLCs>",
         "rocksmith_cdlc_dir": "<Enter your Rocksmith CDLC directory, where you have all the loaded CDLC songs>",
         "allow_load_when_in_game": True,
-        "phpsessid": "<Enter your PHP Session ID from the cookie of the RS Playlist after login>"
+        "phpsessid": "<Enter your PHP Session ID from the cookie of the RS Playlist after login>",
+        "cdlc_import_json_file": "<Enter your directory, where do you want to have to be imported "
+                                 "all the downloaded or archived CDLC  files>"
     },
     "SceneSwitcher": {
         "enabled": False,
