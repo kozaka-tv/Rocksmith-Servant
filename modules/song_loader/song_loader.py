@@ -29,22 +29,22 @@ con = sqlite3.connect('./servant.db')
 
 
 class SongLoader:
-    def __init__(self, enabled, phpsessid: str, cdlc_dir, cfsm_file_name, cdlc_archive_dir, destination_directory,
-                 rocksmith_cdlc_dir, cdlc_import_json_file, allow_load_when_in_game=True):
-        self.enabled = enabled
-        if enabled:
+    def __init__(self, config_data):
+        self.enabled = config_data.song_loader.enabled
+        if self.enabled:
             self.rsplaylist = None
             self.rsplaylist_updated = True
-            self.cdlc_dir = os.path.join(cdlc_dir)
-            self.cfsm_file_name = cfsm_file_name
-            self.cdlc_archive_dir = self.check_cdlc_archive_dir(cdlc_archive_dir)
-            self.destination_directory = destination_directory
-            self.rocksmith_cdlc_dir = self.check_rocksmith_cdlc_dir(rocksmith_cdlc_dir)
-            self.allow_load_when_in_game = allow_load_when_in_game
-            self.phpsessid = rs_playlist.check_phpsessid(phpsessid)
-            self.cdlc_import_json_file = cdlc_import_json_file
+            self.cdlc_dir = os.path.join(config_data.song_loader.cdlc_dir)
+            self.cfsm_file_name = config_data.song_loader.cfsm_file_name
+            self.cdlc_archive_dir = self.check_cdlc_archive_dir(config_data.song_loader.cdlc_archive_dir)
+            self.destination_directory = config_data.song_loader.destination_directory
+            self.rocksmith_cdlc_dir = self.check_rocksmith_cdlc_dir(config_data.song_loader.rocksmith_cdlc_dir)
+            # TODO default must be true? Or false is better?
+            self.allow_load_when_in_game = config_data.song_loader.allow_load_when_in_game
+            self.phpsessid = rs_playlist.check_phpsessid(config_data.song_loader.phpsessid)
+            self.cdlc_import_json_file = config_data.song_loader.cdlc_import_json_file
 
-            self.songs_to_load = os.path.join(cdlc_dir, cfsm_file_name)
+            self.songs_to_load = os.path.join(config_data.song_loader.cdlc_dir, config_data.song_loader.cfsm_file_name)
 
             self.create_directories()
 

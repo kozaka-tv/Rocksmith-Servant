@@ -2,12 +2,11 @@ from utils import logger
 
 
 class SceneSwitcher:
-    def __init__(self, enabled):
+    def __init__(self, config_data):
         """
         Scene Switcher
-        :param enabled: Is the Module enabled?
         """
-        self.enabled = enabled
+        self.enabled = config_data.scene_switcher.enabled
         pass
 
     def run(self):

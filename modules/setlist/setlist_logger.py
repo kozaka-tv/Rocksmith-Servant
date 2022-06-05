@@ -9,14 +9,12 @@ SETLIST_DIR = 'setlist'
 
 class SetlistLogger:
     # TODO add params like file location
-    def __init__(self, enabled, log_file_path):
+    def __init__(self, config_data):
         """
         Setlist Logger
-        :param enabled: Is the Module enabled?
-        :param log_file_path: TODO
         """
         # Init setlist directory and file
-        self.enabled = enabled
+        self.enabled = config_data.setlist_logger.enabled
         # TODO this should be maybe in run?
         self.create_setlist_directory()
         self.file_name = setlist_file_name()
@@ -24,7 +22,7 @@ class SetlistLogger:
             "--------------------------------" + os.linesep +
             "Setlist of " + str(datetime.datetime.now()))
 
-        self.log_file_path = log_file_path
+        self.log_file_path = config_data.setlist_logger.log_file_path
         # TODO
         self.log_file_name = "TODO.txt"
         self.setlist = []

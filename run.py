@@ -4,6 +4,7 @@ import sqlite3
 from time import sleep
 
 from config.configReader import ConfigReader
+from config.config_data import ConfigData
 from modules.cdlc_importer.load_cdlc_json_file import CDLCImporter
 from modules.file_manager.cdlc_file_manager import FileManager
 from modules.scene_switcher.scene_switcher import SceneSwitcher
@@ -47,48 +48,22 @@ KEY_ENABLED = "enabled"
 
 # Initializing configuration
 conf = ConfigReader()
+config_data = ConfigData(conf)
 
 # Initializing modules and utils
-sniffer = Rocksniffer(
-    conf.get_bool(SECTION_ROCK_SNIFFER, KEY_ENABLED),
-    conf.get(SECTION_ROCK_SNIFFER, "host"),
-    conf.get(SECTION_ROCK_SNIFFER, "port")
-)
-setlist_logger = SetlistLogger(
-    conf.get_bool(SECTION_SETLIST_LOGGER, KEY_ENABLED),
-    conf.get(SECTION_SETLIST_LOGGER, "setlist_path")
-)
-file_manager = FileManager(
-    conf.get_bool(SECTION_FILE_MANAGER, KEY_ENABLED),
-    conf.get_set(SECTION_FILE_MANAGER, "source_directories"),
-    conf.get(SECTION_FILE_MANAGER, "destination_directory"),
-    conf.get(SECTION_FILE_MANAGER, "using_cfsm")
-)
+sniffer = Rocksniffer(config_data)
+setlist_logger = SetlistLogger(config_data)
+file_manager = FileManager(config_data)
 cdlc_importer = CDLCImporter(db)
-song_loader = SongLoader(
-    conf.get_bool(SECTION_SONG_LOADER, KEY_ENABLED),
-    conf.get(SECTION_SONG_LOADER, "PHPSESSID"),
-    conf.get(SECTION_SONG_LOADER, "cdlc_dir"),
-    conf.get(SECTION_SONG_LOADER, "cfsm_file_name"),
-    conf.get(SECTION_SONG_LOADER, "cdlc_archive_dir"),
-    file_manager.destination_directory,
-    conf.get(SECTION_SONG_LOADER, "rocksmith_cdlc_dir"),
-    conf.get(SECTION_SONG_LOADER, "cdlc_import_json_file"),
-    conf.get_bool(SECTION_SONG_LOADER, "allow_load_when_in_game")
-)
-scene_switcher = SceneSwitcher(
-    conf.get_bool(SECTION_SCENE_SWITCHER, KEY_ENABLED)
-)
+song_loader = SongLoader(config_data)
+scene_switcher = SceneSwitcher(config_data)
 check_enabled_module_dependencies()
 
 # TODO OBS
 # TODO Behaviour
 
 # Initializing Debugger
-debugger = Debugger(
-    conf.get_bool(SECTION_DEBUGGING, "debug"),
-    conf.get(SECTION_DEBUGGING, "debug_log_interval", int)
-)
+debugger = Debugger(config_data)
 
 
 # TODO extend with other values!

@@ -5,16 +5,13 @@ from utils.exceptions import RocksnifferConnectionError
 
 
 class Rocksniffer:
-    def __init__(self, enabled, host, port):
+    def __init__(self, config_data):
         """
         Rocksniffer reader. Minimalistic, can be improved
-        :param enabled: Is the Module enabled?
-        :param host: Rocksniffer host IP (localhost by default)
-        :param port: Rocksniffer port (9938 by default)
         """
-        self.enabled = enabled
-        self.host = host
-        self.port = port
+        self.enabled = config_data.sniffer.enabled
+        self.host = config_data.sniffer.host
+        self.port = config_data.sniffer.port
 
         self.memory = None
 

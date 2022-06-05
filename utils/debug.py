@@ -4,9 +4,9 @@ from utils import logger
 
 
 class Debugger:
-    def __init__(self, debug, interval):
-        self.debug = debug
-        self.interval = interval
+    def __init__(self, config_data):
+        self.debug = config_data.debugger.debug
+        self.interval = config_data.debugger.interval
 
         self.last_log = 0
 

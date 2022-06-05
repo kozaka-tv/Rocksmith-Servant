@@ -15,16 +15,16 @@ NON_PARSED_FILE_AGE_SECONDS = 9
 
 
 class FileManager:
-    def __init__(self, enabled, source_directories, destination_directory, using_cfsm):
+    def __init__(self, config_data):
         """
         File manager to manage CDLC files
         """
-        self.enabled = enabled
+        self.enabled = config_data.file_manager.enabled
         self.last_run = datetime.datetime.now()
         self.last_run_not_parsed = self.last_run
-        self.source_directories = source_directories
-        self.destination_directory = destination_directory
-        self.using_cfsm = using_cfsm
+        self.source_directories = config_data.file_manager.source_directories
+        self.destination_directory = config_data.file_manager.destination_directory
+        self.using_cfsm = config_data.file_manager.using_cfsm
 
     def run(self):
         if self.enabled:
