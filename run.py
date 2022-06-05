@@ -58,16 +58,11 @@ cdlc_importer = CDLCImporter(db)
 song_loader = SongLoader(config_data)
 scene_switcher = SceneSwitcher(config_data)
 check_enabled_module_dependencies()
-
 # TODO OBS
 # TODO Behaviour
-
-# Initializing Debugger
 debugger = Debugger(config_data)
 
 
-# TODO extend with other values!
-# TODO can not this be in the Module itself?
 def update_config():
     if conf.reload_if_changed():
         config_data_updated = ConfigData(conf)
