@@ -36,7 +36,7 @@ class ConfRockSniffer:
 class ConfSetlistLogger:
     def __init__(self, conf):
         self.enabled = conf.get_bool(SECTION_SETLIST_LOGGER, KEY_ENABLED)
-        self.log_file_path = conf.get(SECTION_SETLIST_LOGGER, "setlist_path")
+        self.setlist_path = conf.get(SECTION_SETLIST_LOGGER, "setlist_path")
 
 
 class ConfFileManager:

@@ -24,6 +24,11 @@ class Rocksniffer:
 
         self.samples = [0, 0, 0]
 
+    def update_config(self, config_data):
+        self.enabled = config_data.sniffer.enabled
+        self.host = config_data.sniffer.host
+        self.port = config_data.sniffer.port
+
     def update(self):
         """
         Get the content of Rocksniffer. In case of success, take a sample of the song time

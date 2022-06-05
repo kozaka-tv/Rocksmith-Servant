@@ -10,7 +10,7 @@ from modules.file_manager.cdlc_file_manager import FileManager
 from modules.scene_switcher.scene_switcher import SceneSwitcher
 from modules.setlist.setlist_logger import SetlistLogger
 from modules.song_loader.song_loader import SongLoader
-from utils import logger, rs_playlist
+from utils import logger
 from utils.debug import Debugger
 from utils.exceptions import RocksnifferConnectionError, ConfigError
 from utils.rocksniffer import Rocksniffer
@@ -70,48 +70,16 @@ debugger = Debugger(config_data)
 # TODO can not this be in the Module itself?
 def update_config():
     if conf.reload_if_changed():
-        # Updating Rocksniffer Configurations
-        sniffer.enabled = conf.get_bool(SECTION_ROCK_SNIFFER, KEY_ENABLED)
-        sniffer.host = conf.get(SECTION_ROCK_SNIFFER, "host")
-        sniffer.port = conf.get(SECTION_ROCK_SNIFFER, "port")
+        config_data_updated = ConfigData(conf)
 
-        # Updating Setlist Configurations
-        setlist_logger.enabled = conf.get_bool(SECTION_SETLIST_LOGGER, KEY_ENABLED)
-        setlist_logger.setlist_path = conf.get(SECTION_SETLIST_LOGGER, "setlist_path")
-        # TODO this should be maybe in run or in song_loader?
-        setlist_logger.create_setlist_directory()
-
-        # Updating Song Loader Configurations
-        song_loader.enabled = conf.get_bool(SECTION_SONG_LOADER, KEY_ENABLED)
-        song_loader.cdlc_dir = conf.get(SECTION_SONG_LOADER, "cdlc_dir")
-        song_loader.cfsm_file_name = conf.get(SECTION_SONG_LOADER, "cfsm_file_name")
-        song_loader.cdlc_archive_dir = song_loader.check_cdlc_archive_dir(
-            conf.get(SECTION_SONG_LOADER, "cdlc_archive_dir"))
-        song_loader.destination_directory = file_manager.destination_directory
-        song_loader.rocksmith_cdlc_dir = song_loader.check_cdlc_archive_dir(
-            conf.get(SECTION_SONG_LOADER, "rocksmith_cdlc_dir"))
-        song_loader.cdlc_import_json_file = conf.get(SECTION_SONG_LOADER, "cdlc_import_json_file")
-        song_loader.allow_load_when_in_game = conf.get_bool(SECTION_SONG_LOADER, "allow_load_when_in_game")
-        song_loader.phpsessid = rs_playlist.check_phpsessid(conf.get(SECTION_SONG_LOADER, "phpsessid"))
-        # TODO all this props should be maybe in run or in song_loader?
-        song_loader.songs_to_load = os.path.join(song_loader.cdlc_dir, song_loader.cfsm_file_name)
-        song_loader.create_directories()
-
-        # Updating Scene Switcher Configurations
-        scene_switcher.enabled = conf.get_bool(SECTION_SCENE_SWITCHER, KEY_ENABLED)
-
-        # Updating FileManager Configurations
-        file_manager.enabled = conf.get_bool(SECTION_FILE_MANAGER, KEY_ENABLED)
-        file_manager.source_directories = conf.get_set(SECTION_FILE_MANAGER, "source_directories")
-        file_manager.destination_directory = conf.get(SECTION_FILE_MANAGER, "destination_directory")
-        file_manager.using_cfsm = conf.get(SECTION_FILE_MANAGER, "using_cfsm")
-
+        sniffer.update_config(config_data_updated)
+        setlist_logger.update_config(config_data_updated)
+        song_loader.update_config(config_data_updated)
+        scene_switcher.update_config(config_data_updated)
+        file_manager.update_config(config_data_updated)
         # TODO OBS
         # TODO Behaviour
-
-        # Updating Debug Configurations
-        debugger.debug = conf.get_bool(SECTION_DEBUGGING, "debug")
-        debugger.interval = conf.get_int_value(SECTION_DEBUGGING, "debug_log_interval")
+        debugger.update_config(config_data_updated)
 
         check_enabled_module_dependencies()
 

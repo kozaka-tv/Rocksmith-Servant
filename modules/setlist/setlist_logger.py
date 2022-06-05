@@ -14,6 +14,7 @@ class SetlistLogger:
         Setlist Logger
         """
         # Init setlist directory and file
+        # TODO use enabled, and do nothing if disabled
         self.enabled = config_data.setlist_logger.enabled
         # TODO this should be maybe in run?
         self.create_setlist_directory()
@@ -22,7 +23,22 @@ class SetlistLogger:
             "--------------------------------" + os.linesep +
             "Setlist of " + str(datetime.datetime.now()))
 
-        self.log_file_path = config_data.setlist_logger.log_file_path
+        self.setlist_path = config_data.setlist_logger.setlist_path
+        # TODO
+        self.log_file_name = "TODO.txt"
+        self.setlist = []
+        self.last_song = None
+
+    def update_config(self, config_data):
+        # TODO use enabled, and do nothing if disabled
+        self.enabled = config_data.setlist_logger.enabled
+        self.create_setlist_directory()
+        self.file_name = setlist_file_name()
+        self.write_to_setlist_file(
+            "--------------------------------" + os.linesep +
+            "Setlist of " + str(datetime.datetime.now()))
+
+        self.setlist_path = config_data.setlist_logger.setlist_path
         # TODO
         self.log_file_name = "TODO.txt"
         self.setlist = []

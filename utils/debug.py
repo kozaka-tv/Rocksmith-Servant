@@ -10,6 +10,12 @@ class Debugger:
 
         self.last_log = 0
 
+    def update_config(self, config_data):
+        self.debug = config_data.debugger.debug
+        self.interval = config_data.debugger.interval
+
+    pass
+
     def log(self, message):
         if self.debug:
             logger.debug("[DEBUG] " + message)

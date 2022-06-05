@@ -39,11 +39,9 @@ class SongLoader:
             self.cdlc_archive_dir = self.check_cdlc_archive_dir(config_data.song_loader.cdlc_archive_dir)
             self.destination_directory = config_data.song_loader.destination_directory
             self.rocksmith_cdlc_dir = self.check_rocksmith_cdlc_dir(config_data.song_loader.rocksmith_cdlc_dir)
-            # TODO default must be true? Or false is better?
             self.allow_load_when_in_game = config_data.song_loader.allow_load_when_in_game
             self.phpsessid = rs_playlist.check_phpsessid(config_data.song_loader.phpsessid)
             self.cdlc_import_json_file = config_data.song_loader.cdlc_import_json_file
-
             self.songs_to_load = os.path.join(config_data.song_loader.cdlc_dir, config_data.song_loader.cfsm_file_name)
 
             self.create_directories()
@@ -51,6 +49,20 @@ class SongLoader:
             self.last_run = time()
 
             self.songs = Songs()
+
+    def update_config(self, config_data):
+        self.enabled = config_data.song_loader.enabled
+        self.cdlc_dir = os.path.join(config_data.song_loader.cdlc_dir)
+        self.cfsm_file_name = config_data.song_loader.cfsm_file_name
+        self.cdlc_archive_dir = self.check_cdlc_archive_dir(config_data.song_loader.cdlc_archive_dir)
+        self.destination_directory = config_data.song_loader.destination_directory
+        self.rocksmith_cdlc_dir = self.check_rocksmith_cdlc_dir(config_data.song_loader.rocksmith_cdlc_dir)
+        self.allow_load_when_in_game = config_data.song_loader.allow_load_when_in_game
+        self.phpsessid = rs_playlist.check_phpsessid(config_data.song_loader.phpsessid)
+        self.cdlc_import_json_file = config_data.song_loader.cdlc_import_json_file
+        self.songs_to_load = os.path.join(config_data.song_loader.cdlc_dir, config_data.song_loader.cfsm_file_name)
+
+        self.create_directories()
 
     @staticmethod
     def check_cdlc_archive_dir(cdlc_archive_dir):

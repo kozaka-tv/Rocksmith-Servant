@@ -26,6 +26,12 @@ class FileManager:
         self.destination_directory = config_data.file_manager.destination_directory
         self.using_cfsm = config_data.file_manager.using_cfsm
 
+    def update_config(self, config_data):
+        self.enabled = config_data.file_manager.enabled
+        self.source_directories = config_data.file_manager.source_directories
+        self.destination_directory = config_data.file_manager.destination_directory
+        self.using_cfsm = config_data.file_manager.using_cfsm
+
     def run(self):
         if self.enabled:
             if self.beat_last_run_not_parsed():
