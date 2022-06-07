@@ -5,7 +5,6 @@ import requests
 from utils.exceptions import ConfigError
 
 # TODO get from the config
-CHANNEL = "kozaka"
 TAG_TO_DOWNLOAD = "8c8c2924"
 TAG_LOADED = "afea46a9"
 
@@ -34,29 +33,29 @@ def check_phpsessid(phpsessid):
     return phpsessid
 
 
-def get_playlist(phpsessid):
-    return requests.get(URL_PLAYLIST % CHANNEL, cookies={'PHPSESSID': phpsessid}).json()
+def get_playlist(twitch_channel, phpsessid):
+    return requests.get(URL_PLAYLIST % twitch_channel, cookies={'PHPSESSID': phpsessid}).json()
 
 
-def set_tag(phpsessid, rspl_request_id, tag_id):
-    url = URL_TAG_SET % (CHANNEL, rspl_request_id, tag_id)
+def set_tag(twitch_channel, phpsessid, rspl_request_id, tag_id):
+    url = URL_TAG_SET % (twitch_channel, rspl_request_id, tag_id)
     cookies = {'PHPSESSID': phpsessid}
     requests.put(url, cookies=cookies).json()
 
 
-def unset_tag(phpsessid, rspl_request_id, tag_id):
-    url = URL_TAG_UNSET % (CHANNEL, rspl_request_id, tag_id)
+def unset_tag(twitch_channel, phpsessid, rspl_request_id, tag_id):
+    url = URL_TAG_UNSET % (twitch_channel, rspl_request_id, tag_id)
     cookies = {'PHPSESSID': phpsessid}
     requests.put(url, cookies=cookies).json()
 
 
-def set_tag_loaded(phpsessid, rspl_request_id):
-    set_tag(phpsessid, rspl_request_id, TAG_LOADED)
+def set_tag_loaded(twitch_channel, phpsessid, rspl_request_id):
+    set_tag(twitch_channel, phpsessid, rspl_request_id, TAG_LOADED)
     # TODO remove tag 'to download'?
-    unset_tag(phpsessid, rspl_request_id, TAG_TO_DOWNLOAD)
+    unset_tag(twitch_channel, phpsessid, rspl_request_id, TAG_TO_DOWNLOAD)
 
 
-def set_tag_to_download(phpsessid, rspl_request_id):
-    set_tag(phpsessid, rspl_request_id, TAG_TO_DOWNLOAD)
+def set_tag_to_download(twitch_channel, phpsessid, rspl_request_id):
+    set_tag(twitch_channel, phpsessid, rspl_request_id, TAG_TO_DOWNLOAD)
     # TODO remove tag 'loaded'?
-    unset_tag(phpsessid, rspl_request_id, TAG_LOADED)
+    unset_tag(twitch_channel, phpsessid, rspl_request_id, TAG_LOADED)

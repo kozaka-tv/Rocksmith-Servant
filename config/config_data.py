@@ -17,6 +17,7 @@ KEY_ENABLED = "enabled"
 class ConfigData:
     def __init__(self, conf):
         self.confReader = ConfigReader()
+
         self.sniffer = ConfRockSniffer(conf)
         self.setlist_logger = ConfSetlistLogger(conf)
         self.file_manager = ConfFileManager(self.confReader)
@@ -50,6 +51,7 @@ class ConfFileManager:
 class ConfSongLoader:
     def __init__(self, conf):
         self.enabled = conf.get_bool(SECTION_SONG_LOADER, KEY_ENABLED)
+        self.twitch_channel = conf.get(SECTION_SONG_LOADER, "twitch_channel")
         self.phpsessid = conf.get(SECTION_SONG_LOADER, "PHPSESSID")
         self.cdlc_dir = conf.get(SECTION_SONG_LOADER, "cdlc_dir")
         self.cfsm_file_name = conf.get(SECTION_SONG_LOADER, "cfsm_file_name")

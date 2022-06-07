@@ -32,6 +32,8 @@ class SongLoader:
     def __init__(self, config_data):
         self.enabled = config_data.song_loader.enabled
         if self.enabled:
+            self.twitch_channel = config_data.song_loader.twitch_channel
+            self.phpsessid = rs_playlist.check_phpsessid(config_data.song_loader.phpsessid)
             self.rsplaylist = None
             self.rsplaylist_updated = True
             self.cdlc_dir = os.path.join(config_data.song_loader.cdlc_dir)
@@ -40,7 +42,6 @@ class SongLoader:
             self.destination_directory = config_data.song_loader.destination_directory
             self.rocksmith_cdlc_dir = self.check_rocksmith_cdlc_dir(config_data.song_loader.rocksmith_cdlc_dir)
             self.allow_load_when_in_game = config_data.song_loader.allow_load_when_in_game
-            self.phpsessid = rs_playlist.check_phpsessid(config_data.song_loader.phpsessid)
             self.cdlc_import_json_file = config_data.song_loader.cdlc_import_json_file
             self.songs_to_load = os.path.join(config_data.song_loader.cdlc_dir, config_data.song_loader.cfsm_file_name)
 
@@ -104,7 +105,7 @@ class SongLoader:
                 self.last_run = time()
 
     def update_playlist(self):
-        new_playlist = get_playlist(self.phpsessid)
+        new_playlist = get_playlist(self.twitch_channel, self.phpsessid)
 
         self.exit_if_user_not_logged_in(new_playlist)
 
@@ -200,7 +201,7 @@ class SongLoader:
                     else:
                         logger.debug("User must download the song: cdlc_id={} - {} - {}".format(cdlc_id, artist, title),
                                      MODULE_NAME)
-                        # rs_playlist.set_tag_to_download(self.phpsessid, song_data.rspl_request_id)
+                        # rs_playlist.set_tag_to_download(self.twitch_channel, self.phpsessid, song_data.rspl_request_id)
 
                 con.commit()
 
@@ -219,7 +220,7 @@ class SongLoader:
                 # TODO this takes 1 sec for each call. If we have a list of 30 songs, it could take 30 seconds!
                 #   Do it only once!
                 if 'afea46a9' not in song_data.tags:
-                    rs_playlist.set_tag_loaded(self.phpsessid, song_data.rspl_request_id)
+                    rs_playlist.set_tag_loaded(self.twitch_channel, self.phpsessid, song_data.rspl_request_id)
                     song_data.tags.add('afea46a9')
                     # song_data.tags.discard('need to download')  # TODO
             else:
@@ -233,13 +234,13 @@ class SongLoader:
                     actually_loaded_songs.add(song_data.song_file_name)
                     # TODO this takes 1 sec for each call. If we have a list of 30 songs, it could take 30 seconds!
                     #   Do it only once!
-                    rs_playlist.set_tag_loaded(self.phpsessid, song_data.rspl_request_id)
+                    rs_playlist.set_tag_loaded(self.twitch_channel, self.phpsessid, song_data.rspl_request_id)
                 else:
                     logger.debug("Could not move file: {}".format(song_to_move), MODULE_NAME)
                     self.songs.missing_from_archive.add(song_data.song_file_name)
                     # TODO this takes 1 sec for each call. If we have a list of 30 songs, it could take 30 seconds!
                     #   Do it only once!
-                    rs_playlist.set_tag_to_download(self.phpsessid, song_data.rspl_request_id)
+                    rs_playlist.set_tag_to_download(self.twitch_channel, self.phpsessid, song_data.rspl_request_id)
 
         if len(actually_loaded_songs) > 0:
             logger.warning("---- Files newly moved and will be parsed: " + str(actually_loaded_songs), MODULE_NAME)
