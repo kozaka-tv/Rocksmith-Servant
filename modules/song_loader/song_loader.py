@@ -33,10 +33,11 @@ class SongLoader:
         self.enabled = config_data.song_loader.enabled
         if self.enabled:
             self.twitch_channel = config_data.song_loader.twitch_channel
-            self.phpsessid = rs_playlist.check_phpsessid(config_data.song_loader.phpsessid)
+            self.phpsessid = config_data.song_loader.phpsessid
             self.rsplaylist = None
             self.rsplaylist_updated = True
             self.cdlc_dir = os.path.join(config_data.song_loader.cdlc_dir)
+            self.rspl_tags = config_data.song_loader.rspl_tags
             self.cfsm_file_name = config_data.song_loader.cfsm_file_name
             self.cdlc_archive_dir = self.check_cdlc_archive_dir(config_data.song_loader.cdlc_archive_dir)
             self.destination_directory = config_data.song_loader.destination_directory
@@ -54,12 +55,13 @@ class SongLoader:
     def update_config(self, config_data):
         self.enabled = config_data.song_loader.enabled
         self.cdlc_dir = os.path.join(config_data.song_loader.cdlc_dir)
+        self.rspl_tags = config_data.song_loader.rspl_tags
         self.cfsm_file_name = config_data.song_loader.cfsm_file_name
         self.cdlc_archive_dir = self.check_cdlc_archive_dir(config_data.song_loader.cdlc_archive_dir)
         self.destination_directory = config_data.song_loader.destination_directory
         self.rocksmith_cdlc_dir = self.check_rocksmith_cdlc_dir(config_data.song_loader.rocksmith_cdlc_dir)
         self.allow_load_when_in_game = config_data.song_loader.allow_load_when_in_game
-        self.phpsessid = rs_playlist.check_phpsessid(config_data.song_loader.phpsessid)
+        self.phpsessid = config_data.song_loader.phpsessid
         self.cdlc_import_json_file = config_data.song_loader.cdlc_import_json_file
         self.songs_to_load = os.path.join(config_data.song_loader.cdlc_dir, config_data.song_loader.cfsm_file_name)
 
@@ -201,7 +203,10 @@ class SongLoader:
                     else:
                         logger.debug("User must download the song: cdlc_id={} - {} - {}".format(cdlc_id, artist, title),
                                      MODULE_NAME)
-                        # rs_playlist.set_tag_to_download(self.twitch_channel, self.phpsessid, song_data.rspl_request_id)
+                        # rs_playlist.set_tag_to_download(self.twitch_channel,
+                        #                                 self.phpsessid,
+                        #                                 song_data.rspl_request_id,
+                        #                                 self.rspl_tags)
 
                 con.commit()
 
@@ -220,7 +225,10 @@ class SongLoader:
                 # TODO this takes 1 sec for each call. If we have a list of 30 songs, it could take 30 seconds!
                 #   Do it only once!
                 if 'afea46a9' not in song_data.tags:
-                    rs_playlist.set_tag_loaded(self.twitch_channel, self.phpsessid, song_data.rspl_request_id)
+                    rs_playlist.set_tag_loaded(self.twitch_channel,
+                                               self.phpsessid,
+                                               song_data.rspl_request_id,
+                                               self.rspl_tags)
                     song_data.tags.add('afea46a9')
                     # song_data.tags.discard('need to download')  # TODO
             else:
@@ -234,7 +242,10 @@ class SongLoader:
                     actually_loaded_songs.add(song_data.song_file_name)
                     # TODO this takes 1 sec for each call. If we have a list of 30 songs, it could take 30 seconds!
                     #   Do it only once!
-                    rs_playlist.set_tag_loaded(self.twitch_channel, self.phpsessid, song_data.rspl_request_id)
+                    rs_playlist.set_tag_loaded(self.twitch_channel,
+                                               self.phpsessid,
+                                               song_data.rspl_request_id,
+                                               self.rspl_tags)
                 else:
                     logger.debug("Could not move file: {}".format(song_to_move), MODULE_NAME)
                     self.songs.missing_from_archive.add(song_data.song_file_name)

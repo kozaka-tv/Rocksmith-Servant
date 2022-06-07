@@ -1,12 +1,4 @@
-import os
-
 import requests
-
-from utils.exceptions import ConfigError
-
-# TODO get from the config
-TAG_TO_DOWNLOAD = "8c8c2924"
-TAG_LOADED = "afea46a9"
 
 # EXAMPLE
 # https://rsplaylist.com/ajax/requests.php?channel=kozaka&action=set-tag&id=1305252&tag=8c8c2924&value=true
@@ -16,21 +8,6 @@ URL_PLAYLIST = RS_PLAYLIST_HOME + "/playlist.php?channel=%s"
 URL_REQUESTS = RS_PLAYLIST_HOME + "/requests.php?channel=%s"
 URL_TAG_SET = URL_REQUESTS + "&action=set-tag&id=%s&tag=%s&value=true"
 URL_TAG_UNSET = URL_REQUESTS + "&action=set-tag&id=%s&tag=%s&value=false"
-
-NL = os.linesep
-ERR_MSG_PHPSESSID = "Please set your PHP Session ID into the config!" + NL + \
-                    "The PHPSESSID is needed to get data from your RS Playlist request page." + NL + \
-                    "You can have the PHPSESSID from the cookie of your browser " \
-                    "after you logged in into the RS Playlist page." + NL + \
-                    "Optionally, use the Tampermonkey script, what could be found under /misc/tampermonkey " \
-                    "with the name: 'RS Playlist enhancer and simplifier.user.js'" + NL + \
-                    "or install it from https://greasyfork.org/en/scripts/440738-rs-playlist-enhancer-and-simplifier"
-
-
-def check_phpsessid(phpsessid):
-    if phpsessid is None or phpsessid.startswith('<Enter your'):
-        raise ConfigError(ERR_MSG_PHPSESSID)
-    return phpsessid
 
 
 def get_playlist(twitch_channel, phpsessid):
@@ -49,13 +26,13 @@ def unset_tag(twitch_channel, phpsessid, rspl_request_id, tag_id):
     requests.put(url, cookies=cookies).json()
 
 
-def set_tag_loaded(twitch_channel, phpsessid, rspl_request_id):
-    set_tag(twitch_channel, phpsessid, rspl_request_id, TAG_LOADED)
+def set_tag_loaded(twitch_channel, phpsessid, rspl_request_id, rspl_tags):
+    set_tag(twitch_channel, phpsessid, rspl_request_id, rspl_tags.tag_loaded)
     # TODO remove tag 'to download'?
-    unset_tag(twitch_channel, phpsessid, rspl_request_id, TAG_TO_DOWNLOAD)
+    unset_tag(twitch_channel, phpsessid, rspl_request_id, rspl_tags.tag_to_download)
 
 
-def set_tag_to_download(twitch_channel, phpsessid, rspl_request_id):
-    set_tag(twitch_channel, phpsessid, rspl_request_id, TAG_TO_DOWNLOAD)
+def set_tag_to_download(twitch_channel, phpsessid, rspl_request_id, rspl_tags):
+    set_tag(twitch_channel, phpsessid, rspl_request_id, rspl_tags.tag_to_download)
     # TODO remove tag 'loaded'?
-    unset_tag(twitch_channel, phpsessid, rspl_request_id, TAG_LOADED)
+    unset_tag(twitch_channel, phpsessid, rspl_request_id, rspl_tags.tag_loaded)

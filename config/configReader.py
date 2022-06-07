@@ -29,11 +29,11 @@ class ConfigReader:
         # TODO remove content later and use variables only?
         self.content = self.load_content_from_config()
 
-        self.create_config_from_template_if_not_exists_and_stop()
+        self.if_needed_create_config_from_template_and_then_stop()
 
         self.log_config()
 
-    def create_config_from_template_if_not_exists_and_stop(self):
+    def if_needed_create_config_from_template_and_then_stop(self):
         if self.last_modification_time == 0:
             self.save()
             logger.error('Because this is the first run, and no ' + CONFIG_FILE_NAME +
@@ -117,7 +117,8 @@ class ConfigReader:
         except FileNotFoundError:
             return 0
 
-    def get_default_config_ini(self):
+    @staticmethod
+    def get_default_config_ini():
         """
         get Config Object from the serialized default config
         :return:
