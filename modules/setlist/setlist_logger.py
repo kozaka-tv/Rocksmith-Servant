@@ -21,7 +21,8 @@ class SetlistLogger:
         self.file_name = setlist_file_name()
         self.write_to_setlist_file(
             "--------------------------------" + os.linesep +
-            "Setlist of " + str(datetime.datetime.now()))
+            "Setlist of " + str(datetime.datetime.now()) + os.linesep +
+            "--------------------------------")
 
         self.setlist_path = config_data.setlist_logger.setlist_path
         # TODO
@@ -36,7 +37,8 @@ class SetlistLogger:
         self.file_name = setlist_file_name()
         self.write_to_setlist_file(
             "--------------------------------" + os.linesep +
-            "Setlist of " + str(datetime.datetime.now()))
+            "Setlist of " + str(datetime.datetime.now()) + os.linesep +
+            "--------------------------------")
 
         self.setlist_path = config_data.setlist_logger.setlist_path
         # TODO
