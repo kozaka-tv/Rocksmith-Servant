@@ -5,24 +5,29 @@ from distutils import util
 import sys
 
 from config.config_ini_template import serialized
-from utils import logger
+from utils import logger, file_utils
 
+CONFIG_DIR_NAME = "config"
 CONFIG_FILE_NAME = "config.ini"
-PATH_CONFIG = os.path.join(os.path.dirname(__file__), CONFIG_FILE_NAME)
-PATH_CONFIG_TEMPLATE = os.path.join(os.path.dirname(__file__), "config_ini_template.py")
+CONFIG_TEMPLATE_FILE_NAME = "config_ini_template.py"
+PATH_CONFIG_DIR = os.path.dirname(os.path.abspath(os.path.join(CONFIG_DIR_NAME, CONFIG_FILE_NAME)))
+PATH_CONFIG_FILE = os.path.join(PATH_CONFIG_DIR, CONFIG_FILE_NAME)
+PATH_CONFIG_TEMPLATE_FILE = os.path.join(PATH_CONFIG_DIR, CONFIG_TEMPLATE_FILE_NAME)
 
 ERROR_MSG = "Error retrieving value from {} for section [{}] with key [{}]."
 
 
 class ConfigTemplateError(Exception):
     def __init__(self, section, key):
-        super().__init__(ERROR_MSG.format(PATH_CONFIG_TEMPLATE, section, key))
+        super().__init__(ERROR_MSG.format(PATH_CONFIG_TEMPLATE_FILE, section, key))
 
 
 class ConfigReader:
     def __init__(self):
 
-        logger.warning('Initialising ' + CONFIG_FILE_NAME + ' from ' + PATH_CONFIG + ' ...')
+        file_utils.create_directory(PATH_CONFIG_DIR)
+
+        logger.warning('Initialising ' + CONFIG_FILE_NAME + ' from ' + PATH_CONFIG_FILE + ' ...')
 
         self.last_modified = None
 
@@ -37,7 +42,8 @@ class ConfigReader:
         if self.last_modification_time == 0:
             self.save()
             logger.error('Because this is the first run, and no ' + CONFIG_FILE_NAME +
-                         ' file was found, I created a configuration file for you from a template in: ' + PATH_CONFIG)
+                         ' file was found, I created a configuration file for you from a template in: '
+                         + PATH_CONFIG_FILE)
             logger.log('Please change the values in the ' + CONFIG_FILE_NAME +
                        ' file according to your needs, and then relaunch Rocksmith Servant!')
             logger.warning('...press any key to exit this program.')
@@ -50,11 +56,11 @@ class ConfigReader:
         :return: Config Object
         """
         config = self.get_default_config_ini()
-        config.read(PATH_CONFIG, encoding="UTF-8")
+        config.read(PATH_CONFIG_FILE, encoding="UTF-8")
         self.last_modified = self.last_modification_time
 
         if self.last_modified != 0:
-            logger.warning(PATH_CONFIG + ' has been loaded!')
+            logger.warning(PATH_CONFIG_FILE + ' has been loaded!')
 
         return config
 
@@ -106,14 +112,14 @@ class ConfigReader:
         """
         Write the config to the specified path
         """
-        with open(PATH_CONFIG, 'w') as configfile:
+        with open(PATH_CONFIG_FILE, 'w') as configfile:
             self.content.write(configfile)
 
     @property
     def last_modification_time(self):
         """ Return last modified time of the config """
         try:
-            return os.stat(PATH_CONFIG).st_mtime
+            return os.stat(PATH_CONFIG_FILE).st_mtime
         except FileNotFoundError:
             return 0
 
@@ -184,7 +190,7 @@ class ConfigReader:
 
     @staticmethod
     def log_bad_value_message(section, key, cast):
-        logger.error(ERROR_MSG.format(PATH_CONFIG, section, key))
+        logger.error(ERROR_MSG.format(PATH_CONFIG_FILE, section, key))
         if cast == bool:
             logger.log("For this type of key, please use either False, No, 0 or True, Yes, 1")
 

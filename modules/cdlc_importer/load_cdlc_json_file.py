@@ -10,6 +10,10 @@ MODULE_NAME = "CDLCImporter"
 
 NL = os.linesep
 
+# TODO hardcoded code!!!!
+# TODO hardcoded code!!!!
+# TODO hardcoded code!!!!
+# TODO hardcoded code!!!!
 CDLC_IMPORT_JSON_FILE = 'c:/Google Drive Kozaka/Kozaka - Live Stream/SongsMasterGrid.json'
 # CDLC_IMPORT_JSON_FILE = '../../import/SongsMasterGrid.json'
 # CDLC_IMPORT_JSON_FILE = '../../import/SongsMasterGrid_BIG.json'
@@ -34,7 +38,7 @@ class CDLCImporter:
 
     def create_tables(self):
         cursor = self.db.cursor()
-        read = open("create_table_songs.sql").read()
+        read = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "create_table_songs.sql")).read()
         cursor.executescript(read)
 
     def init_db(self):
