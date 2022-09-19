@@ -54,14 +54,6 @@ class FileManager:
 
                 self.last_run = datetime.datetime.now()
 
-    # TODO remove this later
-    # def log_warning_times(self):
-    #     logger.warning(
-    #         "time()={} self.last_run={} self.last_run_not_parsed={}".format(
-    #             datetime.datetime.now().second,
-    #             self.last_run.second,
-    #             self.last_run_not_parsed.second), MODULE_NAME)
-
     def beat_last_run(self):
         return math.floor((datetime.datetime.now() - self.last_run).seconds) >= HEARTBEAT
 
