@@ -18,26 +18,30 @@ columns = ['rowId', 'colArtist', 'colTitle', 'colAlbum', 'colKey', 'colArrangeme
 
 class CDLCImporter:
     def __init__(self, config_data, db):
-        self.cdlc_import_json_file = config_data.cdlc_importer.cdlc_import_json_file
+        self.enabled = config_data.cdlc_importer.enabled
+        if self.enabled:
+            self.cdlc_import_json_file = config_data.cdlc_importer.cdlc_import_json_file
+        # TODO should be behind the enabled check?
         self.db = db
 
     def load(self):
-        logger.log("-----------------------------------", MODULE_NAME)
-        logger.warning("Importing CDLC files from CFSM json file...", MODULE_NAME)
+        if self.enabled:
+            logger.log("-----------------------------------", MODULE_NAME)
+            logger.warning("Importing CDLC files from CFSM json file...", MODULE_NAME)
 
-        try:
-            self.init_db()
-        except Exception as e:
-            logger.error("Database init error: {0}".format(e))
-            raise e
+            try:
+                self.init_db()
+            except Exception as e:
+                logger.error("Database init error: {0}".format(e))
+                raise e
 
-        try:
-            self.import_cdlc_files()
-        except Exception as e:
-            logger.error("Could not import CDLCs to the Database: {0}".format(e))
-            raise e
+            try:
+                self.import_cdlc_files()
+            except Exception as e:
+                logger.error("Could not import CDLCs to the Database: {0}".format(e))
+                raise e
 
-        logger.log("-----------------------------------", MODULE_NAME)
+            logger.log("-----------------------------------", MODULE_NAME)
 
     def create_tables(self):
         cursor = self.db.cursor()

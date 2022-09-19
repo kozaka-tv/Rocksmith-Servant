@@ -31,6 +31,9 @@ ERR_MSG_PHPSESSID = "Please set your PHP Session ID into the config!" + NL + \
                     "Optionally, use the Tampermonkey script, what could be found under /misc/tampermonkey " \
                     "with the name: 'RS Playlist enhancer and simplifier.user.js'" + NL + \
                     "or install it from https://greasyfork.org/en/scripts/440738-rs-playlist-enhancer-and-simplifier"
+ERR_MSG_CDLC_IMPORTER = "Please set your directory and file name where the json file is located " + NL + \
+                        "what contains all the CDLC information (exported from CFSM) what " + NL + \
+                        "the Servant have to import into the database!"
 ERR_MSG_RSPL_TAG = "Missing or undefined tag value of the tag '{}' in the config!" + NL + \
                    "Please create a tag in RS Playlist and enter the value into the config!" + NL + \
                    "BAD: {}={}"
@@ -72,22 +75,25 @@ class ConfFileManager:
 
 class ConfCDLCImporter:
     def __init__(self, conf):
-        self.cdlc_import_json_file = conf.get(SECTION_CDLC_IMPORTER, "cdlc_import_json_file")
+        self.enabled = conf.get_bool(SECTION_CDLC_IMPORTER, KEY_ENABLED)
+        self.cdlc_import_json_file = validate_and_get_cdlc_import_json_file(
+            conf.get(SECTION_CDLC_IMPORTER, "cdlc_import_json_file"))
 
 
 class ConfSongLoader:
     def __init__(self, conf):
         self.enabled = conf.get_bool(SECTION_SONG_LOADER, KEY_ENABLED)
-        self.twitch_channel = conf.get(SECTION_SONG_LOADER, "twitch_channel")
-        self.phpsessid = validate_and_get_phpsessid(conf.get(SECTION_SONG_LOADER, "PHPSESSID"))
-        self.cdlc_dir = conf.get(SECTION_SONG_LOADER, "cdlc_dir")
-        self.rspl_tags = RSPLTags(conf)
-        self.cfsm_file_name = conf.get(SECTION_SONG_LOADER, "cfsm_file_name")
-        self.cdlc_archive_dir = conf.get(SECTION_SONG_LOADER, "cdlc_archive_dir")
-        self.destination_directory = conf.get(SECTION_FILE_MANAGER, "destination_directory")
-        self.rocksmith_cdlc_dir = conf.get(SECTION_SONG_LOADER, "rocksmith_cdlc_dir")
-        self.cdlc_import_json_file = conf.get(SECTION_SONG_LOADER, "cdlc_import_json_file")
-        self.allow_load_when_in_game = conf.get_bool(SECTION_SONG_LOADER, "allow_load_when_in_game")
+        if self.enabled:
+            self.twitch_channel = conf.get(SECTION_SONG_LOADER, "twitch_channel")
+            self.phpsessid = validate_and_get_phpsessid(conf.get(SECTION_SONG_LOADER, "PHPSESSID"))
+            self.cdlc_dir = conf.get(SECTION_SONG_LOADER, "cdlc_dir")
+            self.rspl_tags = RSPLTags(conf)
+            self.cfsm_file_name = conf.get(SECTION_SONG_LOADER, "cfsm_file_name")
+            self.cdlc_archive_dir = conf.get(SECTION_SONG_LOADER, "cdlc_archive_dir")
+            self.destination_directory = conf.get(SECTION_FILE_MANAGER, "destination_directory")
+            self.rocksmith_cdlc_dir = conf.get(SECTION_SONG_LOADER, "rocksmith_cdlc_dir")
+            self.cdlc_import_json_file = conf.get(SECTION_SONG_LOADER, "cdlc_import_json_file")
+            self.allow_load_when_in_game = conf.get_bool(SECTION_SONG_LOADER, "allow_load_when_in_game")
 
 
 class RSPLTags:
@@ -118,6 +124,12 @@ def validate_and_get_phpsessid(phpsessid):
     if phpsessid is None or phpsessid.startswith('<Enter your'):
         raise ConfigError(ERR_MSG_PHPSESSID)
     return phpsessid
+
+
+def validate_and_get_cdlc_import_json_file(cdlc_import_json_file):
+    if cdlc_import_json_file is None or cdlc_import_json_file.startswith('<Enter your'):
+        raise ConfigError(ERR_MSG_CDLC_IMPORTER)
+    return cdlc_import_json_file
 
 
 def get_tag(conf, tag_name):
