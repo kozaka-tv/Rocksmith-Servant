@@ -76,14 +76,13 @@ class SongData:
                                        self.rspl_official,
                                        self.song_file_name)
 
-
 # TODO remove this later if the eq is decided!
-s1 = SongData(1, 555, 'asd')
-s2 = SongData(2, 666, 'qwe')
-s3 = SongData(1, 777, '123')
+# s1 = SongData(1, 555, 'asd')
+# s2 = SongData(2, 666, 'qwe')
+# s3 = SongData(1, 777, '123')
 
-song_data_set = {s1, s2, s3}
-print(song_data_set)
+# song_data_set = {s1, s2, s3}
+# print(song_data_set)
 # output:
 # {
 # <SongData: rspl_request_id=1, cdlc_id=555, song_file_name=asd>,
