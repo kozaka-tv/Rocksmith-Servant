@@ -112,6 +112,7 @@ def move_file(file, destination, module_name):
         return False
 
 
+# TODO remove if not used
 def file_datetime_formatted(filename):
     file_time = os.path.getmtime(filename)
     formatted_time = datetime.fromtimestamp(file_time)
