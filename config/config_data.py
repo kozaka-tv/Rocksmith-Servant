@@ -43,7 +43,7 @@ class ConfigData:
         self.sniffer = ConfRockSniffer(conf)
         self.setlist_logger = ConfSetlistLogger(conf)
         self.file_manager = ConfFileManager(self.confReader)
-        # TODO CDLCImporter?
+        self.cdlc_importer = ConfCDLCImporter(conf)
         self.song_loader = ConfSongLoader(conf)
         self.scene_switcher = ConfSceneSwitcher(conf)
         self.debugger = ConfDebugger(conf)
@@ -68,6 +68,11 @@ class ConfFileManager:
         self.source_directories = conf.get_set(SECTION_FILE_MANAGER, "source_directories")
         self.destination_directory = conf.get(SECTION_FILE_MANAGER, "destination_directory")
         self.using_cfsm = conf.get(SECTION_FILE_MANAGER, "using_cfsm")
+
+
+class ConfCDLCImporter:
+    def __init__(self, conf):
+        self.cdlc_import_json_file = conf.get(SECTION_CDLC_IMPORTER, "cdlc_import_json_file")
 
 
 class ConfSongLoader:

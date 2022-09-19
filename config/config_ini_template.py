@@ -26,8 +26,8 @@ serialized = {
         "cdlc_archive_dir": "<Enter your CDLC archive directory, where you store all of your downloaded CDLCs>",
         "rocksmith_cdlc_dir": "<Enter your Rocksmith CDLC directory, where you have all the loaded CDLC songs>",
         "allow_load_when_in_game": True,
-        "cdlc_import_json_file": "<Enter your directory, where do you want to have to be imported "
-                                 "all the downloaded or archived CDLC  files>"
+        "cdlc_import_json_file": "<Enter your directory, where do you want put your json file from CFSM, "
+                                 "what contains all your CDLC files need to be imported into the Servant database>"
     },
     "SceneSwitcher": {
         "enabled": False,
@@ -37,6 +37,11 @@ serialized = {
         "source_directories": "<Enter source directories (separated by ';') from where do you want to move CDLC files>",
         "destination_directory": "<Enter Your Directory to where do you want to move CDLC files>",
         "using_cfsm": False,
+    },
+    "CDLCImporter": {
+        "cdlc_import_json_file": "<Enter your directory, where do you want put your json file from CFSM, "
+                                 "what contains all your CDLC files need to be imported into the Servant database"
+                                 "You have to export from CFSM only the delta, only the newly enumerated songs>"
     },
     "OBSWebSocket": {
         "host": "localhost",

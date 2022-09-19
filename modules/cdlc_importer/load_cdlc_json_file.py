@@ -10,15 +10,6 @@ MODULE_NAME = "CDLCImporter"
 
 NL = os.linesep
 
-# TODO hardcoded code!!!!
-# TODO hardcoded code!!!!
-# TODO hardcoded code!!!!
-# TODO hardcoded code!!!!
-CDLC_IMPORT_JSON_FILE = 'c:/Google Drive Kozaka/Kozaka - Live Stream/SongsMasterGrid.json'
-# CDLC_IMPORT_JSON_FILE = '../../import/SongsMasterGrid.json'
-# CDLC_IMPORT_JSON_FILE = '../../import/SongsMasterGrid_BIG.json'
-# CDLC_IMPORT_JSON_FILE = '../../import/SongsMasterGrid_SMALL.json'
-
 columns = ['rowId', 'colArtist', 'colTitle', 'colAlbum', 'colKey', 'colArrangements', 'colTunings', 'colSongLength',
            'colRepairStatus', 'colSongYear', 'colSongVolume', 'colFileName', 'colFileDate', 'colAppID',
            'colPackageAuthor', 'colPackageVersion', 'colTagged', 'colIgnitionID', 'colIgnitionDate',
@@ -26,7 +17,8 @@ columns = ['rowId', 'colArtist', 'colTitle', 'colAlbum', 'colKey', 'colArrangeme
 
 
 class CDLCImporter:
-    def __init__(self, db):
+    def __init__(self, config_data, db):
+        self.cdlc_import_json_file = config_data.cdlc_importer.cdlc_import_json_file
         self.db = db
 
     def load(self):
@@ -103,7 +95,7 @@ class CDLCImporter:
         logger.debug("... {} songs inserted.".format(len(songs)), MODULE_NAME)
 
     def import_cdlc_files(self):
-        with open(CDLC_IMPORT_JSON_FILE, encoding='utf-8-sig') as json_file:
+        with open(self.cdlc_import_json_file, encoding='utf-8-sig') as json_file:
             logger.log("File to import: {}".format(json_file.name), MODULE_NAME)
 
             # TODO what exactly identifies a song in the DB? colFileName? colKey? colArtistTitleAlbumDate? All?
