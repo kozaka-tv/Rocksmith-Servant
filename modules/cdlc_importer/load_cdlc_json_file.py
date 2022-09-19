@@ -24,8 +24,19 @@ class CDLCImporter:
     def load(self):
         logger.log("-----------------------------------", MODULE_NAME)
         logger.warning("Importing CDLC files from CFSM json file...", MODULE_NAME)
-        self.init_db()
-        self.import_cdlc_files()
+
+        try:
+            self.init_db()
+        except Exception as e:
+            logger.error("Database init error: {0}".format(e))
+            raise e
+
+        try:
+            self.import_cdlc_files()
+        except Exception as e:
+            logger.error("Could not import CDLCs to the Database: {0}".format(e))
+            raise e
+
         logger.log("-----------------------------------", MODULE_NAME)
 
     def create_tables(self):
@@ -37,7 +48,7 @@ class CDLCImporter:
         cursor = self.db.cursor()
         cursor.execute("SELECT count(name) FROM sqlite_master WHERE type='table' AND name='songs'")
         if cursor.fetchone()[0] == 1:
-            logger.debug("Songs Table exists.", MODULE_NAME)
+            logger.debug("Songs Table already exists, do not need to create it.", MODULE_NAME)
         else:
             logger.warning("Songs Table does not exists! Creating...", MODULE_NAME)
             self.create_tables()
