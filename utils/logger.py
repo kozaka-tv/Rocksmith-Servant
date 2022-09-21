@@ -25,8 +25,6 @@ def get_month(n):
 
 
 def create_message_and_save_to_log(name, string):
-    file_utils.create_log_dir()
-
     date = datetime.date.today()
 
     if name:

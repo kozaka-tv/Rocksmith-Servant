@@ -8,7 +8,7 @@ from time import time
 from modules.song_loader.song_data import SongData
 from modules.song_loader.songs import Songs
 from utils import logger, file_utils, rs_playlist
-from utils.exceptions import ConfigError, RSPlaylistNotLoggedInError
+from utils.exceptions import ConfigError, RSPlaylistNotLoggedInError, BadDirectoryError
 from utils.rs_playlist import get_playlist
 
 MODULE_NAME = "SongLoader"
@@ -46,7 +46,14 @@ class SongLoader:
             self.cdlc_import_json_file = config_data.song_loader.cdlc_import_json_file
             self.songs_to_load = os.path.join(config_data.song_loader.cdlc_dir, config_data.song_loader.cfsm_file_name)
 
-            self.create_directories()
+            try:
+                self.create_directories()
+            except FileNotFoundError as bde:
+                logger.error("---------------------------------------", MODULE_NAME)
+                logger.error("Directory {} could not be created!".format(bde.filename), MODULE_NAME)
+                logger.error("Please fix the configuration!", MODULE_NAME)
+                logger.error("---------------------------------------", MODULE_NAME)
+                raise BadDirectoryError
 
             self.last_run = time()
 

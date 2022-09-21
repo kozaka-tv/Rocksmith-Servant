@@ -10,7 +10,7 @@ from modules.file_manager.cdlc_file_manager import FileManager
 from modules.scene_switcher.scene_switcher import SceneSwitcher
 from modules.setlist.setlist_logger import SetlistLogger
 from modules.song_loader.song_loader import SongLoader
-from utils import logger
+from utils import logger, file_utils
 from utils.debug import Debugger
 from utils.exceptions import RocksnifferConnectionError, ConfigError
 from utils.rocksniffer import Rocksniffer
@@ -18,6 +18,7 @@ from utils.rocksniffer import Rocksniffer
 db = sqlite3.connect('servant.db')
 
 debug_log_level = True
+file_utils.create_log_dir()
 
 
 def check_enabled_module_dependencies():
