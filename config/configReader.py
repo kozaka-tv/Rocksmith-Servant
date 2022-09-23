@@ -85,13 +85,13 @@ class ConfigReader:
         logger.warning('---------------------------------------------------------------')
 
     def log_enabled_modules(self):
-        logger.error('--- Enabled Modules ---')
+        logger.warning('--- Enabled Modules ---')
         self.log_module_if_enabled('RockSniffer')
         self.log_module_if_enabled('SetlistLogger')
         self.log_module_if_enabled('SongLoader')
         self.log_module_if_enabled('SceneSwitcher')
         self.log_module_if_enabled('FileManager')
-        logger.error('---------------')
+        logger.warning('---------------')
 
     def log_module_if_enabled(self, feature_name):
         if self.get_bool(feature_name, 'enabled'):
