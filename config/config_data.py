@@ -1,6 +1,7 @@
 import os
 
 from config.configReader import ConfigReader
+from utils import rs_playlist
 from utils.exceptions import ConfigError
 
 SECTION_ROCK_SNIFFER = "RockSniffer"
@@ -24,7 +25,8 @@ TAG_RAIDER_REQ = "rspl_tag_raider_request"
 TAG_VIP_VIEWER_REQ = "rspl_tag_vip_viewer_request"
 
 NL = os.linesep
-ERR_MSG_PHPSESSID = "Please set your PHP Session ID into the config!" + NL + \
+ERR_MSG_PHPSESSID = "Please set your PHP Session ID into the config properly and log in to RSPlaylist!" + NL + \
+                    "You may enter more than one ID, separated by ';'" + NL + \
                     "The PHPSESSID is needed to get data from your RS Playlist request page." + NL + \
                     "You can have the PHPSESSID from the cookie of your browser " \
                     "after you logged in into the RS Playlist page." + NL + \
@@ -85,7 +87,7 @@ class ConfSongLoader:
         self.enabled = conf.get_bool(SECTION_SONG_LOADER, KEY_ENABLED)
         if self.enabled:
             self.twitch_channel = conf.get(SECTION_SONG_LOADER, "twitch_channel")
-            self.phpsessid = validate_and_get_phpsessid(conf.get(SECTION_SONG_LOADER, "PHPSESSID"))
+            self.phpsessid = validate_and_get_phpsessid(conf, self.twitch_channel)
             self.cdlc_dir = conf.get(SECTION_SONG_LOADER, "cdlc_dir")
             self.rspl_tags = RSPLTags(conf)
             self.cfsm_file_name = conf.get(SECTION_SONG_LOADER, "cfsm_file_name")
@@ -120,10 +122,19 @@ class ConfDebugger:
         self.interval = conf.get(SECTION_DEBUGGING, "debug_log_interval", int)
 
 
-def validate_and_get_phpsessid(phpsessid):
+def validate_and_get_phpsessid(conf, twitch_channel):
+    phpsessid = conf.get(SECTION_SONG_LOADER, "phpsessid")
     if phpsessid is None or phpsessid.startswith('<Enter your'):
         raise ConfigError(ERR_MSG_PHPSESSID)
-    return phpsessid
+
+    phpsessid_set = conf.get_set(SECTION_SONG_LOADER, "phpsessid")
+
+    for phpsessid in phpsessid_set:
+        viewers = rs_playlist.get_viewers(twitch_channel, phpsessid)
+        if viewers.get("result") != "Error":
+            return phpsessid
+
+    raise ConfigError(ERR_MSG_PHPSESSID)
 
 
 def validate_and_get_cdlc_import_json_file(cdlc_import_json_file):

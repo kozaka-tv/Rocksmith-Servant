@@ -11,7 +11,8 @@ serialized = {
     "SongLoader": {
         "enabled": False,
         "twitch_channel": "<Enter your Twitch channel name>",
-        "phpsessid": "<Enter your PHP Session ID from the cookie of the RS Playlist after login>",
+        "phpsessid": "<Enter your PHP Session ID from the cookie of the RS Playlist after login. "
+                     "You may enter more than one ID, separated by ';'>",
         "cdlc_dir": "import",
         "rspl_tag_to_download": "<Create a tag in RS Playlist for song need to be downloaded and enter to here>",
         "rspl_tag_downloaded": "<Create a tag in RS Playlist for song which has been downloaded and enter to here>",

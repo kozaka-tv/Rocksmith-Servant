@@ -3,15 +3,27 @@ import requests
 # EXAMPLE
 # https://rsplaylist.com/ajax/requests.php?channel=kozaka&action=set-tag&id=1305252&tag=8c8c2924&value=true
 # https://rsplaylist.com/ajax/requests.php?channel=kozaka&action=set-tag&id=1305252&tag=8c8c2924&value=false
-RS_PLAYLIST_HOME = "https://rsplaylist.com/ajax"
-URL_PLAYLIST = RS_PLAYLIST_HOME + "/playlist.php?channel=%s"
-URL_REQUESTS = RS_PLAYLIST_HOME + "/requests.php?channel=%s"
+RS_PLAYLIST_HOME = "https://rsplaylist.com/ajax/"
+URL_PLAYLIST = RS_PLAYLIST_HOME + "playlist.php?channel=%s"
+URL_REQUESTS = RS_PLAYLIST_HOME + "requests.php?channel=%s"
 URL_TAG_SET = URL_REQUESTS + "&action=set-tag&id=%s&tag=%s&value=true"
 URL_TAG_UNSET = URL_REQUESTS + "&action=set-tag&id=%s&tag=%s&value=false"
+# https://rsplaylist.com/ajax/viewers.php?user_name=&pageIndex=3&channel=kozaka
+URL_VIEWERS = RS_PLAYLIST_HOME + "viewers.php?user_name=&pageIndex=0&channel=%s"
+# https://rsplaylist.com/ajax/form-settings.php?channel=Kozaka
+URL_SETTINGS = RS_PLAYLIST_HOME + "form-settings.php?channel=%s"
 
 
 def get_playlist(twitch_channel, phpsessid):
     return requests.get(URL_PLAYLIST % twitch_channel, cookies={'PHPSESSID': phpsessid}).json()
+
+
+def get_viewers(twitch_channel, phpsessid):
+    return requests.get(URL_VIEWERS % twitch_channel, cookies={'PHPSESSID': phpsessid}).json()
+
+
+def get_settings(twitch_channel, phpsessid):
+    return requests.get(URL_SETTINGS % twitch_channel, cookies={'PHPSESSID': phpsessid}).json()
 
 
 def set_tag(twitch_channel, phpsessid, rspl_request_id, tag_id):
