@@ -3,8 +3,7 @@ import os
 
 from munch import DefaultMunch
 
-from modules.utils import song_loader_helper
-from utils import logger
+from utils import logger, file_utils
 
 MODULE_NAME = "CDLCImporter"
 
@@ -121,7 +120,7 @@ class CDLCImporter:
 
                 with self.db:
                     songs_from_db = self.get_song_from_db_via_file_name(
-                        song_loader_helper.replace_dlc_and_cdlc(cfsm_song_data.colFileName))
+                        file_utils.replace_dlc_and_cdlc(cfsm_song_data.colFileName))
 
                     if len(songs_from_db) == 0:
                         logger.debug("New CDLC found: {}".format(cfsm_song_data.colFileName), MODULE_NAME)

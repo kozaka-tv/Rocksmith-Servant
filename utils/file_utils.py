@@ -123,3 +123,7 @@ def file_datetime_formatted(filename):
 def create_directory(directory_to_create):
     logger.warning("Creating directory '{}' if not exists!".format(directory_to_create), MODULE_NAME)
     pathlib.Path(directory_to_create).mkdir(parents=True, exist_ok=True)
+
+
+def replace_dlc_and_cdlc(file_name):
+    return str(file_name).strip().replace('cdlc\\', '').replace('dlc\\', '')
