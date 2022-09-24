@@ -20,11 +20,12 @@ class FileManager:
         File manager to manage CDLC files
         """
         self.enabled = config_data.file_manager.enabled
-        self.last_run = datetime.datetime.now()
-        self.last_run_not_parsed = self.last_run
-        self.source_directories = config_data.file_manager.source_directories
-        self.destination_directory = config_data.file_manager.destination_directory
-        self.using_cfsm = config_data.file_manager.using_cfsm
+        if self.enabled:
+            self.last_run = datetime.datetime.now()
+            self.last_run_not_parsed = self.last_run
+            self.source_directories = config_data.file_manager.source_directories
+            self.destination_directory = config_data.file_manager.destination_directory
+            self.using_cfsm = config_data.file_manager.using_cfsm
 
     def update_config(self, config_data):
         self.enabled = config_data.file_manager.enabled

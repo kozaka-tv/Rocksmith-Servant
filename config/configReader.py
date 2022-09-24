@@ -80,7 +80,6 @@ class ConfigReader:
         logger.log('SongLoader.allow_load_when_in_game = ' + str(self.get('SongLoader', 'allow_load_when_in_game')))
 
         logger.log('Debugging.debug = ' + str(self.get_bool('Debugging', 'debug')))
-        logger.log('Debugging.debug_log_interval = ' + str(self.get_int_value('Debugging', 'debug_log_interval')))
 
         logger.warning('---------------------------------------------------------------')
 

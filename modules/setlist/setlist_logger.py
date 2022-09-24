@@ -4,6 +4,8 @@ import pathlib
 
 from utils import logger
 
+LOG_SEPARATOR = "-------------------------------------------"
+
 SETLIST_DIR = 'setlist'
 
 
@@ -14,15 +16,14 @@ class SetlistLogger:
         Setlist Logger
         """
         # Init setlist directory and file
-        # TODO use enabled, and do nothing if disabled
         self.enabled = config_data.setlist_logger.enabled
-        # TODO this should be maybe in run?
-        self.create_setlist_directory()
-        self.file_name = setlist_file_name()
-        self.write_to_setlist_file(
-            "--------------------------------" + os.linesep +
-            "Setlist of " + str(datetime.datetime.now()) + os.linesep +
-            "--------------------------------")
+        if self.enabled:
+            # TODO this should be maybe in run?
+            self.create_setlist_directory()
+            self.file_name = setlist_file_name()
+            self.write_to_setlist_file(LOG_SEPARATOR)
+            self.write_to_setlist_file("Setlist of " + str(datetime.datetime.now()))
+            self.write_to_setlist_file(LOG_SEPARATOR)
 
         self.setlist_path = config_data.setlist_logger.setlist_path
         # TODO
@@ -35,10 +36,9 @@ class SetlistLogger:
         self.enabled = config_data.setlist_logger.enabled
         self.create_setlist_directory()
         self.file_name = setlist_file_name()
-        self.write_to_setlist_file(
-            "--------------------------------" + os.linesep +
-            "Setlist of " + str(datetime.datetime.now()) + os.linesep +
-            "--------------------------------")
+        self.write_to_setlist_file(LOG_SEPARATOR)
+        self.write_to_setlist_file("Setlist of " + str(datetime.datetime.now()))
+        self.write_to_setlist_file(LOG_SEPARATOR)
 
         self.setlist_path = config_data.setlist_logger.setlist_path
         # TODO

@@ -7,6 +7,8 @@ class SceneSwitcher:
         Scene Switcher
         """
         self.enabled = config_data.scene_switcher.enabled
+        if self.enabled:
+            pass
         pass
 
     def update_config(self, config_data):
