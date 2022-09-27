@@ -25,12 +25,14 @@ TAG_RAIDER_REQ = "rspl_tag_raider_request"
 TAG_VIP_VIEWER_REQ = "rspl_tag_vip_viewer_request"
 
 NL = os.linesep
-ERR_MSG_PHPSESSID = "Please set your PHP Session ID into the config properly and log in to RSPlaylist!" + NL + \
+ERR_MSG_PHPSESSID = "You have not logged in to RSPlaylist, or your PHP Session ID (phpsessid) is wrong." + NL + \
+                    "Please login to RSPlaylist and try to start again!" + NL + \
+                    "If you still get this error message, check you PHP Session ID in your config.ini!" + NL + \
                     "You may enter more than one ID, separated by ';'" + NL + \
                     "The PHPSESSID is needed to get data from your RS Playlist request page." + NL + \
                     "You can have the PHPSESSID from the cookie of your browser " \
                     "after you logged in into the RS Playlist page." + NL + \
-                    "Optionally, use the Tampermonkey script, what could be found under /misc/tampermonkey " \
+                    "Optionally, use the Tampermonkey script, what could be found under /misc/tampermonkey " + NL + \
                     "with the name: 'RS Playlist enhancer and simplifier.user.js'" + NL + \
                     "or install it from https://greasyfork.org/en/scripts/440738-rs-playlist-enhancer-and-simplifier"
 ERR_MSG_CDLC_IMPORTER = "Please set your directory and file name where the json file is located " + NL + \
