@@ -258,7 +258,8 @@ class SongLoader:
                     self.songs.missing_from_archive.add(song_data.song_file_name)
                     # TODO this takes 1 sec for each call. If we have a list of 30 songs, it could take 30 seconds!
                     #   Do it only once!
-                    rs_playlist.set_tag_to_download(self.twitch_channel, self.phpsessid, song_data.rspl_request_id)
+                    rs_playlist.set_tag_to_download(self.twitch_channel, self.phpsessid, song_data.rspl_request_id,
+                                                    self.rspl_tags)
 
         if len(actually_loaded_songs) > 0:
             logger.warning("---- Files newly moved and will be parsed: " + str(actually_loaded_songs), MODULE_NAME)
