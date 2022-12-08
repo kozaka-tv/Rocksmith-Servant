@@ -49,7 +49,7 @@ class FileManager:
                     self.last_run_not_parsed = self.last_run
 
             elif self.beat_last_run():
-                logger.debug("Scan and move files from root and source dirs...", MODULE_NAME)
+                # logger.debug("Scan and move files from root and source dirs...", MODULE_NAME)
                 self.move_downloaded_cdlc_files(self.scan_cdlc_files_in_root())
                 self.move_downloaded_cdlc_files(self.scan_cdlc_files_in_source_dirs())
 
