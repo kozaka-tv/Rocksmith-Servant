@@ -130,6 +130,7 @@ dmypy.json
 
 /.idea/
 *.iml
+*.bak
 /config/config.ini
 /log_*.txt
 /log/
