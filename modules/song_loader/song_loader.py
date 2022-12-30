@@ -218,7 +218,7 @@ class SongLoader:
                 con.commit()
 
         if len(self.songs.song_data_set) <= 0:
-            # TODO actually this is not true. Only, there is no file moved from archive into the game.
+            # TODO actually this is not true. Only, just no file was moved from archive into the game.
             logger.warning("---- The rsplaylist is empty, nothing to move!", MODULE_NAME)
             return
 
@@ -282,12 +282,14 @@ class SongLoader:
             song_data.tags.add(tag)
 
     def search_song_in_the_db(self, artist, title):
-        rows = self.get_song_from_db(artist, title)
+        rows = self.get_songs_from_db(artist, title)
+        # TODO hm...maybe remove special chars and do a second query. To load all possible variations?
+        # So not only if len(rows) <= 0
         if len(rows) <= 0:
             # remove special chars
             artist_norm = self.remove_special_chars(artist)
             title_norm = self.remove_special_chars(title)
-            rows = self.get_song_from_db(artist_norm, title_norm)
+            rows = self.get_songs_from_db(artist_norm, title_norm)
         return rows
 
     @staticmethod
@@ -296,10 +298,9 @@ class SongLoader:
         return ''.join(c for c in unicodedata.normalize('NFKD', text) if unicodedata.category(c) != 'Mn')
 
     @staticmethod
-    def get_song_from_db(artist, title):
+    def get_songs_from_db(artist, title):
         cur = con.cursor()
         # TODO add and colTagged != 'ODLC'?
         execute = cur.execute("SELECT distinct colFileName FROM songs where colArtist like ? and colTitle like ?",
                               ("%" + artist + "%", "%" + title + "%"))
-        rows = execute.fetchall()
-        return rows
+        return execute.fetchall()
