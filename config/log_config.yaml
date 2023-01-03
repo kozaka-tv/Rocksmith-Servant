@@ -13,7 +13,7 @@ handlers:
     stream: ext://sys.stdout
   file:
     class: logging.handlers.TimedRotatingFileHandler
-    level: DEBUG
+    level: INFO
     formatter: logging
     filename: ./log/servant.log
     when: midnight
