@@ -1,9 +1,10 @@
 import json
+import logging
 import os
 
 from munch import DefaultMunch
 
-from utils import logger, file_utils
+from utils import file_utils
 
 MODULE_NAME = "CDLCImporter"
 
@@ -13,6 +14,8 @@ columns = ['rowId', 'colArtist', 'colTitle', 'colAlbum', 'colKey', 'colArrangeme
            'colRepairStatus', 'colSongYear', 'colSongVolume', 'colFileName', 'colFileDate', 'colAppID',
            'colPackageAuthor', 'colPackageVersion', 'colTagged', 'colIgnitionID', 'colIgnitionDate',
            'colIgnitionVersion', 'colIgnitionAuthor', 'colArtistTitleAlbum', 'colArtistTitleAlbumDate', 'colArtistSort']
+
+log = logging.getLogger()
 
 
 class CDLCImporter:
@@ -25,22 +28,22 @@ class CDLCImporter:
 
     def load(self):
         if self.enabled:
-            logger.log("-----------------------------------", MODULE_NAME)
-            logger.warning("Importing CDLC files from CFSM json file...", MODULE_NAME)
+            log.info("-----------------------------------")
+            log.warning("Importing CDLC files from CFSM json file...")
 
             try:
                 self.init_db()
             except Exception as e:
-                logger.error("Database init error: {0}".format(e))
+                log.error("Database init error: {0}".format(e))
                 raise e
 
             try:
                 self.import_cdlc_files()
             except Exception as e:
-                logger.error("Could not import CDLCs to the Database: {0}".format(e))
+                log.error("Could not import CDLCs to the Database: {0}".format(e))
                 raise e
 
-            logger.log("-----------------------------------", MODULE_NAME)
+            log.info("-----------------------------------")
 
     def create_tables(self):
         cursor = self.db.cursor()
@@ -51,9 +54,9 @@ class CDLCImporter:
         cursor = self.db.cursor()
         cursor.execute("SELECT count(name) FROM sqlite_master WHERE type='table' AND name='songs'")
         if cursor.fetchone()[0] == 1:
-            logger.debug("Songs Table already exists, do not need to create it.", MODULE_NAME)
+            log.debug("Songs Table already exists, do not need to create it.")
         else:
-            logger.warning("Songs Table does not exists! Creating...", MODULE_NAME)
+            log.warning("Songs Table does not exists! Creating...")
             self.create_tables()
         self.db.commit()
 
@@ -84,7 +87,7 @@ class CDLCImporter:
         return rows
 
     def insert_songs_to_db(self, songs):
-        logger.debug("Start insert {} songs ...".format(len(songs)), MODULE_NAME)
+        log.debug("Start insert {} songs ...".format(len(songs)))
 
         value = []
         values = []
@@ -106,11 +109,11 @@ class CDLCImporter:
         self.db.commit()
         c.close()
 
-        logger.debug("... {} songs inserted.".format(len(songs)), MODULE_NAME)
+        log.debug("... {} songs inserted.".format(len(songs)))
 
     def import_cdlc_files(self):
         with open(self.cdlc_import_json_file, encoding='utf-8-sig') as json_file:
-            logger.log("File to import: {}".format(json_file.name), MODULE_NAME)
+            log.info("File to import: {}".format(json_file.name))
 
             # TODO what exactly identifies a song in the DB? colFileName? colKey? colArtistTitleAlbumDate? All?
             count_songs_to_import = 0
@@ -123,16 +126,16 @@ class CDLCImporter:
                         file_utils.replace_dlc_and_cdlc(cfsm_song_data.colFileName))
 
                     if len(songs_from_db) == 0:
-                        logger.debug("New CDLC found: {}".format(cfsm_song_data.colFileName), MODULE_NAME)
+                        log.debug("New CDLC found: {}".format(cfsm_song_data.colFileName))
                         songs_to_import.append(cfsm_song_data)
 
             if len(songs_to_import) == 0:
-                logger.log(
+                log.info(
                     "All {} songs from the import file is already exists in the Database, so nothing must be imported! "
-                    "File: {}".format(count_songs_to_import, json_file.name), MODULE_NAME)
+                    "File: {}".format(count_songs_to_import, json_file.name))
             else:
-                logger.log("Will import {} new CDLC files into the DB.".format(len(songs_to_import)), MODULE_NAME)
+                log.info("Will import {} new CDLC files into the DB.".format(len(songs_to_import)))
                 self.insert_songs_to_db(songs_to_import)
-                logger.log(
+                log.info(
                     "From {} songs, {} new CDLC were imported into the DB.".format(count_songs_to_import,
-                                                                                   len(songs_to_import)), MODULE_NAME)
+                                                                                   len(songs_to_import)))

@@ -12,7 +12,6 @@ SECTION_SCENE_SWITCHER = "SceneSwitcher"
 SECTION_FILE_MANAGER = "FileManager"
 # OBS
 # Behaviour
-SECTION_DEBUGGING = "Debugging"
 
 # Key name definitions
 KEY_ENABLED = "enabled"
@@ -53,7 +52,6 @@ class ConfigData:
         self.cdlc_importer = ConfCDLCImporter(conf)
         self.song_loader = ConfSongLoader(conf)
         self.scene_switcher = ConfSceneSwitcher(conf)
-        self.debugger = ConfDebugger(conf)
 
 
 class ConfRockSniffer:
@@ -117,11 +115,6 @@ class ConfSceneSwitcher:
 
 # TODO OBS
 # TODO Behaviour
-
-class ConfDebugger:
-    def __init__(self, conf):
-        self.debug = conf.get_bool(SECTION_DEBUGGING, "debug")
-        self.interval = conf.get(SECTION_DEBUGGING, "debug_log_interval", int)
 
 
 def validate_and_get_phpsessid(conf, twitch_channel):

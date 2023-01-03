@@ -1,8 +1,9 @@
+import logging
 import os
 import sqlite3
-
 from time import sleep
 
+import config.log_config
 from config.configReader import ConfigReader
 from config.config_data import ConfigData
 from modules.cdlc_importer.load_cdlc_json_file import CDLCImporter
@@ -10,15 +11,15 @@ from modules.file_manager.cdlc_file_manager import FileManager
 from modules.scene_switcher.scene_switcher import SceneSwitcher
 from modules.setlist.setlist_logger import SetlistLogger
 from modules.song_loader.song_loader import SongLoader
-from utils import logger, file_utils
-from utils.debug import Debugger
 from utils.exceptions import RocksnifferConnectionError, ConfigError
 from utils.rocksniffer import Rocksniffer
 
-db = sqlite3.connect('servant.db')
+HEARTBEAT = 0.1
 
-debug_log_level = True
-file_utils.create_log_dir()
+config.log_config.config()
+log = logging.getLogger()
+
+db = sqlite3.connect('servant.db')
 
 
 def check_enabled_module_dependencies():
@@ -26,15 +27,12 @@ def check_enabled_module_dependencies():
         raise ConfigError("Please enable FileManager if you wanna use the SongLoader!")
 
 
-HEARTBEAT = 0.1
-
-logger.warning("------------------------------------------------------------------------")
-logger.warning("----- SERVANT IS STARTING ----------------------------------------------")
-logger.warning("------------------------------------------------------------------------")
+log.warning("------------------------------------------------------------------------")
+log.warning("----- SERVANT IS STARTING ----------------------------------------------")
+log.warning("------------------------------------------------------------------------")
 
 # OBS
 # Behaviour
-SECTION_DEBUGGING = "Debugging"
 
 # Key name definitions
 KEY_ENABLED = "enabled"
@@ -51,9 +49,10 @@ cdlc_importer = CDLCImporter(config_data, db)
 song_loader = SongLoader(config_data)
 scene_switcher = SceneSwitcher(config_data)
 check_enabled_module_dependencies()
+
+
 # TODO OBS
 # TODO Behaviour
-debugger = Debugger(config_data)
 
 
 def update_config():
@@ -67,7 +66,6 @@ def update_config():
         file_manager.update_config(config_data_updated)
         # TODO OBS
         # TODO Behaviour
-        debugger.update_config(config_data_updated)
 
         check_enabled_module_dependencies()
 
@@ -115,10 +113,10 @@ def update_game_information():
         try:
             sniffer_not_loaded_before = sniffer_data_not_loaded()
             if sniffer_not_loaded_before:
-                logger.warning("Trying to connect to RockSniffer to get the information from Rocksmith...")
+                log.warning("Trying to connect to RockSniffer to get the information from Rocksmith...")
             sniffer.update()
             if sniffer_not_loaded_before and sniffer_data_loaded():
-                logger.warning("...connected to RockSniffer...sniffing")
+                log.warning("...connected to RockSniffer...sniffing")
         except RocksnifferConnectionError as rce:
             sniffer.memory = None
             raise rce
@@ -149,9 +147,6 @@ while True:
         update_game_information()
         put_the_song_into_the_setlist()
 
-        # Interval debugging
-        debugger.log_on_interval(get_debug_message())
-
     # Catch and log all the exceptions, but keep app alive.
     except Exception as e:
-        logger.error(e)
+        log.error(e)

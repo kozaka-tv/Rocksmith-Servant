@@ -1,7 +1,5 @@
 import time
 
-from utils import logger
-
 
 class Debugger:
     def __init__(self, config_data):

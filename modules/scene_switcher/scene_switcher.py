@@ -1,4 +1,6 @@
-from utils import logger
+import logging
+
+log = logging.getLogger()
 
 
 class SceneSwitcher:
@@ -17,4 +19,4 @@ class SceneSwitcher:
     def run(self):
         if self.enabled:
             # TODO create main method and call it from here like other
-            logger.warning("TODO Scene switcher!")
+            log.warning("TODO Scene switcher!")

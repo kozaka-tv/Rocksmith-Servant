@@ -1,5 +1,7 @@
 colorama~=0.4.5
-setuptools==65.3.0
+setuptools==65.6.3
 requests==2.28.1
 munch~=2.5.0
-deepdiff~=5.8.1
+deepdiff==6.2.2
+colorlog~=6.7.0
+PyYAML~=6.0

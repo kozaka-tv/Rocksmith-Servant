@@ -1,9 +1,9 @@
 import datetime
-
+import logging
 import math
 
 from definitions import ROOT_DIR
-from utils import logger, file_utils
+from utils import file_utils
 from utils.exceptions import BadDirectoryError
 
 MODULE_NAME = "FileManager"
@@ -12,6 +12,8 @@ HEARTBEAT = 1
 HEARTBEAT_NOT_PARSED = 5
 
 NON_PARSED_FILE_AGE_SECONDS = 9
+
+log = logging.getLogger()
 
 
 class FileManager:
@@ -36,20 +38,20 @@ class FileManager:
     def run(self):
         if self.enabled:
             if self.beat_last_run_not_parsed():
-                logger.debug("Scan and move not parsed files... ", MODULE_NAME)
+                log.debug("Scan and move not parsed files... ")
                 moved = self.move_not_parsed_files()
 
                 if moved:
-                    logger.debug("Files were moved... ", MODULE_NAME)
+                    log.debug("Files were moved... ")
                     self.last_run = datetime.datetime.now()
                     self.last_run_not_parsed = self.last_run
                 else:
-                    logger.debug("Nothing moved... ", MODULE_NAME)
+                    log.debug("Nothing moved... ")
                     self.last_run = datetime.datetime.now()
                     self.last_run_not_parsed = self.last_run
 
             elif self.beat_last_run():
-                # logger.debug("Scan and move files from root and source dirs...", MODULE_NAME)
+                log.debug("Scan and move files from root and source dirs...")
                 self.move_downloaded_cdlc_files(self.scan_cdlc_files_in_root())
                 self.move_downloaded_cdlc_files(self.scan_cdlc_files_in_source_dirs())
 
@@ -65,8 +67,8 @@ class FileManager:
         files_to_move_from_destination_dir = self.scan_cdlc_files_in_destination_dir()
 
         if len(files_to_move_from_destination_dir) > 0:
-            logger.error("Found {} file(s) which one(s) were not parsed! files: {}".format(
-                len(files_to_move_from_destination_dir), files_to_move_from_destination_dir), MODULE_NAME)
+            log.error("Found {} file(s) which one(s) were not parsed! files: {}".format(
+                len(files_to_move_from_destination_dir), files_to_move_from_destination_dir))
             self.move_not_enumerated_cdlc_files(files_to_move_from_destination_dir)
             return True
 
@@ -77,9 +79,9 @@ class FileManager:
         cdlc_files = file_utils.get_files_from_directory(ROOT_DIR)
 
         if len(cdlc_files) > 0:
-            logger.log('Found {} CDLC files in root directory what is not parsed probably.'.format(len(cdlc_files)),
-                       MODULE_NAME)
-            logger.debug(cdlc_files, MODULE_NAME)
+            log.info('Found {} CDLC files in root directory what is not parsed probably.'.format(len(cdlc_files)),
+                     MODULE_NAME)
+            log.debug(cdlc_files)
 
         return cdlc_files
 
@@ -88,18 +90,18 @@ class FileManager:
         try:
             cdlc_files = file_utils.get_files_from_directories(self.source_directories)
         except BadDirectoryError as bde:
-            logger.error("---------------------------------------", MODULE_NAME)
-            logger.error("Bad definition of the section FileManager of key source_directories!", MODULE_NAME)
-            logger.error("Directory {} is bad or could not be reached, "
-                         "therefore it will be not checked anymore.".format(bde.directory), MODULE_NAME)
-            logger.error("Please fix the configuration!", MODULE_NAME)
-            logger.error("---------------------------------------", MODULE_NAME)
+            log.error("---------------------------------------")
+            log.error("Bad definition of the section FileManager of key source_directories!")
+            log.error("Directory {} is bad or could not be reached, "
+                      "therefore it will be not checked anymore.".format(bde.directory))
+            log.error("Please fix the configuration!")
+            log.error("---------------------------------------")
             self.source_directories.discard(bde.directory)
             return
 
         if len(cdlc_files) > 0:
-            logger.log('Found {} new CDLC file under source dirs.'.format(len(cdlc_files)), MODULE_NAME)
-            logger.debug(cdlc_files, MODULE_NAME)
+            log.info('Found {} new CDLC file under source dirs.'.format(len(cdlc_files)))
+            log.debug(cdlc_files)
 
         return cdlc_files
 

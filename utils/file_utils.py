@@ -1,25 +1,19 @@
 import fnmatch
+import logging
 import os
 import pathlib
 import shutil
 from datetime import datetime, timedelta
 
-from utils import logger
 from utils.exceptions import BadDirectoryError
 
 MODULE_NAME = "Utils::FileUtils"
 
 DEFAULT_FILE_AGE_SECONDS = 9
-LOG_DIR = 'log'
+
 CDLC_FILE_EXT = '*.psarc'
 
-
-def create_log_dir():
-    pathlib.Path(os.path.join(LOG_DIR)).mkdir(parents=True, exist_ok=True)
-
-
-def create_cdlc_dir():
-    pathlib.Path(os.path.join(LOG_DIR)).mkdir(parents=True, exist_ok=True)
+log = logging.getLogger()
 
 
 # TODO refactor all this:
@@ -44,7 +38,7 @@ def get_files_from_directories(directories):
             get_files(cdlc_files, directory)
         else:
             error_msg = "Bad directory! Directory {} is not exists or could not be reached.".format(directory)
-            logger.error(error_msg, MODULE_NAME)
+            log.error(error_msg)
             raise BadDirectoryError(error_msg, directory)
 
     return cdlc_files
@@ -83,7 +77,7 @@ def get_file_path(directory, file_name):
 
 def move_files(files, destination, module_name):
     if len(files) > 0:
-        logger.debug('Moving {} files to: {} | files: {}'.format(len(files), destination, files), module_name)
+        log.debug('Moving {} files to: {} | files: {}'.format(len(files), destination, files))
         for file in files:
             move_file(file, destination, module_name)
 
@@ -98,17 +92,17 @@ def last_modification_time(path):
 
 def move_file(file, destination, module_name):
     # TODO remove this logs? Or change to debug?
-    # logger.log("Moving file '{}' if exists!".format(file), module_name)
+    # log.info("Moving file '{}' if exists!".format(file))
 
     if os.path.exists(file):
         destination_file = os.path.join(destination, os.path.basename(file))
         if os.path.isfile(destination_file) and os.path.exists(destination_file):
-            logger.warning('File already exists, removing: {}'.format(destination_file), module_name)
+            log.warning('File already exists, removing: {}'.format(destination_file))
             os.remove(destination_file)
         shutil.move(file, destination)
         return True
     else:
-        logger.debug("File '{}' does not exists, so can not move!".format(file), module_name)
+        log.debug("File '{}' does not exists, so can not move!".format(file))
         return False
 
 
@@ -121,7 +115,7 @@ def file_datetime_formatted(filename):
 
 
 def create_directory(directory_to_create):
-    logger.warning("Creating directory '{}' if not exists!".format(directory_to_create), MODULE_NAME)
+    log.warning("Creating directory '{}' if not exists!".format(directory_to_create))
     pathlib.Path(directory_to_create).mkdir(parents=True, exist_ok=True)
 
 

@@ -56,9 +56,5 @@ serialized = {
         "in_game": "<InGameSceneName>",
         "in_menu": "<MenuSceneName>",
         "forbidden_switch_on_scenes": "<IntroSceneName; OutroSceneName>",
-    },
-    "Debugging": {
-        "debug": False,
-        "debug_log_interval": 1
     }
 }

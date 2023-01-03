@@ -1,12 +1,13 @@
 import datetime
+import logging
 import os
 import pathlib
-
-from utils import logger
 
 LOG_SEPARATOR = "-------------------------------------------"
 
 SETLIST_DIR = 'setlist'
+
+log = logging.getLogger()
 
 
 class SetlistLogger:
@@ -48,12 +49,12 @@ class SetlistLogger:
 
     def create_setlist_directory(self):
         if self.enabled:
-            logger.warning("Creating setlist directory to: {}".format(os.path.join(SETLIST_DIR)))
+            log.warning("Creating setlist directory to: {}".format(os.path.join(SETLIST_DIR)))
             pathlib.Path(os.path.join(SETLIST_DIR)).mkdir(parents=True, exist_ok=True)
 
     def log_a_song(self, song):
         if song not in self.setlist:
-            logger.log("Song was added to setlist: " + song)
+            log.info("Song was added to setlist: " + song)
             self.setlist.append(song)
             self.write_to_setlist_file(song)
 

@@ -1,13 +1,14 @@
+import logging
 import os
 import sqlite3
+from time import time
 
 import unicodedata
 from deepdiff import DeepDiff
-from time import time
 
 from modules.song_loader.song_data import SongData
 from modules.song_loader.songs import Songs
-from utils import logger, file_utils, rs_playlist
+from utils import file_utils, rs_playlist
 from utils.exceptions import ConfigError, RSPlaylistNotLoggedInError, BadDirectoryError
 from utils.rs_playlist import get_playlist
 
@@ -26,6 +27,8 @@ DEFAULT_CDLC_DIR = 'import'
 HEARTBEAT = 5
 
 con = sqlite3.connect('./servant.db')
+
+log = logging.getLogger()
 
 
 class SongLoader:
@@ -49,10 +52,10 @@ class SongLoader:
             try:
                 self.create_directories()
             except FileNotFoundError as bde:
-                logger.error("---------------------------------------", MODULE_NAME)
-                logger.error("Directory {} could not be created!".format(bde.filename), MODULE_NAME)
-                logger.error("Please fix the configuration!", MODULE_NAME)
-                logger.error("---------------------------------------", MODULE_NAME)
+                log.error("---------------------------------------")
+                log.error("Directory {} could not be created!".format(bde.filename))
+                log.error("Please fix the configuration!")
+                log.error("---------------------------------------")
                 raise BadDirectoryError
 
             self.last_run = time()
@@ -94,10 +97,10 @@ class SongLoader:
     def run(self):
         if self.enabled:
             if time() - self.last_run >= HEARTBEAT:
-                # logger.log("Load songs according to the requests!", MODULE_NAME)
+                # log.info("Load songs according to the requests!")
 
                 if self.update_playlist():
-                    logger.warning("Playlist has been changed, update songs!", MODULE_NAME)
+                    log.info("Playlist has been changed, update songs!")
                     self.update_under_rs_loaded_cdlc_files()
 
                     # TODO or maybe this should be configurable?
@@ -109,7 +112,7 @@ class SongLoader:
                     #   I think, the logic must be separated.
                     #   1) rs playlist NOT updated --> Just check dirs and move files
                     #   2) rs playlist UPDATED --> check DB and move files
-                    logger.warning("No rsplaylist change, nothing to do...", MODULE_NAME)
+                    log.info("No rsplaylist change, nothing to do...")
 
                 self.last_run = time()
 
@@ -119,7 +122,7 @@ class SongLoader:
         self.exit_if_user_not_logged_in(new_playlist)
 
         if self.rsplaylist is None:
-            logger.debug("Initial load of the rsplaylist done...", MODULE_NAME)
+            log.debug("Initial load of the rsplaylist done...")
             self.rsplaylist = new_playlist
             return True
 
@@ -128,8 +131,8 @@ class SongLoader:
         if str(diff) == "{}":
             return False
 
-        logger.log("Playlist has been changed, lets update!", MODULE_NAME)
-        # logger.debug("Playlist has been changed! Diffs: {}".format(diff), MODULE_NAME)
+        log.info("Playlist has been changed, lets update!")
+        # log.debug("Playlist has been changed! Diffs: {}".format(diff))
         self.rsplaylist = new_playlist
 
         return True
@@ -140,7 +143,7 @@ class SongLoader:
                 if self.is_user_not_logged_in(cdlc):
                     self.rsplaylist = None
                     self.last_run = time()
-                    logger.error("User must be logged in into RS playlist to be able to use the module!", MODULE_NAME)
+                    log.error("User must be logged in into RS playlist to be able to use the module!")
                     raise RSPlaylistNotLoggedInError
                 else:
                     return
@@ -162,12 +165,12 @@ class SongLoader:
 
     @staticmethod
     def log_loaded_cdlc_files(cdlc_files):
-        logger.log('Found {} into Rocksmith loaded CDLC files.'.format(len(cdlc_files)), MODULE_NAME)
+        log.info('Found {} into Rocksmith loaded CDLC files.'.format(len(cdlc_files)))
 
-        # logger.debug("---------- loaded CDLC files:", MODULE_NAME)
+        # log.debug("---------- loaded CDLC files:")
         # for cdlc_file in cdlc_files:
-        #     logger.debug(cdlc_file, MODULE_NAME)
-        # logger.debug("-----------------------------", MODULE_NAME)
+        #     log.debug(cdlc_file)
+        # log.debug("-----------------------------")
 
     # TODO refactor this. it should be like
     # - get_requests from RS playlist
@@ -187,29 +190,29 @@ class SongLoader:
                 song_data = SongData(rspl_request_id, cdlc_id, rspl_song_id, artist, title)
                 song_data.rspl_official = dlc_set["official"]
                 song_data.rspl_position = str(sr["position"])
-                logger.log("Request: {}".format(song_data), MODULE_NAME)
+                log.info("Request: {}".format(song_data))
 
                 self.update_tags(song_data, sr)
 
                 # Do not load official DLC files
                 if song_data.is_official:  # TODO #113 some ODLC-s were here not skipped! Maybe different official id?
-                    logger.debug("Skipping ODLC: {}".format(song_data), MODULE_NAME)
+                    log.debug("Skipping ODLC: {}".format(song_data))
                     continue
 
                 with con:
                     rows = self.search_song_in_the_db(artist, title)
 
                     if len(rows) > 0:
-                        logger.debug("---- sr " + song_data.rspl_position + " -------", MODULE_NAME)
+                        log.debug("---- sr " + song_data.rspl_position + " -------")
                         for element in rows:
                             song_file_name = str(element[0])
                             song_data.song_file_name = song_file_name
 
-                            logger.debug("row=" + song_file_name, MODULE_NAME)
+                            log.debug("row=" + song_file_name)
                             self.songs.song_data_set.add(song_data)
                     else:
-                        logger.debug("User must download the song: cdlc_id={} - {} - {}".format(cdlc_id, artist, title),
-                                     MODULE_NAME)
+                        log.debug("User must download the song: cdlc_id={} - {} - {}".format(cdlc_id, artist, title),
+                                  MODULE_NAME)
                         # rs_playlist.set_tag_to_download(self.twitch_channel,
                         #                                 self.phpsessid,
                         #                                 song_data.rspl_request_id,
@@ -219,10 +222,10 @@ class SongLoader:
 
         if len(self.songs.song_data_set) <= 0:
             # TODO actually this is not true. Only, just no file was moved from archive into the game.
-            logger.warning("---- The rsplaylist is empty, nothing to move!", MODULE_NAME)
+            log.info("---- The rsplaylist is empty, nothing to move!")
             return
 
-        logger.warning(
+        log.info(
             "---- Files to move from archive according to the requests: " + str(self.songs.song_data_set),
             MODULE_NAME)
 
@@ -242,7 +245,7 @@ class SongLoader:
                 song_to_move = os.path.join(self.cdlc_archive_dir, song_data.song_file_name)
                 moved = file_utils.move_file(song_to_move, self.destination_directory, MODULE_NAME)
                 if moved:
-                    logger.debug(
+                    log.debug(
                         "The song were moved from the archive to under RS. Moved file: {}".format(song_to_move),
                         MODULE_NAME)
                     self.songs.loaded_into_rs.add(song_data.song_file_name)
@@ -254,7 +257,7 @@ class SongLoader:
                                                song_data.rspl_request_id,
                                                self.rspl_tags)
                 else:
-                    logger.debug("Could not move file: {}".format(song_to_move), MODULE_NAME)
+                    log.debug("Could not move file: {}".format(song_to_move))
                     self.songs.missing_from_archive.add(song_data.song_file_name)
                     # TODO this takes 1 sec for each call. If we have a list of 30 songs, it could take 30 seconds!
                     #   Do it only once!
@@ -262,10 +265,10 @@ class SongLoader:
                                                     self.rspl_tags)
 
         if len(actually_loaded_songs) > 0:
-            logger.warning("---- Files newly moved and will be parsed: " + str(actually_loaded_songs), MODULE_NAME)
+            log.warning("---- Files newly moved and will be parsed: " + str(actually_loaded_songs))
         if len(self.songs.missing_from_archive) > 0:
-            logger.error("---- Missing files but found in Database: " + str(self.songs.missing_from_archive),
-                         MODULE_NAME)
+            log.error("---- Missing files but found in Database: " + str(self.songs.missing_from_archive),
+                      MODULE_NAME)
 
     @staticmethod
     def is_user_not_logged_in(cdlc):
