@@ -211,8 +211,7 @@ class SongLoader:
                             log.debug("row=" + song_file_name)
                             self.songs.song_data_set.add(song_data)
                     else:
-                        log.debug("User must download the song: cdlc_id={} - {} - {}".format(cdlc_id, artist, title),
-                                  MODULE_NAME)
+                        log.debug("User must download the song: cdlc_id={} - {} - {}".format(cdlc_id, artist, title))
                         # rs_playlist.set_tag_to_download(self.twitch_channel,
                         #                                 self.phpsessid,
                         #                                 song_data.rspl_request_id,
@@ -225,9 +224,7 @@ class SongLoader:
             log.info("---- The rsplaylist is empty, nothing to move!")
             return
 
-        log.info(
-            "---- Files to move from archive according to the requests: " + str(self.songs.song_data_set),
-            MODULE_NAME)
+        log.info("---- Files to move from archive according to the requests: " + str(self.songs.song_data_set))
 
         actually_loaded_songs = set()
         for song_data in self.songs.song_data_set:
@@ -245,9 +242,7 @@ class SongLoader:
                 song_to_move = os.path.join(self.cdlc_archive_dir, song_data.song_file_name)
                 moved = file_utils.move_file(song_to_move, self.destination_directory, MODULE_NAME)
                 if moved:
-                    log.debug(
-                        "The song were moved from the archive to under RS. Moved file: {}".format(song_to_move),
-                        MODULE_NAME)
+                    log.debug("The song were moved from the archive to under RS. Moved file: {}".format(song_to_move))
                     self.songs.loaded_into_rs.add(song_data.song_file_name)
                     actually_loaded_songs.add(song_data.song_file_name)
                     # TODO this takes 1 sec for each call. If we have a list of 30 songs, it could take 30 seconds!
@@ -267,8 +262,7 @@ class SongLoader:
         if len(actually_loaded_songs) > 0:
             log.warning("---- Files newly moved and will be parsed: " + str(actually_loaded_songs))
         if len(self.songs.missing_from_archive) > 0:
-            log.error("---- Missing files but found in Database: " + str(self.songs.missing_from_archive),
-                      MODULE_NAME)
+            log.error("---- Missing files but found in Database: " + str(self.songs.missing_from_archive))
 
     @staticmethod
     def is_user_not_logged_in(cdlc):

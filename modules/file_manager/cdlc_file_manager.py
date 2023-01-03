@@ -79,8 +79,7 @@ class FileManager:
         cdlc_files = file_utils.get_files_from_directory(ROOT_DIR)
 
         if len(cdlc_files) > 0:
-            log.info('Found {} CDLC files in root directory what is not parsed probably.'.format(len(cdlc_files)),
-                     MODULE_NAME)
+            log.info('Found {} CDLC files in root directory what is not parsed probably.'.format(len(cdlc_files)))
             log.debug(cdlc_files)
 
         return cdlc_files

@@ -6,10 +6,6 @@ from munch import DefaultMunch
 
 from utils import file_utils
 
-MODULE_NAME = "CDLCImporter"
-
-NL = os.linesep
-
 columns = ['rowId', 'colArtist', 'colTitle', 'colAlbum', 'colKey', 'colArrangements', 'colTunings', 'colSongLength',
            'colRepairStatus', 'colSongYear', 'colSongVolume', 'colFileName', 'colFileDate', 'colAppID',
            'colPackageAuthor', 'colPackageVersion', 'colTagged', 'colIgnitionID', 'colIgnitionDate',
