@@ -1,4 +1,7 @@
+import logging
 import time
+
+log = logging.getLogger()
 
 
 class Debugger:
@@ -16,7 +19,7 @@ class Debugger:
 
     def log(self, message):
         if self.debug:
-            logger.debug("[DEBUG] " + message)
+            log.debug("[DEBUG] " + message)
 
     def log_on_interval(self, message):
         if self.last_log + self.interval < time.time():

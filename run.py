@@ -92,11 +92,9 @@ def get_debug_message():
                   "duration:{sniffer.songLength}s " \
                   "".format(sniffer=sniffer) + os.linesep
 
-    debug_str = "Debug: {0} interval: {1}".format(str(debugger.debug), str(debugger.interval)) + os.linesep
-
     setlist = "Setlist: {0}".format(str(setlist_logger.setlist)) + os.linesep
 
-    return os.linesep + modules_str + sniffer_str + debug_str + setlist
+    return os.linesep + modules_str + sniffer_str + setlist
 
 
 def in_game():
