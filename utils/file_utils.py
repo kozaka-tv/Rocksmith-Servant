@@ -7,8 +7,6 @@ from datetime import datetime, timedelta
 
 from utils.exceptions import BadDirectoryError
 
-MODULE_NAME = "Utils::FileUtils"
-
 DEFAULT_FILE_AGE_SECONDS = 9
 
 CDLC_FILE_EXT = '*.psarc'
