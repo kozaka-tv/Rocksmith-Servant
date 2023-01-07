@@ -3,6 +3,8 @@ import logging
 import os
 import pathlib
 
+from utils import date_utils
+
 LOG_SEPARATOR = "-------------------------------------------"
 
 SETLIST_DIR = 'setlist'
@@ -23,7 +25,7 @@ class SetlistLogger:
             self.create_setlist_directory()
             self.file_name = setlist_file_name()
             self.write_to_setlist_file(LOG_SEPARATOR)
-            self.write_to_setlist_file("Setlist of " + str(datetime.datetime.now()))
+            self.write_to_setlist_file("Setlist of " + date_utils.now())
             self.write_to_setlist_file(LOG_SEPARATOR)
 
         self.setlist_path = config_data.setlist_logger.setlist_path
@@ -38,7 +40,7 @@ class SetlistLogger:
         self.create_setlist_directory()
         self.file_name = setlist_file_name()
         self.write_to_setlist_file(LOG_SEPARATOR)
-        self.write_to_setlist_file("Setlist of " + str(datetime.datetime.now()))
+        self.write_to_setlist_file("Setlist of " + date_utils.now())
         self.write_to_setlist_file(LOG_SEPARATOR)
 
         self.setlist_path = config_data.setlist_logger.setlist_path
