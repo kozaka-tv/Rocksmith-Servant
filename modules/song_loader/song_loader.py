@@ -229,14 +229,13 @@ class SongLoader:
         actually_loaded_songs = set()
         for song_data in self.songs.song_data_set:
             if song_data.song_file_name in self.songs.loaded_into_rs:
-                # TODO this takes 1 sec for each call. If we have a list of 30 songs, it could take 30 seconds!
-                #   Do it only once!
-                if 'afea46a9' not in song_data.tags:
+
+                if self.rspl_tags.tag_loaded not in song_data.tags:
                     rs_playlist.set_tag_loaded(self.twitch_channel,
                                                self.phpsessid,
                                                song_data.rspl_request_id,
                                                self.rspl_tags)
-                    song_data.tags.add('afea46a9')
+                    song_data.tags.add(self.rspl_tags.tag_loaded)
                     # song_data.tags.discard('need to download')  # TODO
             else:
                 song_to_move = os.path.join(self.cdlc_archive_dir, song_data.song_file_name)

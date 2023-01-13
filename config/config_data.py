@@ -140,13 +140,13 @@ def validate_and_get_cdlc_import_json_file(cdlc_import_json_file):
 
 def get_tag(conf, tag_name):
     value = conf.get(SECTION_SONG_LOADER, tag_name)
-    if value is None or value.startswith('<Create a tag in RS Playlist'):
+    if not value or value.startswith('<Create a tag in RS Playlist'):
         return None
     return value
 
 
 def get_tag_validated(conf, tag_name):
     value = conf.get(SECTION_SONG_LOADER, tag_name)
-    if value is None or value.startswith('<Create a tag in RS Playlist'):
+    if not value or value.startswith('<Create a tag in RS Playlist'):
         raise ConfigError(ERR_MSG_RSPL_TAG.format(tag_name, tag_name, value))
     return value
