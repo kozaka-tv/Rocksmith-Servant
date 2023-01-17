@@ -126,16 +126,23 @@ class SongLoader:
             self.rsplaylist = new_playlist
             return True
 
-        diff = DeepDiff(self.rsplaylist, new_playlist, exclude_regex_paths="\\['inactive_time'\\]")
-
-        if str(diff) == "{}":
+        if self.playlist_does_not_changed(new_playlist):
             return False
 
         log.info("Playlist has been changed, lets update!")
-        # log.debug("Playlist has been changed! Diffs: {}".format(diff))
+
         self.rsplaylist = new_playlist
 
         return True
+
+    def playlist_does_not_changed(self, new_playlist):
+        diff = DeepDiff(self.rsplaylist, new_playlist, exclude_regex_paths="\\['inactive_time'\\]")
+        if str(diff) == "{}":
+            log.debug("Playlist does not changed!")
+            return True
+
+        log.debug(f"Playlist has been changed! Diffs: {diff}")
+        return False
 
     def exit_if_user_not_logged_in(self, new_playlist):
         for sr in new_playlist["playlist"]:
