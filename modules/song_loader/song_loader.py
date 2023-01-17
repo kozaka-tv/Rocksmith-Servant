@@ -165,12 +165,13 @@ class SongLoader:
 
     @staticmethod
     def log_loaded_cdlc_files(cdlc_files):
-        log.info('Found {} into Rocksmith loaded CDLC files.'.format(len(cdlc_files)))
+        log.info(f'Found {len(cdlc_files)} into Rocksmith loaded CDLC files.')
 
-        # log.debug("---------- loaded CDLC files:")
-        # for cdlc_file in cdlc_files:
-        #     log.debug(cdlc_file)
-        # log.debug("-----------------------------")
+        if log.isEnabledFor(logging.DEBUG):
+            log.debug(f"---------- The {len(cdlc_files)} files already loaded into Rocksmith:")
+            for cdlc_file in cdlc_files:
+                log.debug(cdlc_file)
+            log.debug("-----------------------------")
 
     # TODO refactor this. it should be like
     # - get_requests from RS playlist

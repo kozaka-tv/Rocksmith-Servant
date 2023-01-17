@@ -8,22 +8,22 @@ formatters:
 handlers:
   console:
     class: logging.StreamHandler
-    level: DEBUG
+    level: INFO
     formatter: logging
     stream: ext://sys.stdout
   file:
     class: logging.handlers.TimedRotatingFileHandler
-    level: DEBUG
+    level: INFO
     formatter: logging
     filename: ./log/servant.log
     when: midnight
     encoding: utf8
   colour:
     class: logging.StreamHandler
-    level: DEBUG
+    level: INFO
     formatter: colorlog
 loggers:
   '':
-    level: DEBUG
+    level: INFO
     handlers: [ colour, file ]
     propagate: yes
