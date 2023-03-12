@@ -11,7 +11,7 @@ from modules.file_manager.cdlc_file_manager import FileManager
 from modules.scene_switcher.scene_switcher import SceneSwitcher
 from modules.setlist.setlist_logger import SetlistLogger
 from modules.song_loader.song_loader import SongLoader
-from utils.exceptions import RocksnifferConnectionError, ConfigError
+from utils.exceptions import RocksnifferConnectionError, ConfigError, RSPlaylistNotLoggedInError
 from utils.rocksniffer import Rocksniffer
 
 HEARTBEAT = 0.1
@@ -39,7 +39,11 @@ KEY_ENABLED = "enabled"
 
 # Initializing configuration
 conf = ConfigReader()
-config_data = ConfigData(conf)
+try:
+    config_data = ConfigData(conf)
+except ConfigError as e:
+    log.error(e)
+    exit()
 
 # Initializing modules and utils
 sniffer = Rocksniffer(config_data)
@@ -145,6 +149,10 @@ while True:
         update_game_information()
         put_the_song_into_the_setlist()
 
-    # Catch and log all the exceptions, but keep app alive.
+    # Catch and log all known exceptions, but keep app alive.
+    except RSPlaylistNotLoggedInError as e:
+        log.error(e)
+
     except Exception as e:
         log.error(e)
+        raise e
