@@ -141,3 +141,4 @@ dmypy.json
 /cdlc_archive/
 /modules/song_loader/log/
 /servant.db
+/tmp/

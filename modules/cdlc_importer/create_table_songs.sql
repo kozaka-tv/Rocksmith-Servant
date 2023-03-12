@@ -1,5 +1,8 @@
-create table songs
+create table main.songs
 (
+    id                      integer not null
+        constraint songs_pk
+            primary key autoincrement,
     rowId                   text,
     colArtist               text,
     colTitle                text,
@@ -24,11 +27,20 @@ create table songs
     colArtistTitleAlbum     text,
     colArtistTitleAlbumDate text,
     colArtistSort,
-    dlc_id
+    dlc_id,
+    artistNormalized        text,
+    titleNormalized         text
 );
 
-create index idx_artist_title
-    on songs (colArtist, colTitle);
+create index main.songs_artist_title_index
+    on main.songs (colArtist, colTitle);
 
-create index idx_file_name
-    on songs (colFileName);
+create index main.songs_artist_title_normalized_index
+    on main.songs (artistNormalized, titleNormalized);
+
+create index main.songs_file_name_index
+    on main.songs (colFileName);
+
+create unique index main.songs_id_index
+    on main.songs (id);
+
