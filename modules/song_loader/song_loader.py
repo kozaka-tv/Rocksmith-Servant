@@ -3,12 +3,11 @@ import os
 import sqlite3
 from time import time
 
-import unicodedata
 from deepdiff import DeepDiff
 
 from modules.song_loader.song_data import SongData
 from modules.song_loader.songs import Songs
-from utils import file_utils, rs_playlist
+from utils import file_utils, rs_playlist, string_utils, db_utils
 from utils.exceptions import ConfigError, RSPlaylistNotLoggedInError, BadDirectoryError
 from utils.rs_playlist import get_playlist
 
@@ -286,25 +285,13 @@ class SongLoader:
             song_data.tags.add(tag)
 
     def search_song_in_the_db(self, artist, title):
-        rows = self.get_songs_from_db(artist, title)
+        rows = db_utils.get_songs_from_db(artist, title)
         # TODO hm...maybe remove special chars and do a second query. To load all possible variations?
+        # TODO make a special search for similar words in artist and title
         # So not only if len(rows) <= 0
         if len(rows) <= 0:
             # remove special chars
-            artist_norm = self.remove_special_chars(artist)
-            title_norm = self.remove_special_chars(title)
-            rows = self.get_songs_from_db(artist_norm, title_norm)
+            artist_norm = string_utils.remove_special_chars(artist)
+            title_norm = string_utils.remove_special_chars(title)
+            rows = db_utils.get_songs_from_db(artist_norm, title_norm)
         return rows
-
-    @staticmethod
-    def remove_special_chars(text):
-        # return unicodedata.normalize('NFD', text).encode('ascii', 'ignore')
-        return ''.join(c for c in unicodedata.normalize('NFKD', text) if unicodedata.category(c) != 'Mn')
-
-    @staticmethod
-    def get_songs_from_db(artist, title):
-        cur = con.cursor()
-        # TODO add and colTagged != 'ODLC'?
-        execute = cur.execute("SELECT distinct colFileName FROM songs where colArtist like ? and colTitle like ?",
-                              ("%" + artist + "%", "%" + title + "%"))
-        return execute.fetchall()
