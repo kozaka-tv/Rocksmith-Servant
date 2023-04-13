@@ -284,7 +284,8 @@ class SongLoader:
         for tag in sr['tags']:
             song_data.tags.add(tag)
 
-    def search_song_in_the_db(self, artist, title):
+    @staticmethod
+    def search_song_in_the_db(artist, title):
         rows = db_utils.get_songs_from_db(artist, title)
         # TODO hm...maybe remove special chars and do a second query. To load all possible variations?
         # TODO make a special search for similar words in artist and title
