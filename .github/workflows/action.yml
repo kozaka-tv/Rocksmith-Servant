@@ -1,5 +1,3 @@
-# This is a workflow for testing various Nuitka command-line options
-
 name: Build-All-Platforms
 
 # Controls when the workflow will run
@@ -28,7 +26,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10' # Version range or exact version of a Python version to use, using SemVer's version range syntax
+          python-version: '3.11' # Version range or exact version of a Python version to use, using SemVer's version range syntax
           architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
           cache: 'pip'
           cache-dependency-path: |
@@ -40,7 +38,7 @@ jobs:
       # Build python script into a stand-alone exe
       - uses: jimkring/python-script-to-exe@v0.2.0
         with:
-          script-name: test.py
+          script-name: run.py
           onefile: true
           access-token: ${{ secrets.NUITKA_COMMERCIAL_ACCESS_TOKEN }}
           # macos-create-app-bundle: ${{ runner.os == 'macOS' }}
