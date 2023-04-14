@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name='Rocksmith-Servant',
     version='0.2.0',
-    packages=[''],
+    # packages=[''],
     url='https://github.com/kozaka-tv/Rocksmith-Servant',
     license='MIT License',
     author='kozaka',
