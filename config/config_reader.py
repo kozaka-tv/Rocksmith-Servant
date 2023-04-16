@@ -63,7 +63,7 @@ class ConfigReader:
         self.last_modified = self.last_modification_time
 
         if self.last_modified != 0:
-            log.warning(PATH_CONFIG_FILE + ' has been loaded!')
+            log.warning('%s has been loaded!', PATH_CONFIG_FILE)
 
         return config
 
@@ -185,7 +185,7 @@ class ConfigReader:
         self.content[section][key] = new_key
         self.save()
 
-        log.warning("Bad value has been replaced with the default: {}".format(new_key))
+        log.warning("Bad value has been replaced with the default: %s", new_key)
 
     @staticmethod
     def log_bad_value_message(section, key, cast):
