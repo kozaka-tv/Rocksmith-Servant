@@ -106,11 +106,11 @@ class CDLCImporter:
         self.db.commit()
         cursor.close()
 
-        log.debug(f"... {len(songs)} songs inserted.")
+        log.debug("... %s songs inserted.", len(songs))
 
     def import_cdlc_files(self):
         with open(self.cdlc_import_json_file, encoding='utf-8-sig') as json_file:
-            log.info(f"File to import: {json_file.name}")
+            log.info("File to import: %s", json_file.name)
 
             # TODO what exactly identifies a song in the DB? colFileName? colKey? colArtistTitleAlbumDate? All?
             count_songs_to_import = 0
@@ -123,15 +123,15 @@ class CDLCImporter:
                         file_utils.replace_dlc_and_cdlc(cfsm_song_data.colFileName))
 
                     if len(songs_from_db) == 0:
-                        log.debug(f"New CDLC found: {cfsm_song_data.colFileName}")
+                        log.debug("New CDLC found: %s", cfsm_song_data.colFileName)
                         songs_to_import.append(cfsm_song_data)
 
             if len(songs_to_import) == 0:
                 log.info(
-                    f"All {count_songs_to_import} songs from the import file is already exists in the Database"
-                    f" so nothing must be imported! File: {json_file.name}")
+                    "All %s songs from the import file is already exists in the Database so "
+                    "nothing must be imported! File: %s", count_songs_to_import, json_file.name)
             else:
-                log.info(f"Will import {len(songs_to_import)} new CDLC files into the DB.")
+                log.info("Will import %s new CDLC files into the DB.", len(songs_to_import))
                 self.insert_songs_to_db(songs_to_import)
-                log.info(
-                    f"From {count_songs_to_import} songs, {len(songs_to_import)} new CDLC were imported into the DB.")
+                log.info(f"From %s songs, %s new CDLC were imported into the DB.",
+                         count_songs_to_import, len(songs_to_import))
