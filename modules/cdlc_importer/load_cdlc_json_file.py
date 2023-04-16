@@ -84,7 +84,7 @@ class CDLCImporter:
         return rows
 
     def insert_songs_to_db(self, songs):
-        log.debug(f"Start insert {len(songs)} songs ...")
+        log.debug("Start insert %s songs ...", len(songs))
 
         value = []
         values = []
