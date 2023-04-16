@@ -100,11 +100,11 @@ class CDLCImporter:
 
         insert_query = "insert into songs ({0}) values (?{1})".format(",".join(columns), ",?" * (len(columns) - 1))
 
-        c = self.db.cursor()
-        c.executemany(insert_query, values)
+        cursor = self.db.cursor()
+        cursor.executemany(insert_query, values)
         values.clear()
         self.db.commit()
-        c.close()
+        cursor.close()
 
         log.debug("... {} songs inserted.".format(len(songs)))
 

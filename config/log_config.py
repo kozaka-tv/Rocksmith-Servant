@@ -24,9 +24,7 @@ def config():
 
 
 if __name__ == "__main__":
-    """
-    In case you wanna do a test run.
-    """
+    # In case you want to do a test run.
     config()
 
     root = logging.getLogger()
