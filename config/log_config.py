@@ -20,7 +20,9 @@ def config():
     create_log_dir()
 
     path = pathlib.Path(__file__).with_suffix(".yaml")
-    logging.config.dictConfig(yaml.safe_load(path.read_text()))
+    text = path.read_text()
+    load = yaml.safe_load(text)
+    logging.config.dictConfig(load)
 
 
 if __name__ == "__main__":
