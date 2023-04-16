@@ -84,9 +84,9 @@ class Rocksniffer:
             return not self.samples[0] < self.samples[1] < self.samples[2]
 
     @property
-    def currentState(self):
+    def current_state(self):
         return self.memory["currentState"]
 
     @property
     def in_game(self):
-        return self.currentState in range(3, 5)
+        return self.current_state in range(3, 5)
