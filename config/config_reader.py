@@ -102,11 +102,11 @@ class ConfigReader:
         Reload only if the config file has been changed
         :return: True if config file has been changed and reloaded, otherwise False
         """
-        if self.last_modified == self.last_modification_time:
-            return False
-        else:
+        if self.last_modified != self.last_modification_time:
             self.content = self.load_content_from_config()
             return True
+
+        return False
 
     def save(self):
         """
@@ -164,8 +164,7 @@ class ConfigReader:
                 return util.strtobool(self.content[section][key].lower())
 
             # Else we cast it
-            else:
-                return cast(self.content[section][key])
+            return cast(self.content[section][key])
         except:
             # To keep consistency and ease to use for the end user correct the bad value
             self.log_bad_value_message(section, key, cast)
@@ -199,5 +198,5 @@ class ConfigReader:
             log.warning("Configuration has been reloaded!")
             self.log_config()
             return True
-        else:
-            return False
+
+        return False
