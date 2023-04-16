@@ -43,11 +43,12 @@ class ConfigReader:
     def if_needed_create_config_from_template_and_then_stop(self):
         if self.last_modification_time == 0:
             self.save()
-            log.error('Because this is the first run, and no ' + CONFIG_FILE_NAME +
-                      ' file was found, I created a configuration file for you from a template in: '
-                      + PATH_CONFIG_FILE)
-            log.info('Please change the values in the ' + CONFIG_FILE_NAME +
-                     ' file according to your needs, and then relaunch Rocksmith Servant!')
+            log.error(
+                'Because this is the first run, and no %s file was found, I created a configuration file for '
+                'you from a template in: %s', CONFIG_FILE_NAME, PATH_CONFIG_FILE)
+            log.info(
+                'Please change the values in the %s file according to your needs, and then relaunch Rocksmith Servant!',
+                CONFIG_FILE_NAME)
             log.warning('...press any key to exit this program.')
             input()
             sys.exit()
@@ -73,13 +74,13 @@ class ConfigReader:
         self.log_enabled_modules()
         log.warning('------- SOME IMPORTANT CONFIG VALUES --------------------------')
 
-        log.info('RockSniffer.host = ' + str(self.get('RockSniffer', 'host')))
-        log.info('RockSniffer.port = ' + str(self.get('RockSniffer', 'port')))
+        log.info('RockSniffer.host = %s', str(self.get('RockSniffer', 'host')))
+        log.info('RockSniffer.port = %s', str(self.get('RockSniffer', 'port')))
 
-        log.info('SongLoader.cfsm_file_name = ' + str(self.get('SongLoader', 'cfsm_file_name')))
-        log.info('SongLoader.cdlc_archive_dir = ' + str(self.get('SongLoader', 'cdlc_archive_dir')))
-        log.info('SongLoader.rocksmith_cdlc_dir = ' + str(self.get('SongLoader', 'rocksmith_cdlc_dir')))
-        log.info('SongLoader.allow_load_when_in_game = ' + str(self.get('SongLoader', 'allow_load_when_in_game')))
+        log.info('SongLoader.cfsm_file_name = %s', str(self.get('SongLoader', 'cfsm_file_name')))
+        log.info('SongLoader.cdlc_archive_dir = %s', str(self.get('SongLoader', 'cdlc_archive_dir')))
+        log.info('SongLoader.rocksmith_cdlc_dir = %s', str(self.get('SongLoader', 'rocksmith_cdlc_dir')))
+        log.info('SongLoader.allow_load_when_in_game = %s', str(self.get('SongLoader', 'allow_load_when_in_game')))
 
         log.warning('---------------------------------------------------------------')
 
