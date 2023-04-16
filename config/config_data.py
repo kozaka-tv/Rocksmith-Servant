@@ -44,11 +44,11 @@ ERR_MSG_RSPL_TAG = "Missing or undefined tag value of the tag '{}' in the config
 
 class ConfigData:
     def __init__(self, conf):
-        self.confReader = ConfigReader()
+        self.conf_reader = ConfigReader()
 
         self.sniffer = ConfRockSniffer(conf)
         self.setlist_logger = ConfSetlistLogger(conf)
-        self.file_manager = ConfFileManager(self.confReader)
+        self.file_manager = ConfFileManager(self.conf_reader)
         self.cdlc_importer = ConfCDLCImporter(conf)
         self.song_loader = ConfSongLoader(conf)
         self.scene_switcher = ConfSceneSwitcher(conf)
