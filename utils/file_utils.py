@@ -75,7 +75,7 @@ def get_file_path(directory, file_name):
 
 def move_files(files, destination, module_name):
     if len(files) > 0:
-        log.debug('Moving {} files to: {} | files: {}'.format(len(files), destination, files))
+        log.debug(f'Moving {len(files)} files to: {destination} | files: {files}')
         for file in files:
             move_file(file, destination, module_name)
 
@@ -90,17 +90,17 @@ def last_modification_time(path):
 
 def move_file(file, destination, module_name):
     # TODO remove this logs? Or change to debug?
-    # log.info("Moving file '{}' if exists!".format(file))
+    # log.info(f"Moving file '{file}' if exists!")
 
     if os.path.exists(file):
         destination_file = os.path.join(destination, os.path.basename(file))
         if os.path.isfile(destination_file) and os.path.exists(destination_file):
-            log.warning('File already exists, removing: {}'.format(destination_file))
+            log.warning(f'File already exists, removing: {destination_file}')
             os.remove(destination_file)
         shutil.move(file, destination)
         return True
     else:
-        log.debug("File '{}' does not exists, so can not move!".format(file))
+        log.debug(f"File '{file}' does not exists, so can not move!")
         return False
 
 
@@ -108,12 +108,11 @@ def move_file(file, destination, module_name):
 def file_datetime_formatted(filename):
     file_time = os.path.getmtime(filename)
     formatted_time = datetime.fromtimestamp(file_time)
-    print("File datetime: {0}".format(formatted_time))  # TODO remove
     return formatted_time
 
 
 def create_directory(directory_to_create):
-    log.warning("Creating directory '{}' if not exists!".format(directory_to_create))
+    log.warning(f"Creating directory '{directory_to_create}' if not exists!")
     pathlib.Path(directory_to_create).mkdir(parents=True, exist_ok=True)
 
 

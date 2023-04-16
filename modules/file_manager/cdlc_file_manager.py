@@ -67,8 +67,8 @@ class FileManager:
         files_to_move_from_destination_dir = self.scan_cdlc_files_in_destination_dir()
 
         if len(files_to_move_from_destination_dir) > 0:
-            log.error("Found {} file(s) which one(s) were not parsed! files: {}".format(
-                len(files_to_move_from_destination_dir), files_to_move_from_destination_dir))
+            log.error(f"Found {len(files_to_move_from_destination_dir)} file(s) which one(s) were not parsed!"
+                      f" files: {files_to_move_from_destination_dir}")
             self.move_not_enumerated_cdlc_files(files_to_move_from_destination_dir)
             return True
 
@@ -79,7 +79,7 @@ class FileManager:
         cdlc_files = file_utils.get_files_from_directory(ROOT_DIR)
 
         if len(cdlc_files) > 0:
-            log.info('Found {} CDLC files in root directory what is not parsed probably.'.format(len(cdlc_files)))
+            log.info(f'Found {len(cdlc_files)} CDLC files in root directory what is not parsed probably.')
             log.debug(cdlc_files)
 
         return cdlc_files
@@ -91,15 +91,15 @@ class FileManager:
         except BadDirectoryError as bde:
             log.error("---------------------------------------")
             log.error("Bad definition of the section FileManager of key source_directories!")
-            log.error("Directory {} is bad or could not be reached, "
-                      "therefore it will be not checked anymore.".format(bde.directory))
+            log.error(f"Directory {format(bde.directory)} is bad or could not be reached, "
+                      f"therefore it will be not checked anymore.")
             log.error("Please fix the configuration!")
             log.error("---------------------------------------")
             self.source_directories.discard(bde.directory)
             return
 
         if len(cdlc_files) > 0:
-            log.info('Found {} new CDLC file under source dirs.'.format(len(cdlc_files)))
+            log.info(f'Found {len(cdlc_files)} new CDLC file under source dirs.')
             log.debug(cdlc_files)
 
         return cdlc_files
