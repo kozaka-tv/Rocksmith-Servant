@@ -112,7 +112,7 @@ class ConfigReader:
         """
         Write the config to the specified path
         """
-        with open(PATH_CONFIG_FILE, 'w') as configfile:
+        with open(PATH_CONFIG_FILE, 'w', encoding="utf-8") as configfile:
             self.content.write(configfile)
 
     @property

@@ -43,7 +43,8 @@ class CDLCImporter:
 
     def create_tables(self):
         cursor = self.db.cursor()
-        read = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "create_table_songs.sql")).read()
+        read = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "create_table_songs.sql"),
+                    encoding="utf-8").read()
         cursor.executescript(read)
 
     def init_db(self):
