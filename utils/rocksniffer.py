@@ -42,7 +42,7 @@ class Rocksniffer:
             raise RocksnifferConnectionError(self.host, self.port)
 
     def get_sniffer_data(self):
-        request = "http://{}:{}/".format(self.host, self.port)
+        request = f"http://{self.host}:{self.port}/"
         with urlopen(request) as response:
             result = json.loads(response.read().decode(response.headers.get_content_charset('utf-8')))
         return result
@@ -53,7 +53,6 @@ class Rocksniffer:
         self.albumName = self.memory['songDetails']['albumName']
         self.songLength = self.memory['songDetails']['songLength']
         self.albumYear = self.memory['songDetails']['albumYear']
-        pass
 
     def take_sample(self):
         """
@@ -78,10 +77,10 @@ class Rocksniffer:
         :return:
         """
         time_between_samples = abs(self.samples[0] - self.samples[2])
-        if time_between_samples > 2:
-            return True
-        else:
+        if time_between_samples <= 2:
             return not self.samples[0] < self.samples[1] < self.samples[2]
+
+        return True
 
     @property
     def current_state(self):
