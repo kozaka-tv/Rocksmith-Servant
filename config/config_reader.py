@@ -14,14 +14,14 @@ PATH_CONFIG_DIR = os.path.dirname(os.path.abspath(os.path.join(CONFIG_DIR_NAME, 
 PATH_CONFIG_FILE = os.path.join(PATH_CONFIG_DIR, CONFIG_FILE_NAME)
 PATH_CONFIG_TEMPLATE_FILE = os.path.join(PATH_CONFIG_DIR, CONFIG_TEMPLATE_FILE_NAME)
 
-ERROR_MSG = "Error retrieving value from {} for section [{}] with key [{}]."
+ERROR_MSG = "Error retrieving value from %s for section [%s] with key [%s]."
 
 log = logging.getLogger()
 
 
 class ConfigTemplateError(Exception):
     def __init__(self, section, key):
-        super().__init__(ERROR_MSG.format(PATH_CONFIG_TEMPLATE_FILE, section, key))
+        super().__init__(ERROR_MSG, PATH_CONFIG_TEMPLATE_FILE, section, key)
 
 
 class ConfigReader:
@@ -189,7 +189,7 @@ class ConfigReader:
 
     @staticmethod
     def log_bad_value_message(section, key, cast):
-        log.error(ERROR_MSG.format(PATH_CONFIG_FILE, section, key))
+        log.error(ERROR_MSG, PATH_CONFIG_FILE, section, key)
         if cast == bool:
             log.info("For this type of key, please use either False, No, 0 or True, Yes, 1")
 
