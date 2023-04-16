@@ -19,7 +19,7 @@ class Debugger:
 
     def log(self, message):
         if self.debug:
-            log.debug("[DEBUG] %s", message)
+            log.debug(f'[DEBUG] {message}')
 
     def log_on_interval(self, message):
         if self.last_log + self.interval < time.time():
