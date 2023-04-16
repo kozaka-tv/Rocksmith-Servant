@@ -29,7 +29,7 @@ class ConfigReader:
 
         file_utils.create_directory(PATH_CONFIG_DIR)
 
-        log.warning('Initialising {0} from {1} ...'.format(CONFIG_FILE_NAME, PATH_CONFIG_FILE))
+        log.warning('Initialising %s from %s ...', CONFIG_FILE_NAME, PATH_CONFIG_FILE)
 
         self.last_modified = None
 
@@ -43,12 +43,11 @@ class ConfigReader:
     def if_needed_create_config_from_template_and_then_stop(self):
         if self.last_modification_time == 0:
             self.save()
-            log.error(
-                'Because this is the first run, and no {0} file was found, I created a configuration '
-                'file for you from a template in: {1}'.format(CONFIG_FILE_NAME, PATH_CONFIG_FILE))
-            log.info(
-                'Please change the values in the {0} file according to your needs, and then relaunch '
-                'Rocksmith Servant!'.format(CONFIG_FILE_NAME))
+            log.error('Because this is the first run, and no ' + CONFIG_FILE_NAME +
+                      ' file was found, I created a configuration file for you from a template in: '
+                      + PATH_CONFIG_FILE)
+            log.info('Please change the values in the ' + CONFIG_FILE_NAME +
+                     ' file according to your needs, and then relaunch Rocksmith Servant!')
             log.warning('...press any key to exit this program.')
             input()
             sys.exit()
