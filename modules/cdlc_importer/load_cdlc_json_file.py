@@ -30,13 +30,13 @@ class CDLCImporter:
             try:
                 self.init_db()
             except Exception as e:
-                log.error("Database init error!", e)
+                log.error("%s Database init error: %s", type(e), e)
                 raise e
 
             try:
                 self.import_cdlc_files()
             except Exception as e:
-                log.error("Could not import CDLCs to the Database!", e)
+                log.error("%s Could not import CDLCs to the Database: %s", type(e), e)
                 raise e
 
             log.info("-----------------------------------")
