@@ -6,8 +6,6 @@ from definitions import ROOT_DIR
 from utils import file_utils
 from utils.exceptions import BadDirectoryError
 
-MODULE_NAME = "FileManager"
-
 HEARTBEAT = 1
 HEARTBEAT_NOT_PARSED = 5
 
@@ -110,8 +108,8 @@ class FileManager:
     @staticmethod
     def move_not_enumerated_cdlc_files(files):
         if len(files) > 0:
-            file_utils.move_files(files, ROOT_DIR, MODULE_NAME)
+            file_utils.move_files(files, ROOT_DIR)
 
     def move_downloaded_cdlc_files(self, files):
         if files and len(files) > 0:
-            file_utils.move_files(files, self.destination_directory, MODULE_NAME)
+            file_utils.move_files(files, self.destination_directory)

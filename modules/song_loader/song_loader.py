@@ -11,8 +11,6 @@ from utils import file_utils, rs_playlist, string_utils, db_utils
 from utils.exceptions import ConfigError, RSPlaylistNotLoggedInError, BadDirectoryError
 from utils.rs_playlist import get_playlist
 
-MODULE_NAME = "SongLoader"
-
 NL = os.linesep
 
 ERR_MSG_CDLC_ARCHIVE_DIR = "Please set your CDLC archive directory in the config!" + NL + \
@@ -246,7 +244,7 @@ class SongLoader:
                     # song_data.tags.discard('need to download')  # TODO
             else:
                 song_to_move = os.path.join(self.cdlc_archive_dir, song_data.song_file_name)
-                moved = file_utils.move_file(song_to_move, self.destination_directory, MODULE_NAME)
+                moved = file_utils.move_file(song_to_move, self.destination_directory)
                 if moved:
                     log.debug(f"The song were moved from the archive to under RS. Moved file: {song_to_move}")
                     self.songs.loaded_into_rs.add(song_data.song_file_name)
