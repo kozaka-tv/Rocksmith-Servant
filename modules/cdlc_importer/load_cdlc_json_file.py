@@ -133,5 +133,5 @@ class CDLCImporter:
             else:
                 log.info("Will import %s new CDLC files into the DB.", len(songs_to_import))
                 self.insert_songs_to_db(songs_to_import)
-                log.info(f"From %s songs, %s new CDLC were imported into the DB.",
+                log.info("From %s songs, %s new CDLC were imported into the DB.",
                          count_songs_to_import, len(songs_to_import))

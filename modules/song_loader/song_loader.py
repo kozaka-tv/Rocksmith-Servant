@@ -50,7 +50,7 @@ class SongLoader:
                 self.create_directories()
             except FileNotFoundError as bde:
                 log.error("---------------------------------------")
-                log.error(f"Directory {bde.filename} could not be created!")
+                log.error("Directory %s could not be created!", bde.filename)
                 log.error("Please fix the configuration!")
                 log.error("---------------------------------------")
                 raise BadDirectoryError
@@ -138,7 +138,7 @@ class SongLoader:
             log.debug("Playlist does not changed!")
             return True
 
-        log.debug(f"Playlist has been changed! Diffs: {diff}")
+        log.debug("Playlist has been changed! Diffs: %s", diff)
         return False
 
     def exit_if_user_not_logged_in(self, new_playlist):
@@ -169,10 +169,10 @@ class SongLoader:
 
     @staticmethod
     def log_loaded_cdlc_files(cdlc_files):
-        log.info(f'Found {len(cdlc_files)} into Rocksmith loaded CDLC files.')
+        log.info('Found %s into Rocksmith loaded CDLC files.', len(cdlc_files))
 
         if log.isEnabledFor(logging.DEBUG):
-            log.debug(f"---------- The {len(cdlc_files)} files already loaded into Rocksmith:")
+            log.debug("---------- The %s files already loaded into Rocksmith:", len(cdlc_files))
             for cdlc_file in cdlc_files:
                 log.debug(cdlc_file)
             log.debug("-----------------------------")
@@ -195,28 +195,28 @@ class SongLoader:
                 song_data = SongData(rspl_request_id, cdlc_id, rspl_song_id, artist, title)
                 song_data.rspl_official = dlc_set["official"]
                 song_data.rspl_position = str(sr["position"])
-                log.info(f"Request: {song_data}")
+                log.info("Request: %s", song_data)
 
                 self.update_tags(song_data, sr)
 
                 # Do not load official DLC files
                 if song_data.is_official:  # TODO #113 some ODLC-s were here not skipped! Maybe different official id?
-                    log.debug(f"Skipping ODLC: {song_data}")
+                    log.debug("Skipping ODLC: %s", song_data)
                     continue
 
                 with con:
                     rows = self.search_song_in_the_db(artist, title)
 
                     if len(rows) > 0:
-                        log.debug(f"---- sr {song_data.rspl_position} -------")
+                        log.debug("---- sr %s -------", song_data.rspl_position)
                         for element in rows:
                             song_file_name = str(element[0])
                             song_data.song_file_name = song_file_name
 
-                            log.debug(f"row={song_file_name}")
+                            log.debug("row=%s", song_file_name)
                             self.songs.song_data_set.add(song_data)
                     else:
-                        log.debug(f"User must download the song: cdlc_id={cdlc_id} - {artist} - {title}")
+                        log.debug("User must download the song: cdlc_id=%s - %s - %s", cdlc_id, artist, title)
                         # rs_playlist.set_tag_to_download(self.twitch_channel,
                         #                                 self.phpsessid,
                         #                                 song_data.rspl_request_id,
@@ -229,7 +229,7 @@ class SongLoader:
             log.info("---- The rsplaylist is empty, nothing to move!")
             return
 
-        log.info(f"---- Files to move from archive according to the requests: {str(self.songs.song_data_set)}")
+        log.info("---- Files to move from archive according to the requests: %s", str(self.songs.song_data_set))
 
         actually_loaded_songs = set()
         for song_data in self.songs.song_data_set:
@@ -246,7 +246,7 @@ class SongLoader:
                 song_to_move = os.path.join(self.cdlc_archive_dir, song_data.song_file_name)
                 moved = file_utils.move_file(song_to_move, self.destination_directory)
                 if moved:
-                    log.debug(f"The song were moved from the archive to under RS. Moved file: {song_to_move}")
+                    log.debug("The song were moved from the archive to under RS. Moved file: %s", song_to_move)
                     self.songs.loaded_into_rs.add(song_data.song_file_name)
                     actually_loaded_songs.add(song_data.song_file_name)
                     # TODO this takes 1 sec for each call. If we have a list of 30 songs, it could take 30 seconds!
@@ -256,7 +256,7 @@ class SongLoader:
                                                song_data.rspl_request_id,
                                                self.rspl_tags)
                 else:
-                    log.debug(f"Could not move file: {song_to_move}")
+                    log.debug("Could not move file: %s", song_to_move)
                     self.songs.missing_from_archive.add(song_data.song_file_name)
                     # TODO this takes 1 sec for each call. If we have a list of 30 songs, it could take 30 seconds!
                     #   Do it only once!
@@ -264,9 +264,9 @@ class SongLoader:
                                                     self.rspl_tags)
 
         if len(actually_loaded_songs) > 0:
-            log.warning(f"---- Files newly moved and will be parsed: {str(actually_loaded_songs)}")
+            log.warning("---- Files newly moved and will be parsed: %s", str(actually_loaded_songs))
         if len(self.songs.missing_from_archive) > 0:
-            log.error(f"---- Missing files but found in Database: {str(self.songs.missing_from_archive)}")
+            log.error("---- Missing files but found in Database: %s", str(self.songs.missing_from_archive))
 
     @staticmethod
     def is_user_not_logged_in(cdlc):

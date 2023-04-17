@@ -58,23 +58,16 @@ class SongData:
         return hash(self.rspl_request_id)
 
     def __repr__(self):
-        return os.linesep + '<SongData: ' \
-                            'rspl_request_id={}, ' \
-                            'rspl_song_id={}, ' \
-                            'cdlc_id={}, ' \
-                            'artist={}, ' \
-                            'title={}, ' \
-                            'artist_title={}, ' \
-                            'rspl_official={}, ' \
-                            'song_file_name={}' \
-                            '>'.format(self.rspl_request_id,
-                                       self.rspl_song_id,
-                                       self.cdlc_id,
-                                       self.artist,
-                                       self.title,
-                                       self.artist_title,
-                                       self.rspl_official,
-                                       self.song_file_name)
+        return f"{os.linesep}<SongData: " \
+               f"rspl_request_id={self.rspl_request_id}, " \
+               f"rspl_song_id={self.rspl_song_id}, " \
+               f"cdlc_id={self.cdlc_id}, " \
+               f"artist={self.artist}, " \
+               f"title={self.title}, " \
+               f"artist_title={self.artist_title}, " \
+               f"rspl_official={self.rspl_official}, " \
+               f"song_file_name={self.song_file_name}" \
+               f">"
 
 # TODO remove this later if the eq is decided!
 # s1 = SongData(1, 555, 'asd')
