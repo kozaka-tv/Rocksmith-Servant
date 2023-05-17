@@ -69,13 +69,13 @@ class SongData:
                f"song_file_name={self.song_file_name}" \
                f">"
 
-# TODO remove this later if the eq is decided!
+# TODO create a test out from this later
 # s1 = SongData(1, 555, 'asd')
 # s2 = SongData(2, 666, 'qwe')
 # s3 = SongData(1, 777, '123')
 
-# song_data_set = {s1, s2, s3}
-# print(song_data_set)
+# songs_from_archive_need_to_be_loaded = {s1, s2, s3}
+# print(songs_from_archive_need_to_be_loaded)
 # output:
 # {
 # <SongData: rspl_request_id=1, cdlc_id=555, song_file_name=asd>,

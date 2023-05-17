@@ -191,7 +191,7 @@ class SongLoader:
                 title = dlc_set["title"]
 
                 # TODO if it is possible, do not create always a new SongData. If it is already exists, just reuse it!
-                #   search in a list
+                #      search in a list
                 song_data = SongData(rspl_request_id, cdlc_id, rspl_song_id, artist, title)
                 song_data.rspl_official = dlc_set["official"]
                 song_data.rspl_position = str(sr["position"])
@@ -214,7 +214,7 @@ class SongLoader:
                             song_data.song_file_name = song_file_name
 
                             log.debug("row=%s", song_file_name)
-                            self.songs.song_data_set.add(song_data)
+                            self.songs.songs_from_archive_need_to_be_loaded.add(song_data)
                     else:
                         log.debug("User must download the song: cdlc_id=%s - %s - %s", cdlc_id, artist, title)
                         # rs_playlist.set_tag_to_download(self.twitch_channel,
@@ -224,15 +224,16 @@ class SongLoader:
 
                 con.commit()
 
-        if len(self.songs.song_data_set) <= 0:
+        if len(self.songs.songs_from_archive_need_to_be_loaded) <= 0:
             # TODO actually this is not true. Only, just no file was moved from archive into the game.
             log.info("---- The rsplaylist is empty, nothing to move!")
             return
 
-        log.info("---- Files to move from archive according to the requests: %s", str(self.songs.song_data_set))
+        log.info("---- Files to move from archive according to the requests: %s",
+                 str(self.songs.songs_from_archive_need_to_be_loaded))
 
         actually_loaded_songs = set()
-        for song_data in self.songs.song_data_set:
+        for song_data in self.songs.songs_from_archive_need_to_be_loaded:
             if song_data.song_file_name in self.songs.loaded_into_rs:
 
                 if self.rspl_tags.tag_loaded not in song_data.tags:
