@@ -4,8 +4,8 @@ import sqlite3
 from time import sleep
 
 import config.log_config
-from config.config_reader import ConfigReader
 from config.config_data import ConfigData
+from config.config_reader import ConfigReader
 from modules.cdlc_importer.load_cdlc_json_file import CDLCImporter
 from modules.file_manager.cdlc_file_manager import FileManager
 from modules.scene_switcher.scene_switcher import SceneSwitcher
@@ -155,4 +155,3 @@ while True:
 
     except Exception as e:
         log.error(e)
-        raise e
