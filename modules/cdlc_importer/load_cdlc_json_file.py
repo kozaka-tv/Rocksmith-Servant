@@ -123,7 +123,7 @@ class CDLCImporter:
                         file_utils.replace_dlc_and_cdlc(cfsm_song_data.colFileName))
 
                     if len(songs_from_db) == 0:
-                        log.debug("New CDLC found: %s", cfsm_song_data.colFileName)
+                        log.info("New CDLC found: %s", cfsm_song_data.colFileName)
                         songs_to_import.append(cfsm_song_data)
 
             if len(songs_to_import) == 0:
