@@ -195,7 +195,7 @@ class SongLoader:
                 song_data = SongData(rspl_request_id, cdlc_id, rspl_song_id, artist, title)
                 song_data.rspl_official = dlc_set["official"]
                 song_data.rspl_position = str(sr["position"])
-                log.info("Request: %s", song_data)
+                log.debug("Request: %s", song_data)
 
                 self.update_tags(song_data, sr)
 
