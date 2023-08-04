@@ -143,7 +143,8 @@ while True:
 
         update_config()
 
-        scene_switcher.run()
+        # TODO
+        # scene_switcher.run()
         file_manager.run()
         song_loader.run()
         update_game_information()

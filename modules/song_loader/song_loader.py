@@ -116,7 +116,7 @@ class SongLoader:
     def update_playlist(self):
         new_playlist = get_playlist(self.twitch_channel, self.phpsessid)
 
-        self.exit_if_user_not_logged_in(new_playlist)
+        self.exit_if_user_is_not_logged_in_on_rspl_page(new_playlist)
 
         if self.rsplaylist is None:
             log.debug("Initial load of the rsplaylist done...")
@@ -141,7 +141,7 @@ class SongLoader:
         log.debug("Playlist has been changed! Diffs: %s", diff)
         return False
 
-    def exit_if_user_not_logged_in(self, new_playlist):
+    def exit_if_user_is_not_logged_in_on_rspl_page(self, new_playlist):
         for sr in new_playlist["playlist"]:
             for cdlc in sr["dlc_set"]:
                 if self.is_user_not_logged_in(cdlc):
