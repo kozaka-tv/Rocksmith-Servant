@@ -4,8 +4,8 @@ requests==2.31.0
 munch==4.0.0
 deepdiff==6.3.1
 colorlog~=6.7.0
-PyYAML~=6.0
-wheel
+PyYAML==6.0.1
+wheel==0.41.0
 twine
 ordered-set
 zstandard==0.21.0
