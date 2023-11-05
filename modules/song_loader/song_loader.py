@@ -3,8 +3,8 @@ import os
 import sqlite3
 from time import time
 
-from modules.song_loader import song_loader_utils
 from modules.song_loader.song_data import SongData
+from modules.song_loader.song_loader_utils import log_loaded_cdlc_files, playlist_does_not_changed
 from modules.song_loader.songs import Songs
 from utils import file_utils, rs_playlist, string_utils, db_utils
 from utils.exceptions import ConfigError, RSPlaylistNotLoggedInError, BadDirectoryError
@@ -122,7 +122,7 @@ class SongLoader:
             log.info("Initial load of the rsplaylist done...")
             return True
 
-        if song_loader_utils.playlist_does_not_changed(self.rsplaylist, new_playlist):
+        if playlist_does_not_changed(self.rsplaylist, new_playlist):
             return False
 
         log.info("Playlist has been changed, lets update!")
@@ -152,20 +152,9 @@ class SongLoader:
     def scan_cdlc_files_under_rs_dir(self):
         cdlc_files = file_utils.get_file_names_from(self.rocksmith_cdlc_dir)
 
-        if len(cdlc_files) > 0:
-            self.log_loaded_cdlc_files(cdlc_files)
+        log_loaded_cdlc_files(cdlc_files)
 
         return cdlc_files
-
-    @staticmethod
-    def log_loaded_cdlc_files(cdlc_files):
-        log.info('Found %s into Rocksmith loaded CDLC files.', len(cdlc_files))
-
-        if log.isEnabledFor(logging.DEBUG):
-            log.debug("---------- Found %s files already loaded into Rocksmith:", len(cdlc_files))
-            for cdlc_file in cdlc_files:
-                log.debug(cdlc_file)
-            log.debug("-----------------------------")
 
     # TODO refactor this. it should be like
     # - get_requests from RS playlist
