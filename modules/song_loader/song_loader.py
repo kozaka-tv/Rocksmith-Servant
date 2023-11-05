@@ -162,7 +162,7 @@ class SongLoader:
         log.info('Found %s into Rocksmith loaded CDLC files.', len(cdlc_files))
 
         if log.isEnabledFor(logging.DEBUG):
-            log.debug("---------- The %s files already loaded into Rocksmith:", len(cdlc_files))
+            log.debug("---------- Found %s files already loaded into Rocksmith:", len(cdlc_files))
             for cdlc_file in cdlc_files:
                 log.debug(cdlc_file)
             log.debug("-----------------------------")
