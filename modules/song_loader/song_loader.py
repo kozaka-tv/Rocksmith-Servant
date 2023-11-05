@@ -4,20 +4,13 @@ import sqlite3
 from time import time
 
 from modules.song_loader.song_data import SongData
-from modules.song_loader.song_loader_utils import log_loaded_cdlc_files, playlist_does_not_changed
+from modules.song_loader.song_loader_utils import log_loaded_cdlc_files, playlist_does_not_changed, update_tags, \
+    check_cdlc_archive_dir, check_rocksmith_cdlc_dir
 from modules.song_loader.songs import Songs
-from utils import file_utils, rs_playlist, string_utils, db_utils
-from utils.exceptions import ConfigError, RSPlaylistNotLoggedInError, BadDirectoryError
-from utils.rs_playlist import get_playlist
-
-NL = os.linesep
-
-ERR_MSG_CDLC_ARCHIVE_DIR = "Please set your CDLC archive directory in the config!" + NL + \
-                           "This is the directory, where you normally store all of your downloaded CDLC files."
-
-ERR_MSG_ROCKSMITH_CDLC_DIR = "Please set your Rocksmith CDLC directory!" + NL + \
-                             "This is the directory, where you normally store all of your CDLC files what you play" \
-                             "in the game."
+from utils import file_utils, rs_playlist
+from utils.db_utils import search_song_in_the_db
+from utils.exceptions import RSPlaylistNotLoggedInError, BadDirectoryError
+from utils.rs_playlist import get_playlist, is_user_not_logged_in
 
 DEFAULT_CDLC_DIR = 'import'
 HEARTBEAT = 5
@@ -38,9 +31,9 @@ class SongLoader:
             self.cdlc_dir = os.path.join(config_data.song_loader.cdlc_dir)
             self.rspl_tags = config_data.song_loader.rspl_tags
             self.cfsm_file_name = config_data.song_loader.cfsm_file_name
-            self.cdlc_archive_dir = self.check_cdlc_archive_dir(config_data.song_loader.cdlc_archive_dir)
+            self.cdlc_archive_dir = check_cdlc_archive_dir(config_data.song_loader.cdlc_archive_dir)
             self.destination_directory = config_data.song_loader.destination_directory
-            self.rocksmith_cdlc_dir = self.check_rocksmith_cdlc_dir(config_data.song_loader.rocksmith_cdlc_dir)
+            self.rocksmith_cdlc_dir = check_rocksmith_cdlc_dir(config_data.song_loader.rocksmith_cdlc_dir)
             self.allow_load_when_in_game = config_data.song_loader.allow_load_when_in_game
             self.cdlc_import_json_file = config_data.song_loader.cdlc_import_json_file
             self.songs_to_load = os.path.join(config_data.song_loader.cdlc_dir, config_data.song_loader.cfsm_file_name)
@@ -63,27 +56,15 @@ class SongLoader:
         self.cdlc_dir = os.path.join(config_data.song_loader.cdlc_dir)
         self.rspl_tags = config_data.song_loader.rspl_tags
         self.cfsm_file_name = config_data.song_loader.cfsm_file_name
-        self.cdlc_archive_dir = self.check_cdlc_archive_dir(config_data.song_loader.cdlc_archive_dir)
+        self.cdlc_archive_dir = check_cdlc_archive_dir(config_data.song_loader.cdlc_archive_dir)
         self.destination_directory = config_data.song_loader.destination_directory
-        self.rocksmith_cdlc_dir = self.check_rocksmith_cdlc_dir(config_data.song_loader.rocksmith_cdlc_dir)
+        self.rocksmith_cdlc_dir = check_rocksmith_cdlc_dir(config_data.song_loader.rocksmith_cdlc_dir)
         self.allow_load_when_in_game = config_data.song_loader.allow_load_when_in_game
         self.phpsessid = config_data.song_loader.phpsessid
         self.cdlc_import_json_file = config_data.song_loader.cdlc_import_json_file
         self.songs_to_load = os.path.join(config_data.song_loader.cdlc_dir, config_data.song_loader.cfsm_file_name)
 
         self.create_directories()
-
-    @staticmethod
-    def check_cdlc_archive_dir(cdlc_archive_dir):
-        if cdlc_archive_dir is None or cdlc_archive_dir.startswith('<Enter your'):
-            raise ConfigError(ERR_MSG_CDLC_ARCHIVE_DIR)
-        return os.path.join(cdlc_archive_dir)
-
-    @staticmethod
-    def check_rocksmith_cdlc_dir(rocksmith_cdlc_dir):
-        if rocksmith_cdlc_dir is None or rocksmith_cdlc_dir.startswith('<Enter your'):
-            raise ConfigError(ERR_MSG_ROCKSMITH_CDLC_DIR)
-        return os.path.join(rocksmith_cdlc_dir)
 
     def create_directories(self):
         file_utils.create_directory(self.cdlc_dir)
@@ -134,7 +115,7 @@ class SongLoader:
     def exit_if_user_is_not_logged_in_on_rspl_page(self, new_playlist):
         for sr in new_playlist["playlist"]:
             for cdlc in sr["dlc_set"]:
-                if self.is_user_not_logged_in(cdlc):
+                if is_user_not_logged_in(cdlc):
                     self.rsplaylist = None
                     self.last_run = time()
                     log.error("User must be logged in into RS playlist to be able to use the module!")
@@ -176,7 +157,7 @@ class SongLoader:
                 song_data.rspl_position = str(sr["position"])
                 log.debug("Request: %s", song_data)
 
-                self.update_tags(song_data, sr)
+                update_tags(song_data, sr)
 
                 # Do not load official DLC files
                 if song_data.is_official:  # TODO #113 some ODLC-s were here not skipped! Maybe different official id?
@@ -184,7 +165,7 @@ class SongLoader:
                     continue
 
                 with con:
-                    rows = self.search_song_in_the_db(artist, title)
+                    rows = search_song_in_the_db(artist, title)
 
                     if len(rows) > 0:
                         log.debug("---- sr %s -------", song_data.rspl_position)
@@ -250,30 +231,3 @@ class SongLoader:
                                    self.rspl_tags)
         song_data.tags.add(self.rspl_tags.tag_loaded)
         # song_data.tags.discard('need to download')  # TODO
-
-    @staticmethod
-    def is_user_not_logged_in(cdlc):
-        try:
-            cdlc['id']
-        except TypeError:
-            return True
-        return False
-
-    @staticmethod
-    def update_tags(song_data, sr):
-        song_data.tags.clear()
-        for tag in sr['tags']:
-            song_data.tags.add(tag)
-
-    @staticmethod
-    def search_song_in_the_db(artist, title):
-        rows = db_utils.get_songs_from_db(artist, title)
-        # TODO hm...maybe remove special chars and do a second query. To load all possible variations?
-        # TODO make a special search for similar words in artist and title
-        # So not only if len(rows) <= 0
-        if len(rows) <= 0:
-            # remove special chars
-            artist_norm = string_utils.remove_special_chars(artist)
-            title_norm = string_utils.remove_special_chars(title)
-            rows = db_utils.get_songs_from_db(artist_norm, title_norm)
-        return rows
