@@ -3,8 +3,7 @@ import os
 import sqlite3
 from time import time
 
-from deepdiff import DeepDiff
-
+from modules.song_loader import song_loader_utils
 from modules.song_loader.song_data import SongData
 from modules.song_loader.songs import Songs
 from utils import file_utils, rs_playlist, string_utils, db_utils
@@ -119,11 +118,11 @@ class SongLoader:
         self.exit_if_user_is_not_logged_in_on_rspl_page(new_playlist)
 
         if self.rsplaylist is None:
-            log.debug("Initial load of the rsplaylist done...")
             self.rsplaylist = new_playlist
+            log.info("Initial load of the rsplaylist done...")
             return True
 
-        if self.playlist_does_not_changed(new_playlist):
+        if song_loader_utils.playlist_does_not_changed(self.rsplaylist, new_playlist):
             return False
 
         log.info("Playlist has been changed, lets update!")
@@ -131,15 +130,6 @@ class SongLoader:
         self.rsplaylist = new_playlist
 
         return True
-
-    def playlist_does_not_changed(self, new_playlist):
-        diff = DeepDiff(self.rsplaylist, new_playlist, exclude_regex_paths="\\['inactive_time'\\]")
-        if str(diff) == "{}":
-            log.debug("Playlist does not changed!")
-            return True
-
-        log.debug("Playlist has been changed! Diffs: %s", diff)
-        return False
 
     def exit_if_user_is_not_logged_in_on_rspl_page(self, new_playlist):
         for sr in new_playlist["playlist"]:
@@ -237,12 +227,7 @@ class SongLoader:
             if song_data.song_file_name in self.songs.loaded_into_rs:
 
                 if self.rspl_tags.tag_loaded not in song_data.tags:
-                    rs_playlist.set_tag_loaded(self.twitch_channel,
-                                               self.phpsessid,
-                                               song_data.rspl_request_id,
-                                               self.rspl_tags)
-                    song_data.tags.add(self.rspl_tags.tag_loaded)
-                    # song_data.tags.discard('need to download')  # TODO
+                    self.set_tag_loaded(song_data)
             else:
                 song_to_move = os.path.join(self.cdlc_archive_dir, song_data.song_file_name)
                 moved = file_utils.move_file(song_to_move, self.destination_directory)
@@ -268,6 +253,14 @@ class SongLoader:
             log.warning("---- Files newly moved and will be parsed: %s", str(actually_loaded_songs))
         if len(self.songs.missing_from_archive) > 0:
             log.error("---- Missing files but found in Database: %s", str(self.songs.missing_from_archive))
+
+    def set_tag_loaded(self, song_data):
+        rs_playlist.set_tag_loaded(self.twitch_channel,
+                                   self.phpsessid,
+                                   song_data.rspl_request_id,
+                                   self.rspl_tags)
+        song_data.tags.add(self.rspl_tags.tag_loaded)
+        # song_data.tags.discard('need to download')  # TODO
 
     @staticmethod
     def is_user_not_logged_in(cdlc):
