@@ -1,11 +1,11 @@
 colorama~=0.4.5
-setuptools==69.0.3
+setuptools==69.1.0
 requests==2.31.0
 munch==4.0.0
 deepdiff==6.7.1
 colorlog==6.8.2
 PyYAML==6.0.1
 wheel==0.42.0
-twine
+twine==5.0.0
 ordered-set
 zstandard==0.22.0
