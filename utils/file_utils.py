@@ -112,8 +112,12 @@ def file_datetime_formatted(filename):
 
 
 def create_directory(directory_to_create):
-    log.warning("Creating directory '%s' if not exists!", directory_to_create)
     pathlib.Path(directory_to_create).mkdir(parents=True, exist_ok=True)
+
+
+def create_directory_logged(directory_to_create):
+    log.warning("Creating directory '%s' if not exists!", directory_to_create)
+    create_directory(directory_to_create)
 
 
 def replace_dlc_and_cdlc(file_name):

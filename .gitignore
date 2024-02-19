@@ -142,3 +142,4 @@ dmypy.json
 /modules/song_loader/log/
 /servant.db
 /tmp/
+/psarc-info-files/

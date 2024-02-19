@@ -67,9 +67,9 @@ class SongLoader:
         self.create_directories()
 
     def create_directories(self):
-        file_utils.create_directory(self.cdlc_dir)
-        file_utils.create_directory(self.cdlc_archive_dir)
-        file_utils.create_directory(self.rocksmith_cdlc_dir)
+        file_utils.create_directory_logged(self.cdlc_dir)
+        file_utils.create_directory_logged(self.cdlc_archive_dir)
+        file_utils.create_directory_logged(self.rocksmith_cdlc_dir)
 
     def run(self):
         if self.enabled:
