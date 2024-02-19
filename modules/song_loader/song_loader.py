@@ -177,10 +177,10 @@ class SongLoader:
                             self.songs.songs_from_archive_need_to_be_loaded.add(song_data)
                     else:
                         log.debug("User must download the song: cdlc_id=%s - %s - %s", cdlc_id, artist, title)
-                        # rs_playlist.set_tag_to_download(self.twitch_channel,
-                        #                                 self.phpsessid,
-                        #                                 song_data.rspl_request_id,
-                        #                                 self.rspl_tags)
+                        rs_playlist.set_tag_to_download(self.twitch_channel,
+                                                        self.phpsessid,
+                                                        song_data.rspl_request_id,
+                                                        self.rspl_tags)
 
                 con.commit()
 
