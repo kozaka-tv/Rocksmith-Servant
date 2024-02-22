@@ -37,9 +37,6 @@ def extract_psarc(filename_to_extract, song_data_input):
             log.warning('Could not extract any song information from the psarc file: %s', filename_to_extract)
             return None
 
-        # TODO this writes out the data into a file.
-        # __write_info_file(entry, filename_to_extract, psarc)
-
         return __create_song_data(entry, psarc, song_data_input)
 
 
@@ -148,11 +145,12 @@ def __get_psarc_info(filestream):
 
 
 def __write_info_file(entry, filename_to_extract, psarc):
+    # TODO this writes out the data into a file if needed
     json_filename = filename_to_extract + EXTENSION_PSARC_INFO_JSON
     json_file_path = os.path.join(DIR_PSARC_INFO_FILES, os.path.basename(json_filename))
-    data = __read_entry(psarc, entry)
+    data_to_write = __read_entry(psarc, entry)
     with open(json_file_path, 'wb') as fstream:
-        fstream.write(data)
+        fstream.write(data_to_write)
         # TODO use different log level
         log.warning('Info file %s created.', json_file_path)
 
@@ -175,9 +173,9 @@ if __name__ == '__main__':
     psarc_files = ('c:\\work\\PycharmProjects\\Rocksmith-Servant\\tmp\\AC-DC_Big-Gun_v3_5_DD_p.psarc',
                    'c:\\work\\PycharmProjects\\Rocksmith-Servant\\tmp\\BABYMETAL_ONE-(English)_v1_4_p.psarc')
     for psarc_file in psarc_files:
-        data = SongData()
-        data.song_file_name = psarc_file
-        extract_psarc(psarc_file, data)
-        log.warning('artist=' + data.artist)
-        log.warning('title=' + data.title)
-        log.warning('song_file_name=' + data.song_file_name)
+        song_data = SongData()
+        song_data.song_file_name = psarc_file
+        extract_psarc(psarc_file, song_data)
+        log.warning('artist=' + song_data.artist)
+        log.warning('title=' + song_data.title)
+        log.warning('song_file_name=' + song_data.song_file_name)
