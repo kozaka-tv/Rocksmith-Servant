@@ -143,3 +143,4 @@ dmypy.json
 /servant.db
 /tmp/
 /psarc-info-files/
+/parser_test.db

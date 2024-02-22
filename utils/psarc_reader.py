@@ -4,6 +4,7 @@ import codecs
 import json
 import logging
 import os
+import sqlite3
 import struct
 import sys
 import zlib
@@ -44,8 +45,7 @@ def __create_song_data(entry, psarc, song_data_input):
     song_data = json.loads(__read_entry(psarc, entry).decode('utf-8').replace('\\r\\n', ''))
     attributes = song_data['Entries'][next(iter(song_data['Entries']))]['Attributes']
     song_data_input.artist = attributes['ArtistName']
-    song_data_input.title = attributes['SongName']
-    # return SongData(artist=artist, title=title)
+    song_data_input.title = attributes['SongName']  # return SongData(artist=artist, title=title)
 
 
 def __pad(data, blocksize=16):
@@ -90,8 +90,7 @@ def __read_entry(filestream, entry):
 
 def __cipher_toc():
     """AES CFB Mode"""
-    return AES.new(codecs.decode(ARC_KEY, 'hex'), mode=AES.MODE_CFB,
-                   IV=codecs.decode(ARC_IV, 'hex'), segment_size=128)
+    return AES.new(codecs.decode(ARC_KEY, 'hex'), mode=AES.MODE_CFB, IV=codecs.decode(ARC_IV, 'hex'), segment_size=128)
 
 
 def __get_psarc_info(filestream):
@@ -113,12 +112,9 @@ def __get_psarc_info(filestream):
     while idx < n_entries:
         data = toc[toc_position:toc_position + ENTRY_SIZE]
 
-        entries.append({
-            # 'md5': data[:16],
-            'zindex': struct.unpack('>L', data[16:20])[0],
-            'length': struct.unpack('>Q', b'\x00' * 3 + data[20:25])[0],
-            'offset': struct.unpack('>Q', b'\x00' * 3 + data[25:])[0]
-        })
+        entries.append({  # 'md5': data[:16],
+            'zindex': struct.unpack('>L', data[16:20])[0], 'length': struct.unpack('>Q', b'\x00' * 3 + data[20:25])[0],
+            'offset': struct.unpack('>Q', b'\x00' * 3 + data[25:])[0]})
         toc_position += ENTRY_SIZE
         idx += 1
 
@@ -164,12 +160,19 @@ def __is_song_info_file(file_name):
     # TODO remove unused
     # return True
     # TODO keep only one file what is used later on
-    return file_name.find('.hsan') > -1
-    # return file_name.find('manifests/songs_dlc') > -1 and file_name.find('.hsan') > -1
-    # return file_name.find('songs/arr') > -1 or file_name.find('manifests/songs_dlc') > -1
+    return file_name.find(
+        '.hsan') > -1  # return file_name.find('manifests/songs_dlc') > -1 and file_name.find('.hsan') > -1  # return file_name.find('songs/arr') > -1 or file_name.find('manifests/songs_dlc') > -1
 
 
 if __name__ == '__main__':
+
+    db = sqlite3.connect('..\\parser_test.db')
+    cursor = db.cursor()
+    cursor.execute('DROP TABLE IF EXISTS songs')
+    db.commit()
+    cursor.execute('CREATE TABLE songs (artist text, title text, song_file_name text)')
+    db.commit()
+
     psarc_files = ('c:\\work\\PycharmProjects\\Rocksmith-Servant\\tmp\\AC-DC_Big-Gun_v3_5_DD_p.psarc',
                    'c:\\work\\PycharmProjects\\Rocksmith-Servant\\tmp\\BABYMETAL_ONE-(English)_v1_4_p.psarc')
     for psarc_file in psarc_files:
@@ -179,3 +182,8 @@ if __name__ == '__main__':
         log.warning('artist=' + song_data.artist)
         log.warning('title=' + song_data.title)
         log.warning('song_file_name=' + song_data.song_file_name)
+        sql = "insert into songs (artist, title, song_file_name) " + "values ('" + song_data.artist + "', '" + song_data.title + "', '" + song_data.song_file_name + "')"
+        cursor.execute(sql)
+        db.commit()
+
+    db.close()
