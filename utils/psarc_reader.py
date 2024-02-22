@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import codecs
+import json
 import logging
 import os
 import struct
@@ -9,6 +10,7 @@ import zlib
 
 from Crypto.Cipher import AES
 
+from modules.song_loader.song_data import SongData
 from utils import file_utils
 
 log = logging.getLogger()
@@ -23,7 +25,33 @@ ARC_KEY = 'C53DB23870A1A2F71CAE64061FDD0E1157309DC85204D4C5BFDF25090DF2572C'
 ARC_IV = 'E915AA018FEF71FC508132E4BB4CEB42'
 
 
-def pad(data, blocksize=16):
+def extract_psarc(filename_to_extract, song_data_input):
+    # TODO extract this create dir to the module __init__ where the function is called
+    file_utils.create_directory(os.path.join(DIR_PSARC_INFO_FILES))
+    # TODO use different log level
+    log.warning('Extracting %s', filename_to_extract)
+
+    with open(filename_to_extract, 'rb') as psarc:
+        entry = __get_psarc_info(psarc)
+        if entry is None:
+            log.warning('Could not extract any song information from the psarc file: %s', filename_to_extract)
+            return None
+
+        # TODO this writes out the data into a file.
+        # __write_info_file(entry, filename_to_extract, psarc)
+
+        return __create_song_data(entry, psarc, song_data_input)
+
+
+def __create_song_data(entry, psarc, song_data_input):
+    song_data = json.loads(__read_entry(psarc, entry).decode('utf-8').replace('\\r\\n', ''))
+    attributes = song_data['Entries'][next(iter(song_data['Entries']))]['Attributes']
+    song_data_input.artist = attributes['ArtistName']
+    song_data_input.title = attributes['SongName']
+    # return SongData(artist=artist, title=title)
+
+
+def __pad(data, blocksize=16):
     """Zeros padding"""
     # So we need zeroes in order to match AES's encoding scheme which breaks
     # the data into 16-byte chunks. If we have 52 bytes to decode, then we have
@@ -34,13 +62,13 @@ def pad(data, blocksize=16):
     return data + bytes(padding)
 
 
-def stdout_same_line(line):
+def __stdout_same_line(line):
     """Prepend carriage return and output to stdout"""
     sys.stdout.write('\r' + line[:80])
     sys.stdout.flush()
 
 
-def read_entry(filestream, entry):
+def __read_entry(filestream, entry):
     """Extract zlib for one entry"""
     data = bytes()
 
@@ -63,13 +91,13 @@ def read_entry(filestream, entry):
     return data
 
 
-def cipher_toc():
+def __cipher_toc():
     """AES CFB Mode"""
     return AES.new(codecs.decode(ARC_KEY, 'hex'), mode=AES.MODE_CFB,
                    IV=codecs.decode(ARC_IV, 'hex'), segment_size=128)
 
 
-def read_toc(filestream):
+def __get_psarc_info(filestream):
     """Read entry list and Z-fragments.
     Returns a list of entries to be used with read_entry."""
 
@@ -81,7 +109,7 @@ def read_toc(filestream):
 
     toc_size = header[3] - 32
     n_entries = header[5]
-    toc = cipher_toc().decrypt(pad(filestream.read(toc_size)))
+    toc = __cipher_toc().decrypt(__pad(filestream.read(toc_size)))
     toc_position = 0
 
     idx = 0
@@ -89,7 +117,7 @@ def read_toc(filestream):
         data = toc[toc_position:toc_position + ENTRY_SIZE]
 
         entries.append({
-            'md5': data[:16],
+            # 'md5': data[:16],
             'zindex': struct.unpack('>L', data[16:20])[0],
             'length': struct.unpack('>Q', b'\x00' * 3 + data[20:25])[0],
             'offset': struct.unpack('>Q', b'\x00' * 3 + data[25:])[0]
@@ -109,46 +137,32 @@ def read_toc(filestream):
 
     # Process the first entry as it contains the file listing
     entries[0]['filepath'] = ''
-    filepaths = read_entry(filestream, entries[0]).split()
+    filepaths = __read_entry(filestream, entries[0]).split()
     for entry, filepath in zip(entries[1:], filepaths):
-        entry['filepath'] = filepath.decode("utf-8")
+        filepath_decoded = filepath.decode("utf-8")
+        if __is_song_info_file(filepath_decoded):
+            entry['filepath'] = filepath_decoded
+            return entry
 
-    # TODO return only the useful files
-    return entries[1:]
-
-
-def extract_psarc(filename_to_extract):
-    base_path = os.path.join(DIR_PSARC_INFO_FILES, os.path.basename(filename_to_extract)[:-6])
-    # base_path2 = os.path.join(DIR_PSARC_INFO_FILES)
-    # TODO extract this create dir to the module __init__ where the function is called
-    file_utils.create_directory(os.path.join(DIR_PSARC_INFO_FILES))
-
-    with open(filename_to_extract, 'rb') as psarc:
-        entries = read_toc(psarc)
-        # TODO use different log but in debug level
-        log.info('Extracting ', os.path.basename(filename_to_extract))
-
-        for idx, entry in enumerate(entries):
-            filepath_from_the_entry = entry['filepath']
-            if is_song_info_file(filepath_from_the_entry):
-                write_info_file(entry, filename_to_extract, psarc)
+    return None
 
 
-def write_info_file(entry, filename_to_extract, psarc):
+def __write_info_file(entry, filename_to_extract, psarc):
     json_filename = filename_to_extract + EXTENSION_PSARC_INFO_JSON
     json_file_path = os.path.join(DIR_PSARC_INFO_FILES, os.path.basename(json_filename))
-    data = read_entry(psarc, entry)
+    data = __read_entry(psarc, entry)
     with open(json_file_path, 'wb') as fstream:
-        log.info('Writing ', json_file_path)
         fstream.write(data)
+        # TODO use different log level
+        log.warning('Info file %s created.', json_file_path)
 
 
-def create_dir_if_not_exists(base_path):
+def __create_dir_if_not_exists(base_path):
     if not os.path.exists(base_path):
         os.makedirs(base_path)
 
 
-def is_song_info_file(file_name):
+def __is_song_info_file(file_name):
     # TODO remove unused
     # return True
     # TODO keep only one file what is used later on
@@ -161,4 +175,9 @@ if __name__ == '__main__':
     psarc_files = ('c:\\work\\PycharmProjects\\Rocksmith-Servant\\tmp\\AC-DC_Big-Gun_v3_5_DD_p.psarc',
                    'c:\\work\\PycharmProjects\\Rocksmith-Servant\\tmp\\BABYMETAL_ONE-(English)_v1_4_p.psarc')
     for psarc_file in psarc_files:
-        extract_psarc(psarc_file)
+        data = SongData()
+        data.song_file_name = psarc_file
+        extract_psarc(psarc_file, data)
+        log.warning('artist=' + data.artist)
+        log.warning('title=' + data.title)
+        log.warning('song_file_name=' + data.song_file_name)

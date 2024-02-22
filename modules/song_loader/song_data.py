@@ -17,7 +17,8 @@ class State(Enum):
 
 
 class SongData:
-    def __init__(self, rspl_request_id, cdlc_id, rspl_song_id, artist=None, title=None, song_file_name=None):
+    def __init__(self, rspl_request_id=None, cdlc_id=None, rspl_song_id=None, artist=None, title=None,
+                 song_file_name=None):
         self.rspl_request_id = rspl_request_id  # id of the request on RSPL
         self.rspl_song_id = rspl_song_id  # id of the request on RSPL
         self.cdlc_id = cdlc_id
