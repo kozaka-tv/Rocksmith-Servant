@@ -10,3 +10,6 @@ twine==5.0.0
 ordered-set
 zstandard==0.22.0
 crypto~=1.4.1
+
+pytest==8.0.1
+fuzzywuzzy~=0.18.0
