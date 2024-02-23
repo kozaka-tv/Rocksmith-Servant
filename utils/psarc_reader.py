@@ -42,8 +42,8 @@ def extract_psarc(filename_to_extract, song_data_input):
 
 
 def __create_song_data(entry, psarc, song_data_input):
-    song_data = json.loads(__read_entry(psarc, entry).decode('utf-8').replace('\\r\\n', ''))
-    attributes = song_data['Entries'][next(iter(song_data['Entries']))]['Attributes']
+    song_data_dict = json.loads(__read_entry(psarc, entry).decode('utf-8').replace('\\r\\n', ''))
+    attributes = song_data_dict['Entries'][next(iter(song_data_dict['Entries']))]['Attributes']
     song_data_input.artist = attributes['ArtistName']
     song_data_input.title = attributes['SongName']  # return SongData(artist=artist, title=title)
 
@@ -157,11 +157,12 @@ def __create_dir_if_not_exists(base_path):
 
 
 def __is_song_info_file(file_name):
+    # TODO keep only one file what is used later on
+    return file_name.find('.hsan') > -1
     # TODO remove unused
     # return True
-    # TODO keep only one file what is used later on
-    return file_name.find(
-        '.hsan') > -1  # return file_name.find('manifests/songs_dlc') > -1 and file_name.find('.hsan') > -1  # return file_name.find('songs/arr') > -1 or file_name.find('manifests/songs_dlc') > -1
+    # return file_name.find('manifests/songs_dlc') > -1 and file_name.find('.hsan') > -1
+    # return file_name.find('songs/arr') > -1 or file_name.find('manifests/songs_dlc') > -1
 
 
 if __name__ == '__main__':
@@ -173,8 +174,8 @@ if __name__ == '__main__':
     cursor.execute('CREATE TABLE songs (artist text, title text, song_file_name text)')
     db.commit()
 
-    psarc_files = ('c:\\work\\PycharmProjects\\Rocksmith-Servant\\tmp\\AC-DC_Big-Gun_v3_5_DD_p.psarc',
-                   'c:\\work\\PycharmProjects\\Rocksmith-Servant\\tmp\\BABYMETAL_ONE-(English)_v1_4_p.psarc')
+    psarc_files = ('c:\\work\\PycharmProjects\\Rocksmith-Servant\\tests\\test_data\\AC-DC_Big-Gun_v3_5_DD_p.psarc',
+                   'c:\\work\\PycharmProjects\\Rocksmith-Servant\\tests\\test_data\\BABYMETAL_ONE-(English)_v1_4_p.psarc')
     for psarc_file in psarc_files:
         song_data = SongData()
         song_data.song_file_name = psarc_file
@@ -182,7 +183,8 @@ if __name__ == '__main__':
         log.warning('artist=' + song_data.artist)
         log.warning('title=' + song_data.title)
         log.warning('song_file_name=' + song_data.song_file_name)
-        sql = "insert into songs (artist, title, song_file_name) " + "values ('" + song_data.artist + "', '" + song_data.title + "', '" + song_data.song_file_name + "')"
+        sql = ("insert into songs (artist, title, song_file_name) " +
+               "values ('") + song_data.artist + "', '" + song_data.title + "', '" + song_data.song_file_name + "')"
         cursor.execute(sql)
         db.commit()
 
