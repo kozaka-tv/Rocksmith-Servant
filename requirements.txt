@@ -9,7 +9,7 @@ wheel==0.42.0
 twine==5.0.0
 ordered-set
 zstandard==0.22.0
-crypto~=1.4.1
+pycryptodome==3.20.0
 
 pytest==8.0.1
 fuzzywuzzy~=0.18.0
