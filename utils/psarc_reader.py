@@ -4,14 +4,11 @@ import codecs
 import json
 import logging
 import os
-import sqlite3
 import struct
-import sys
 import zlib
 
 from Crypto.Cipher import AES
 
-from modules.song_loader.song_data import SongData
 from utils import file_utils
 
 log = logging.getLogger()
@@ -26,7 +23,7 @@ ARC_KEY = 'C53DB23870A1A2F71CAE64061FDD0E1157309DC85204D4C5BFDF25090DF2572C'
 ARC_IV = 'E915AA018FEF71FC508132E4BB4CEB42'
 
 
-def extract_psarc(filename_to_extract, song_data_input):
+def extract_psarc(filename_to_extract, song_data_input, write_to_file=False):
     # TODO extract this create dir to the module __init__ where the function is called
     file_utils.create_directory(os.path.join(DIR_PSARC_INFO_FILES))
     # TODO use different log level
@@ -37,6 +34,9 @@ def extract_psarc(filename_to_extract, song_data_input):
         if entry is None:
             log.warning('Could not extract any song information from the psarc file: %s', filename_to_extract)
             return None
+
+        if write_to_file:
+            __write_info_file(entry, filename_to_extract, psarc)
 
         return __create_song_data(entry, psarc, song_data_input)
 
@@ -57,12 +57,6 @@ def __pad(data, blocksize=16):
     padding = (blocksize - len(data)) % blocksize
     # Modify this to return a bytes object, since that's what pycrypto needs.
     return data + bytes(padding)
-
-
-def __stdout_same_line(line):
-    """Prepend carriage return and output to stdout"""
-    sys.stdout.write('\r' + line[:80])
-    sys.stdout.flush()
 
 
 def __read_entry(filestream, entry):
@@ -163,29 +157,3 @@ def __is_song_info_file(file_name):
     # return True
     # return file_name.find('manifests/songs_dlc') > -1 and file_name.find('.hsan') > -1
     # return file_name.find('songs/arr') > -1 or file_name.find('manifests/songs_dlc') > -1
-
-
-if __name__ == '__main__':
-
-    db = sqlite3.connect('..\\parser_test.db')
-    cursor = db.cursor()
-    cursor.execute('DROP TABLE IF EXISTS songs')
-    db.commit()
-    cursor.execute('CREATE TABLE songs (artist text, title text, song_file_name text)')
-    db.commit()
-
-    psarc_files = ('c:\\work\\PycharmProjects\\Rocksmith-Servant\\tests\\test_data\\AC-DC_Big-Gun_v3_5_DD_p.psarc',
-                   'c:\\work\\PycharmProjects\\Rocksmith-Servant\\tests\\test_data\\BABYMETAL_ONE-(English)_v1_4_p.psarc')
-    for psarc_file in psarc_files:
-        song_data = SongData()
-        song_data.song_file_name = psarc_file
-        extract_psarc(psarc_file, song_data)
-        log.warning('artist=' + song_data.artist)
-        log.warning('title=' + song_data.title)
-        log.warning('song_file_name=' + song_data.song_file_name)
-        sql = ("insert into songs (artist, title, song_file_name) " +
-               "values ('") + song_data.artist + "', '" + song_data.title + "', '" + song_data.song_file_name + "')"
-        cursor.execute(sql)
-        db.commit()
-
-    db.close()
