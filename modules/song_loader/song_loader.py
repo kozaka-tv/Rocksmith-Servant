@@ -7,7 +7,7 @@ from modules.song_loader.song_data import SongData
 from modules.song_loader.song_loader_utils import log_loaded_cdlc_files, playlist_does_not_changed, update_tags, \
     check_cdlc_archive_dir, check_rocksmith_cdlc_dir
 from modules.song_loader.songs import Songs
-from utils import file_utils, rs_playlist
+from utils import file_utils, rs_playlist, psarc_reader
 from utils.db_utils import search_song_in_the_db
 from utils.exceptions import RSPlaylistNotLoggedInError, BadDirectoryError
 from utils.rs_playlist import get_playlist, is_user_not_logged_in
@@ -127,6 +127,10 @@ class SongLoader:
         loaded_cdlc_files = self.scan_cdlc_files_under_rs_dir()
         for loaded_cdlc_file in loaded_cdlc_files:
             self.songs.loaded_into_rs.add(loaded_cdlc_file)
+            song_data = SongData()
+            filename_to_extract = os.path.join(self.rocksmith_cdlc_dir, loaded_cdlc_file)
+            psarc_reader.extract_psarc(filename_to_extract, song_data, True)
+            self.songs.loaded_into_rs_with_song_data.add(song_data)
             if len(self.songs.missing_from_archive) > 0:
                 self.songs.missing_from_archive.discard(loaded_cdlc_file)
 

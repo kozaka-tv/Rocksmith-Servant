@@ -22,6 +22,9 @@ BLOCK_SIZE = 65536
 ARC_KEY = 'C53DB23870A1A2F71CAE64061FDD0E1157309DC85204D4C5BFDF25090DF2572C'
 ARC_IV = 'E915AA018FEF71FC508132E4BB4CEB42'
 
+ATTR_ARTIST_NAME = 'ArtistName'
+ATTR_SONG_NAME = 'SongName'
+
 
 def extract_psarc(filename_to_extract, song_data_input, write_to_file=False):
     # TODO extract this create dir to the module __init__ where the function is called
@@ -41,11 +44,54 @@ def extract_psarc(filename_to_extract, song_data_input, write_to_file=False):
         return __create_song_data(entry, psarc, song_data_input)
 
 
+# TODO make song_data_input optional. If not exists, default is a new object and that is returned?
 def __create_song_data(entry, psarc, song_data_input):
-    song_data_dict = json.loads(__read_entry(psarc, entry).decode('utf-8').replace('\\r\\n', ''))
-    attributes = song_data_dict['Entries'][next(iter(song_data_dict['Entries']))]['Attributes']
-    song_data_input.artist = attributes['ArtistName']
-    song_data_input.title = attributes['SongName']  # return SongData(artist=artist, title=title)
+    song_data_dict = get_song_data_dict(entry, psarc)
+
+    iterator = iter(song_data_dict['Entries'])
+
+    while next_value := next(iterator):
+        attributes = song_data_dict['Entries'][next_value]['Attributes']
+        artist_name = get_artist_name(attributes, song_data_dict)
+        if artist_name is not None:
+            song_data_input.artist = artist_name
+            song_data_input.title = get_song_name(attributes, song_data_dict)
+            # TODO return new song_data?
+            # return SongData(artist=artist, title=title)
+            return
+
+    # TODO raise an exception here?
+    log.warning("Could not extract useful attribute information from: %s", song_data_dict)
+
+
+def get_song_data_dict(entry, psarc):
+    return json.loads(__read_entry(psarc, entry).decode('utf-8').replace('\\r\\n', ''))
+
+
+def get_attributes(song_data_dict):
+    iterator = iter(song_data_dict['Entries'])
+
+    while val := next(iterator):
+        attributes = song_data_dict['Entries'][val]['Attributes']
+        name = get_artist_name(attributes, song_data_dict)
+        if name is not None:
+            return attributes
+
+    log.warning("Could not extract useful attribute information from: %s", song_data_dict)
+
+
+def get_artist_name(attributes_, song_data_dict):
+    try:
+        return attributes_[ATTR_ARTIST_NAME]
+    except KeyError as e:
+        log.warning("Could not extract attribute %s from: %s", ATTR_ARTIST_NAME, song_data_dict)
+
+
+def get_song_name(attributes_, song_data_dict):
+    try:
+        return attributes_[ATTR_SONG_NAME]
+    except:
+        log.error("Could not extract attribute %s from: %s", ATTR_SONG_NAME, song_data_dict)
 
 
 def __pad(data, blocksize=16):
