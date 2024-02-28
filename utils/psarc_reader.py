@@ -92,7 +92,7 @@ def __get_psarc_info(filestream):
     Returns a list of entries to be used with read_entry."""
 
     entries = []
-    zlength = []
+    z_length = []
 
     filestream.seek(0)
     header = struct.unpack('>4sL4sLLLLL', filestream.read(32))
@@ -115,12 +115,12 @@ def __get_psarc_info(filestream):
     idx = 0
     while idx < (toc_size - ENTRY_SIZE * n_entries) / 2:
         data = toc[toc_position:toc_position + 2]
-        zlength.append(struct.unpack('>H', data)[0])
+        z_length.append(struct.unpack('>H', data)[0])
         toc_position += 2
         idx += 1
 
     for entry in entries:
-        entry['zlength'] = zlength[entry['zindex']:]
+        entry['zlength'] = z_length[entry['zindex']:]
 
     # Process the first entry as it contains the file listing
     entries[0]['filepath'] = ''
