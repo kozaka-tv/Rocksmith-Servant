@@ -64,15 +64,15 @@ def __read_entry(filestream, entry):
     data = bytes()
 
     length = entry['length']
-    zlength = entry['zlength']
+    z_length = entry['zlength']
     filestream.seek(entry['offset'])
 
     i = 0
     while len(data) < length:
-        if zlength[i] == 0:
+        if z_length[i] == 0:
             data += filestream.read(BLOCK_SIZE)
         else:
-            chunk = filestream.read(zlength[i])
+            chunk = filestream.read(z_length[i])
             try:
                 data += zlib.decompress(chunk)
             except zlib.error:

@@ -28,7 +28,7 @@ def test_artist(test_input, expected):
         ("..\\tests\\test_data\\Depresszió_Itt-Az-Én-Időm_v1_p.psarc", "Itt Az Én Időm")
     ]
 )
-def test_artist(test_input, expected):
+def test_title(test_input, expected):
     song_data = SongData()
 
     extract_psarc(test_input, song_data)
