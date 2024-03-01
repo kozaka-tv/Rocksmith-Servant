@@ -83,14 +83,14 @@ def get_attributes(song_data_dict):
 def get_artist_name(attributes_, song_data_dict):
     try:
         return attributes_[ATTR_ARTIST_NAME]
-    except KeyError as e:
+    except KeyError:
         log.warning("Could not extract attribute %s from: %s", ATTR_ARTIST_NAME, song_data_dict)
 
 
 def get_song_name(attributes_, song_data_dict):
     try:
         return attributes_[ATTR_SONG_NAME]
-    except:
+    except KeyError:
         log.error("Could not extract attribute %s from: %s", ATTR_SONG_NAME, song_data_dict)
 
 
