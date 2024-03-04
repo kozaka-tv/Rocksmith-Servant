@@ -9,8 +9,6 @@ from utils.exceptions import BadDirectoryError
 HEARTBEAT = 1
 HEARTBEAT_NOT_PARSED = 5
 
-NON_PARSED_FILE_AGE_SECONDS = 11
-
 log = logging.getLogger()
 
 
@@ -103,7 +101,7 @@ class FileManager:
         return cdlc_files
 
     def scan_cdlc_files_in_destination_dir(self):
-        return file_utils.get_not_parsed_files_from_directory(self.destination_directory, NON_PARSED_FILE_AGE_SECONDS)
+        return file_utils.get_not_parsed_files_from_directory(self.destination_directory)
 
     def move_downloaded_cdlc_files(self, files):
         if files and len(files) > 0:

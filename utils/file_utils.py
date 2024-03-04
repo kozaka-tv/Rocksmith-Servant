@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 from utils.exceptions import BadDirectoryError
 
-DEFAULT_FILE_AGE_SECONDS = 9
+DEFAULT_NOT_PARSED_FILE_AGE_SECONDS = 15
 
 CDLC_FILE_EXT = '*.psarc'
 
@@ -23,9 +23,9 @@ def get_files_from_directory(directory):
     return cdlc_files
 
 
-def get_not_parsed_files_from_directory(directory, file_age_seconds=DEFAULT_FILE_AGE_SECONDS):
+def get_not_parsed_files_from_directory(directory):
     cdlc_files = []
-    get_files(cdlc_files, directory, True, file_age_seconds)
+    get_files(cdlc_files, directory, True, DEFAULT_NOT_PARSED_FILE_AGE_SECONDS)
     return cdlc_files
 
 
@@ -42,7 +42,7 @@ def get_files_from_directories(directories):
     return cdlc_files
 
 
-def get_files(cdlc_files, directory, older=False, file_age_seconds=DEFAULT_FILE_AGE_SECONDS):
+def get_files(cdlc_files, directory, older=False, file_age_seconds=DEFAULT_NOT_PARSED_FILE_AGE_SECONDS):
     for root, dir_names, filenames in os.walk(directory):
         for filename in fnmatch.filter(filenames, CDLC_FILE_EXT):
             file = os.path.join(root, filename)
