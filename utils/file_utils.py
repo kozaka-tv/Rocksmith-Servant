@@ -73,7 +73,7 @@ def get_file_path(directory, file_name):
     return os.path.join(directory, file_name)
 
 
-def move_files(files, destination):
+def move_files_to(destination, files):
     if len(files) > 0:
         log.debug('Moving %s files to: %s | files: %s', len(files), destination, files)
         for file in files:

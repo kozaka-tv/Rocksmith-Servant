@@ -2,14 +2,14 @@ import datetime
 import logging
 import math
 
-from definitions import ROOT_DIR
+from definitions import TMP_DIR, TMP_DIR_NAME
 from utils import file_utils
 from utils.exceptions import BadDirectoryError
 
 HEARTBEAT = 1
 HEARTBEAT_NOT_PARSED = 5
 
-NON_PARSED_FILE_AGE_SECONDS = 9
+NON_PARSED_FILE_AGE_SECONDS = 11
 
 log = logging.getLogger()
 
@@ -37,7 +37,7 @@ class FileManager:
         if self.enabled:
             if self.beat_last_run_not_parsed():
                 log.debug("Scan and move not parsed files... ")
-                moved = self.move_not_parsed_files()
+                moved = self.move_not_parsed_files_to_tmp()
 
                 if moved:
                     log.debug("Files were moved... ")
@@ -49,8 +49,8 @@ class FileManager:
                     self.last_run_not_parsed = self.last_run
 
             elif self.beat_last_run():
-                log.debug("Scan and move files from root and source dirs...")
-                self.move_downloaded_cdlc_files(self.scan_cdlc_files_in_root())
+                log.debug("Scan and move files from %s and source dirs...", TMP_DIR_NAME)
+                self.move_downloaded_cdlc_files(self.scan_cdlc_files_in_tmp())
                 self.move_downloaded_cdlc_files(self.scan_cdlc_files_in_source_dirs())
 
                 self.last_run = datetime.datetime.now()
@@ -61,24 +61,24 @@ class FileManager:
     def beat_last_run_not_parsed(self):
         return math.floor((datetime.datetime.now() - self.last_run_not_parsed).seconds) >= HEARTBEAT_NOT_PARSED
 
-    def move_not_parsed_files(self):
-        files_to_move_from_destination_dir = self.scan_cdlc_files_in_destination_dir()
+    def move_not_parsed_files_to_tmp(self):
+        not_enumerated_cdlc_files = self.scan_cdlc_files_in_destination_dir()
 
-        if len(files_to_move_from_destination_dir) > 0:
-            log.error("Found %s file(s) which one(s) were not parsed! files: %s"
-                      , len(files_to_move_from_destination_dir), files_to_move_from_destination_dir)
-            self.move_not_enumerated_cdlc_files(files_to_move_from_destination_dir)
+        if len(not_enumerated_cdlc_files) > 0:
+            log.error("Found %s file(s) which one(s) were not yet parsed so I moving them to tmp now! files: %s"
+                      , len(not_enumerated_cdlc_files), not_enumerated_cdlc_files)
+            file_utils.move_files_to(TMP_DIR, not_enumerated_cdlc_files)
             return True
 
         return False
 
     @staticmethod
-    def scan_cdlc_files_in_root():
-        cdlc_files = file_utils.get_files_from_directory(ROOT_DIR)
+    def scan_cdlc_files_in_tmp():
+        cdlc_files = file_utils.get_files_from_directory(TMP_DIR)
 
         if len(cdlc_files) > 0:
-            log.info('Found %s CDLC files in root directory what is not parsed probably.', len(cdlc_files))
-            log.debug(cdlc_files)
+            log.info('Found %s CDLC files in %s directory what is not parsed probably.', len(cdlc_files), TMP_DIR_NAME)
+            log.debug("%s", cdlc_files)
 
         return cdlc_files
 
@@ -105,11 +105,6 @@ class FileManager:
     def scan_cdlc_files_in_destination_dir(self):
         return file_utils.get_not_parsed_files_from_directory(self.destination_directory, NON_PARSED_FILE_AGE_SECONDS)
 
-    @staticmethod
-    def move_not_enumerated_cdlc_files(files):
-        if len(files) > 0:
-            file_utils.move_files(files, ROOT_DIR)
-
     def move_downloaded_cdlc_files(self, files):
         if files and len(files) > 0:
-            file_utils.move_files(files, self.destination_directory)
+            file_utils.move_files_to(self.destination_directory, files)
