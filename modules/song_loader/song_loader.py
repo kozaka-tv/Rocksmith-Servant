@@ -124,17 +124,19 @@ class SongLoader:
                     return
 
     def update_under_rs_loaded_cdlc_files(self):
-        loaded_cdlc_files = self.scan_cdlc_files_under_rs_dir()
-        for loaded_cdlc_file in loaded_cdlc_files:
+        for loaded_cdlc_file in self.cdlc_files_under_rs_dir():
             self.songs.loaded_into_rs.add(loaded_cdlc_file)
-            song_data = SongData()
-            filename_to_extract = os.path.join(self.rocksmith_cdlc_dir, loaded_cdlc_file)
-            psarc_reader.extract_psarc(filename_to_extract, song_data, True)
-            self.songs.loaded_into_rs_with_song_data.add(song_data)
+            self.extract_song_information(loaded_cdlc_file)
             if len(self.songs.missing_from_archive) > 0:
                 self.songs.missing_from_archive.discard(loaded_cdlc_file)
 
-    def scan_cdlc_files_under_rs_dir(self):
+    def extract_song_information(self, loaded_cdlc_file):
+        song_data = SongData()
+        filename_to_extract = os.path.join(self.rocksmith_cdlc_dir, loaded_cdlc_file)
+        psarc_reader.extract_psarc(filename_to_extract, song_data, True)
+        self.songs.loaded_into_rs_with_song_data.add(song_data)
+
+    def cdlc_files_under_rs_dir(self):
         cdlc_files = file_utils.get_file_names_from(self.rocksmith_cdlc_dir)
 
         log_loaded_cdlc_files(cdlc_files)
@@ -218,6 +220,7 @@ class SongLoader:
                 else:
                     log.debug("Could not move file: %s", song_to_move)
                     self.songs.missing_from_archive.add(song_data.song_file_name)
+                    song_data.missing = True
                     # TODO this takes 1 sec for each call. If we have a list of 30 songs, it could take 30 seconds!
                     #   Do it only once!
                     rs_playlist.set_tag_to_download(self.twitch_channel, self.phpsessid, song_data.rspl_request_id,
