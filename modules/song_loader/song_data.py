@@ -1,11 +1,10 @@
-import os
 from enum import unique, Enum
 
 from utils import string_utils
 
 
-# TODO do we need this state at all?
 @unique
+# TODO do we need this state at all?
 class State(Enum):
     # -- New request on the rsplaylist
     NEW_REQUEST = 10
@@ -28,11 +27,13 @@ class SongData:
         self.rspl_song_id = rspl_song_id  # id of the request on RSPL
         self.artist = artist
         self.title = title
+        self.song_file_name = song_file_name
+
         self.artist_title = string_utils.create_artist_minus_title(artist, title)
 
+        # --
         self.rspl_official = None
         self.rspl_position = None
-        self.song_file_name = song_file_name
         # --
         self.state = State.NEW_REQUEST
         self.tags = set()
@@ -60,25 +61,17 @@ class SongData:
         return hash(self.rspl_request_id)
 
     def __repr__(self):
-        return f"{os.linesep}<SongData: " \
-               f"rspl_request_id={self.rspl_request_id}, " \
-               f"rspl_song_id={self.rspl_song_id}, " \
-               f"cdlc_id={self.cdlc_id}, " \
-               f"artist={self.artist}, " \
-               f"title={self.title}, " \
-               f"artist_title={self.artist_title}, " \
-               f"rspl_official={self.rspl_official}, " \
-               f"song_file_name={self.song_file_name}" \
-               f">"
-
-# TODO create a test out from this later
-# s1 = SongData(1, 555, 'asd')
-# s2 = SongData(2, 666, 'qwe')
-# s3 = SongData(1, 777, '123')
-
-# songs_from_archive_need_to_be_loaded = {s1, s2, s3}
-# print(songs_from_archive_need_to_be_loaded)
-# output:
-# {
-# <SongData: rspl_request_id=1, cdlc_id=555, song_file_name=asd>,
-# <SongData: rspl_request_id=2, cdlc_id=666, song_file_name=qwe>}
+        # TODO add default line separator at the beginning?
+        # return (os.linesep +
+        # TODO extend with other properties?
+        return ("<SongData: " +
+                f"rspl_request_id={self.rspl_request_id}, " +
+                f"rspl_song_id={self.rspl_song_id}, " +
+                f"cdlc_id={self.cdlc_id}, " +
+                f"artist={self.artist}, " +
+                f"title={self.title}, " +
+                f"artist_title={self.artist_title}, " +
+                f"rspl_official={self.rspl_official}, " +
+                f"song_file_name={self.song_file_name}, " +
+                f"missing={self.missing}" +
+                ">")
