@@ -191,8 +191,7 @@ class SongLoader:
                 con.commit()
 
         if len(self.songs.songs_from_archive_need_to_be_loaded) <= 0:
-            # TODO actually this is not true. Only, just no file was moved from archive into the game.
-            log.info("---- The rsplaylist is empty, nothing to move!")
+            log.info("---- No new file must be moved and loaded from archive!")
             return
 
         log.info("---- Files to move from archive according to the requests: %s",
