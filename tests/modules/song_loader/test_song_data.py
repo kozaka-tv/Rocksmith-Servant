@@ -38,7 +38,6 @@ def test_song_data__when_artist_and_title_is_given__then_artist_and_title_is_set
 
 def test_is_official__when_no_official_is_set__then_return_false():
     song_data = SongData()
-    # song_data.rspl_official
     assert song_data.is_official is False
 
 
