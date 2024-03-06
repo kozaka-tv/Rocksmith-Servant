@@ -9,11 +9,11 @@ import zlib
 
 from Crypto.Cipher import AES
 
-from utils import file_utils
+from definitions import PSARC_INFO_FILE_CACHE_DIR
+from modules.song_loader.song_data import SongData
 
 log = logging.getLogger()
 
-DIR_PSARC_INFO_FILES = '../psarc-info-files'
 EXTENSION_PSARC_INFO_JSON = '.info.json'
 
 ENTRY_SIZE = 30
@@ -27,71 +27,73 @@ ATTR_SONG_NAME = 'SongName'
 
 
 def extract_psarc(filename_to_extract, song_data_input, write_to_file=False):
-    # TODO extract this create dir to the module __init__ where the function is called
-    file_utils.create_directory(os.path.join(DIR_PSARC_INFO_FILES))
-    # TODO use different log level
-    log.warning('Extracting %s', filename_to_extract)
+    log.debug('Extracting %s', filename_to_extract)
 
     with open(filename_to_extract, 'rb') as psarc:
         entry = __get_psarc_info(psarc)
         if entry is None:
-            log.warning('Could not extract any song information from the psarc file: %s', filename_to_extract)
+            # TODO raise exception?
+            log.error('Could not extract any song information from the psarc file: %s', filename_to_extract)
             return None
 
         if write_to_file:
             __write_info_file(entry, filename_to_extract, psarc)
 
-        return __create_song_data(entry, psarc, song_data_input)
+        __create_song_data(entry, psarc, song_data_input)
+        log.debug("Song data with the extracted information: %s", song_data_input)
 
 
 # TODO make song_data_input optional. If not exists, default is a new object and that is returned?
-def __create_song_data(entry, psarc, song_data_input):
+def __create_song_data(entry, psarc, song_data_input: SongData):
     song_data_dict = get_song_data_dict(entry, psarc)
 
     iterator = iter(song_data_dict['Entries'])
 
-    while next_value := next(iterator):
-        attributes = song_data_dict['Entries'][next_value]['Attributes']
-        artist_name = get_artist_name(attributes, song_data_dict)
+    while key := next(iterator):
+        log.debug("Extracting attribute from the entry: %s", key)
+
+        value_ = song_data_dict['Entries'][key]
+        attributes = value_['Attributes']
+        artist_name = get_artist_name(attributes, key, song_data_dict)
         if artist_name is not None:
             song_data_input.artist = artist_name
             song_data_input.title = get_song_name(attributes, song_data_dict)
-            # TODO return new song_data?
+
+            # TODO return new song_data?s
             # return SongData(artist=artist, title=title)
             return
 
-    # TODO raise an exception here?
-    log.warning("Could not extract useful attribute information from: %s", song_data_dict)
+    raise Exception("Could not extract useful attribute information from: %s", song_data_dict)
 
 
 def get_song_data_dict(entry, psarc):
-    return json.loads(__read_entry(psarc, entry).decode('utf-8').replace('\\r\\n', ''))
+    return json.loads(__read_entry_data(psarc, entry).decode('utf-8').replace('\\r\\n', ''))
 
 
 def get_attributes(song_data_dict):
     iterator = iter(song_data_dict['Entries'])
 
-    while val := next(iterator):
-        attributes = song_data_dict['Entries'][val]['Attributes']
-        name = get_artist_name(attributes, song_data_dict)
+    while key := next(iterator):
+        attributes = song_data_dict['Entries'][key]['Attributes']
+        name = get_artist_name(attributes, key, song_data_dict)
         if name is not None:
             return attributes
 
     log.warning("Could not extract useful attribute information from: %s", song_data_dict)
 
 
-def get_artist_name(attributes_, song_data_dict):
+def get_artist_name(attributes_, key, song_data_dict):
     try:
         return attributes_[ATTR_ARTIST_NAME]
     except KeyError:
-        log.warning("Could not extract attribute %s from: %s", ATTR_ARTIST_NAME, song_data_dict)
+        log.debug("Could not extract attribute %s from the entry: %s - %s", ATTR_ARTIST_NAME, key, song_data_dict)
 
 
 def get_song_name(attributes_, song_data_dict):
     try:
         return attributes_[ATTR_SONG_NAME]
     except KeyError:
-        log.error("Could not extract attribute %s from: %s", ATTR_SONG_NAME, song_data_dict)
+        log.error("Could not extract attribute %s from this entry: %s", ATTR_SONG_NAME, song_data_dict)
 
 
 def __pad(data, blocksize=16):
@@ -105,7 +107,7 @@ def __pad(data, blocksize=16):
     return data + bytes(padding)
 
 
-def __read_entry(filestream, entry):
+def __read_entry_data(filestream, entry):
     """Extract zlib for one entry"""
     data = bytes()
 
@@ -170,7 +172,7 @@ def __get_psarc_info(filestream):
 
     # Process the first entry as it contains the file listing
     entries[0]['filepath'] = ''
-    filepaths = __read_entry(filestream, entries[0]).split()
+    filepaths = __read_entry_data(filestream, entries[0]).split()
     for entry, filepath in zip(entries[1:], filepaths):
         filepath_decoded = filepath.decode("utf-8")
         if __is_song_info_file(filepath_decoded):
@@ -183,12 +185,11 @@ def __get_psarc_info(filestream):
 def __write_info_file(entry, filename_to_extract, psarc):
     # TODO this writes out the data into a file if needed
     json_filename = filename_to_extract + EXTENSION_PSARC_INFO_JSON
-    json_file_path = os.path.join(DIR_PSARC_INFO_FILES, os.path.basename(json_filename))
-    data_to_write = __read_entry(psarc, entry)
+    json_file_path = os.path.join(PSARC_INFO_FILE_CACHE_DIR, os.path.basename(json_filename))
+    data_to_write = __read_entry_data(psarc, entry)
     with open(json_file_path, 'wb') as fstream:
         fstream.write(data_to_write)
-        # TODO use different log level
-        log.warning('Info file %s created.', json_file_path)
+        log.debug('Info file %s created.', json_file_path)
 
 
 def __create_dir_if_not_exists(base_path):

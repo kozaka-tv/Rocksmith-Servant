@@ -3,6 +3,7 @@ import os
 import sqlite3
 from time import time
 
+from definitions import CACHE_DIR, PSARC_INFO_FILE_CACHE_DIR
 from modules.song_loader.song_data import SongData
 from modules.song_loader.song_loader_utils import log_loaded_cdlc_files, playlist_does_not_changed, update_tags, \
     check_cdlc_archive_dir, check_rocksmith_cdlc_dir
@@ -67,6 +68,7 @@ class SongLoader:
         self.create_directories()
 
     def create_directories(self):
+        file_utils.create_directory_logged(PSARC_INFO_FILE_CACHE_DIR)
         file_utils.create_directory_logged(self.cdlc_dir)
         file_utils.create_directory_logged(self.cdlc_archive_dir)
         file_utils.create_directory_logged(self.rocksmith_cdlc_dir)
@@ -124,21 +126,27 @@ class SongLoader:
                     return
 
     def update_under_rs_loaded_cdlc_files(self):
-        for loaded_cdlc_file in self.cdlc_files_under_rs_dir():
-            self.songs.loaded_into_rs.add(loaded_cdlc_file)
-            self.extract_song_information(loaded_cdlc_file)
-            if len(self.songs.missing_from_archive) > 0:
-                self.songs.missing_from_archive.discard(loaded_cdlc_file)
+        cdlc_files = self.cdlc_files_under_rs_dir()
 
-    def extract_song_information(self, loaded_cdlc_file):
+        for cdlc_file_name in cdlc_files:
+            self.songs.loaded_into_rs.add(cdlc_file_name)
+            # TODO temporary commented out
+            self.extract_song_information(cdlc_file_name)
+            if len(self.songs.missing_from_archive) > 0:
+                self.songs.missing_from_archive.discard(cdlc_file_name)
+
+        log.info('Song data for the %s into Rocksmith loaded CDLC files were extracted.', len(cdlc_files))
+
+    def extract_song_information(self, cdlc_file_name: str):
         song_data = SongData()
-        filename_to_extract = os.path.join(self.rocksmith_cdlc_dir, loaded_cdlc_file)
+        filename_to_extract = os.path.join(self.rocksmith_cdlc_dir, cdlc_file_name)
         psarc_reader.extract_psarc(filename_to_extract, song_data, True)
         self.songs.loaded_into_rs_with_song_data.add(song_data)
 
     def cdlc_files_under_rs_dir(self):
         cdlc_files = file_utils.get_file_names_from(self.rocksmith_cdlc_dir)
 
+        # TODO this is a duplicated iteration!
         log_loaded_cdlc_files(cdlc_files)
 
         return cdlc_files
