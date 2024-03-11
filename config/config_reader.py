@@ -27,7 +27,7 @@ class ConfigTemplateError(Exception):
 class ConfigReader:
     def __init__(self):
 
-        file_utils.create_directory(PATH_CONFIG_DIR)
+        file_utils.create_directory_logged(PATH_CONFIG_DIR)
 
         log.warning('Initialising %s from %s ...', CONFIG_FILE_NAME, PATH_CONFIG_FILE)
 

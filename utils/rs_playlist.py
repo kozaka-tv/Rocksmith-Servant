@@ -48,3 +48,11 @@ def set_tag_to_download(twitch_channel, phpsessid, rspl_request_id, rspl_tags):
     set_tag(twitch_channel, phpsessid, rspl_request_id, rspl_tags.tag_to_download)
     # TODO remove tag 'loaded'?
     unset_tag(twitch_channel, phpsessid, rspl_request_id, rspl_tags.tag_loaded)
+
+
+def is_user_not_logged_in(cdlc):
+    try:
+        cdlc['id']
+    except TypeError:
+        return True
+    return False

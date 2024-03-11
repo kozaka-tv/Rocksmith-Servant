@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 from utils.exceptions import BadDirectoryError
 
-DEFAULT_FILE_AGE_SECONDS = 9
+DEFAULT_NOT_PARSED_FILE_AGE_SECONDS = 15
 
 CDLC_FILE_EXT = '*.psarc'
 
@@ -23,9 +23,9 @@ def get_files_from_directory(directory):
     return cdlc_files
 
 
-def get_not_parsed_files_from_directory(directory, file_age_seconds=DEFAULT_FILE_AGE_SECONDS):
+def get_not_parsed_files_from_directory(directory):
     cdlc_files = []
-    get_files(cdlc_files, directory, True, file_age_seconds)
+    get_files(cdlc_files, directory, True, DEFAULT_NOT_PARSED_FILE_AGE_SECONDS)
     return cdlc_files
 
 
@@ -42,7 +42,7 @@ def get_files_from_directories(directories):
     return cdlc_files
 
 
-def get_files(cdlc_files, directory, older=False, file_age_seconds=DEFAULT_FILE_AGE_SECONDS):
+def get_files(cdlc_files, directory, older=False, file_age_seconds=DEFAULT_NOT_PARSED_FILE_AGE_SECONDS):
     for root, dir_names, filenames in os.walk(directory):
         for filename in fnmatch.filter(filenames, CDLC_FILE_EXT):
             file = os.path.join(root, filename)
@@ -73,7 +73,7 @@ def get_file_path(directory, file_name):
     return os.path.join(directory, file_name)
 
 
-def move_files(files, destination):
+def move_files_to(destination, files):
     if len(files) > 0:
         log.debug('Moving %s files to: %s | files: %s', len(files), destination, files)
         for file in files:
@@ -112,8 +112,12 @@ def file_datetime_formatted(filename):
 
 
 def create_directory(directory_to_create):
-    log.warning("Creating directory '%s' if not exists!", directory_to_create)
     pathlib.Path(directory_to_create).mkdir(parents=True, exist_ok=True)
+
+
+def create_directory_logged(directory_to_create):
+    log.warning("Creating directory '%s' if not exists!", directory_to_create)
+    create_directory(directory_to_create)
 
 
 def replace_dlc_and_cdlc(file_name):
