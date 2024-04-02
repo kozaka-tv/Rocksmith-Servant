@@ -5,13 +5,13 @@ import pathlib
 import shutil
 from datetime import datetime, timedelta
 
+from definitions import CDLC_FILE_EXT
 from utils.exceptions import BadDirectoryError
 
 DEFAULT_NOT_PARSED_FILE_AGE_SECONDS = 15
 
-CDLC_FILE_EXT = '*.psarc'
-
 log = logging.getLogger()
+LOG_DEBUG_IS_ENABLED = log.isEnabledFor(logging.DEBUG)
 
 
 # TODO refactor all this:
@@ -53,11 +53,20 @@ def get_files(cdlc_files, directory, older=False, file_age_seconds=DEFAULT_NOT_P
                 cdlc_files.append(file)
 
 
-def get_file_names_from(directory):
+def get_file_names_from(directory, extension=CDLC_FILE_EXT):
+    log.info('Reading file names from directory: %s', directory)
+    if LOG_DEBUG_IS_ENABLED:
+        log.debug("----- Files ------------------------------------------")
+
     cdlc_files = set()
     for root, dir_names, filenames in os.walk(directory):
-        for filename in fnmatch.filter(filenames, CDLC_FILE_EXT):
+        for filename in fnmatch.filter(filenames, extension):
             cdlc_files.add(filename)
+            if LOG_DEBUG_IS_ENABLED:
+                log.debug(filename)
+
+    log.info("---------- Found %s files", len(cdlc_files))
+
     return cdlc_files
 
 
@@ -89,8 +98,8 @@ def last_modification_time(path):
 
 
 def move_file(file, destination):
-    # TODO remove this logs? Or change to debug?
-    # log.info(f"Moving file '{file}' if exists!")
+    if LOG_DEBUG_IS_ENABLED:
+        log.debug(f"Moving file {file} to {destination} if exists!")
 
     if os.path.exists(file):
         destination_file = os.path.join(destination, os.path.basename(file))
@@ -101,6 +110,16 @@ def move_file(file, destination):
         return True
 
     log.debug("File '%s' does not exists, so can not move!", file)
+    return False
+
+
+def delete_file(directory, file):
+    if os.path.exists(directory):
+        file_path = os.path.join(directory, os.path.basename(file))
+        if os.path.isfile(file_path) and os.path.exists(file_path):
+            log.debug(f"Deleting file {file} from {directory} if exists!")
+            os.remove(file_path)
+        return True
     return False
 
 

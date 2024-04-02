@@ -1,28 +1,28 @@
+import fnmatch
 import logging
 import os
-import sqlite3
 from time import time
 
-from definitions import CACHE_DIR, PSARC_INFO_FILE_CACHE_DIR
+from config.config_data import ConfigData
+from definitions import PSARC_INFO_FILE_CACHE_DIR, CDLC_INFO_FILE_EXT, CDLC_FILE_EXT, EXTENSION_PSARC_INFO_JSON
+from modules.database.db_manager import DBManager
 from modules.song_loader.song_data import SongData
-from modules.song_loader.song_loader_utils import log_loaded_cdlc_files, playlist_does_not_changed, update_tags, \
+from modules.song_loader.song_loader_utils import playlist_does_not_changed, update_tags, \
     check_cdlc_archive_dir, check_rocksmith_cdlc_dir
-from modules.song_loader.songs import Songs
 from utils import file_utils, rs_playlist, psarc_reader
-from utils.db_utils import search_song_in_the_db
-from utils.exceptions import RSPlaylistNotLoggedInError, BadDirectoryError
+from utils.exceptions import BadDirectoryError
+from utils.exceptions import RSPlaylistNotLoggedInError
 from utils.rs_playlist import get_playlist, is_user_not_logged_in
 
 DEFAULT_CDLC_DIR = 'import'
 HEARTBEAT = 5
 
-con = sqlite3.connect('./servant.db')
-
 log = logging.getLogger()
+LOG_DEBUG_IS_ENABLED = log.isEnabledFor(logging.DEBUG)
 
 
 class SongLoader:
-    def __init__(self, config_data):
+    def __init__(self, config_data: ConfigData, db_manager: DBManager, songs):
         self.enabled = config_data.song_loader.enabled
         if self.enabled:
             self.twitch_channel = config_data.song_loader.twitch_channel
@@ -48,9 +48,19 @@ class SongLoader:
                 log.error("---------------------------------------")
                 raise BadDirectoryError
 
-            self.last_run = time()
+            # TODO really it is needed to store and have as input the DBManger + db? Is import not enough?
+            self.db_manager = db_manager
+            self.db = db_manager.db
+            self.songs = songs
 
-            self.songs = Songs()
+            # TODO commented out for work
+            # TODO commented out for work
+            # TODO commented out for work
+            # TODO commented out for work
+            self.update_all_cdlc_file_information()
+            self.__get_psarc_information_for_new_files_in_dir(self.cdlc_archive_dir)
+
+            self.last_run = time()
 
     def update_config(self, config_data):
         self.enabled = config_data.song_loader.enabled
@@ -80,7 +90,7 @@ class SongLoader:
 
                 if self.update_playlist():
                     log.info("Playlist has been changed, update songs!")
-                    self.update_under_rs_loaded_cdlc_files()
+                    self.update_cdlc_files_in_rs_dir()
 
                     # TODO or maybe this should be configurable?
                     # else:  # load songs only in case we are not in game to avoid lagging in game
@@ -125,31 +135,132 @@ class SongLoader:
                 else:
                     return
 
-    def update_under_rs_loaded_cdlc_files(self):
-        cdlc_files = self.cdlc_files_under_rs_dir()
+    def update_all_cdlc_file_information(self):
+        filenames_from_cache_dir = self.__get_cdlc_filenames_from_cache_dir()
+        filenames_from_archive_dir = self.__get_cdlc_filenames_from_archive_dir()
+        filenames_from_rs_dir = self.__get_cdlc_filenames_from_rs_dir()
+
+        self.__clean_up_archive_dir_for_duplicates(filenames_from_rs_dir, filenames_from_archive_dir)
+
+        self.__get_psarc_information_for_new_files_in_dir(self.rocksmith_cdlc_dir, filenames_from_cache_dir)
+        self.__get_psarc_information_for_new_files_in_dir(self.cdlc_archive_dir, filenames_from_cache_dir)
+
+        # TODO not needed!
+        # TODO not needed!
+        # TODO not needed!
+        # TODO not needed!
+        # TODO not needed!
+        # TODO not needed!
+        # TODO not needed!
+        # TODO not needed!
+        # self.__update_cdlc_files_in_archive_dir(filenames_from_archive_dir)
+
+        # ---------- TODO cleanup cache --> Or clean up only at start?
+        log.info('Count of files in cache: %s', len(filenames_from_cache_dir))
+        log.info('Count of files in archive: %s', len(filenames_from_archive_dir))
+        log.info('Count of files in rs: %s', len(filenames_from_rs_dir))
+        # TODO files_in_rs
+        # TODO files_in_cache
+        # TODO cleanup cache
+
+    @staticmethod
+    def __get_cdlc_filenames_from_cache_dir():
+        return file_utils.get_file_names_from(PSARC_INFO_FILE_CACHE_DIR, CDLC_INFO_FILE_EXT)
+
+    def __get_cdlc_filenames_from_archive_dir(self):
+        return file_utils.get_file_names_from(self.cdlc_archive_dir)
+
+    def __get_cdlc_filenames_from_rs_dir(self):
+        return file_utils.get_file_names_from(self.rocksmith_cdlc_dir)
+
+    def __clean_up_archive_dir_for_duplicates(self, filenames_from_rs_dir, filenames_from_archive_dir):
+        files_to_clean_up = set(filenames_from_rs_dir).intersection(filenames_from_archive_dir)
+
+        if len(files_to_clean_up) > 0:
+            log.warning(
+                "Duplicated CDLC files found in the archive and under RS! Files to be deleted from the archive: %s",
+                files_to_clean_up)
+
+        for filename in files_to_clean_up:
+            file_utils.delete_file(self.cdlc_archive_dir, filename)
+
+    def __get_psarc_information_for_new_files_in_dir(self, directory, filenames_from_cache_dir):
+        log.info('Reading and updating cache files from directory: %s', directory)
+
+        # if LOG_DEBUG_IS_ENABLED:
+        #     log.debug("----- Files ------------------------------------------")
+
+        counter = 0
+        cdlc_files = set()  # TODO needed this set?
+        for root, dir_names, filenames in os.walk(directory):
+            for filename in fnmatch.filter(filenames, CDLC_FILE_EXT):
+                try:
+                    filenames_from_cache_dir.remove(filename + EXTENSION_PSARC_INFO_JSON)
+                except KeyError:
+                    song_data = self.__extract_song_information(directory, filename)
+                    cdlc_files.add(filename)
+                    counter += 1
+                    # if LOG_DEBUG_IS_ENABLED:
+                    # TODO correct log level
+                    log.warning("Extracted information for the file: %s", filename)
+
+        log.info("---------- Extracted %s cdlc information", counter)
+        if LOG_DEBUG_IS_ENABLED:
+            log.debug("Extracted information for the file: %s", cdlc_files)
+
+        # TODO no need to return anything!
+        return cdlc_files
+
+    def __update_cdlc_files_in_archive_dir(self, cdlc_file_names):
+        counter = 0
+        for cdlc_file_name in cdlc_file_names:
+            # TODO inline
+            song_data = self.extract_song_information_from_archive_dir(cdlc_file_name)
+            self.songs.archive.add(song_data)
+            counter += 1
+            if counter % 500 == 0:
+                log.info(f"Extracted {counter} CDLCs")
+
+            # if len(self.songs.missing_from_archive) > 0:
+            #     self.songs.missing_from_archive.discard(cdlc_file_name)
+
+        log.info('Song data for the %s into Rocksmith loaded CDLC files were extracted.', len(cdlc_file_names))
+
+        return cdlc_file_names
+
+    def update_cdlc_files_in_rs_dir(self):
+        cdlc_files = self.__get_cdlc_filenames_from_rs_dir()
 
         for cdlc_file_name in cdlc_files:
             self.songs.loaded_into_rs.add(cdlc_file_name)
-            # TODO temporary commented out
-            self.extract_song_information(cdlc_file_name)
+
+            # TODO temporary commented out because this is a draft!
+            # TODO temporary commented out because this is a draft!
+            # TODO temporary commented out because this is a draft!
+            # TODO temporary commented out because this is a draft!
+            song_data = self.extract_song_information_from_rs_dir(cdlc_file_name)
+            self.songs.loaded_into_rs_with_song_data.add(song_data)
+
             if len(self.songs.missing_from_archive) > 0:
                 self.songs.missing_from_archive.discard(cdlc_file_name)
 
         log.info('Song data for the %s into Rocksmith loaded CDLC files were extracted.', len(cdlc_files))
 
-    def extract_song_information(self, cdlc_file_name: str):
+    def extract_song_information_from_rs_dir(self, cdlc_file_name: str):
+        return self.__extract_song_information(self.rocksmith_cdlc_dir, cdlc_file_name)
+
+    def extract_song_information_from_archive_dir(self, cdlc_file_name: str):
+        return self.__extract_song_information(self.cdlc_archive_dir, cdlc_file_name)
+
+    @staticmethod
+    def __extract_song_information(directory, cdlc_file_name: str):
         song_data = SongData()
-        filename_to_extract = os.path.join(self.rocksmith_cdlc_dir, cdlc_file_name)
-        psarc_reader.extract_psarc(filename_to_extract, song_data, True)
-        self.songs.loaded_into_rs_with_song_data.add(song_data)
-
-    def cdlc_files_under_rs_dir(self):
-        cdlc_files = file_utils.get_file_names_from(self.rocksmith_cdlc_dir)
-
-        # TODO this is a duplicated iteration!
-        log_loaded_cdlc_files(cdlc_files)
-
-        return cdlc_files
+        # TODO set cdlc_file_name into song_data here, or earlier? Or even later?
+        song_data.song_file_name = cdlc_file_name
+        file_path_to_extract = os.path.join(directory, cdlc_file_name)
+        # TODO write_to_file is True here, to keep the json in the cache. Is this not always True?
+        psarc_reader.extract_psarc(file_path_to_extract, song_data, True)
+        return song_data
 
     # TODO refactor this. it should be like
     # - get_requests from RS playlist
@@ -178,25 +289,22 @@ class SongLoader:
                     log.debug("Skipping ODLC: %s", song_data)
                     continue
 
-                with con:
-                    rows = search_song_in_the_db(artist, title)
+                rows = self.db_manager.search_song_in_the_db(artist, title)
 
-                    if len(rows) > 0:
-                        log.debug("---- sr %s -------", song_data.rspl_position)
-                        for element in rows:
-                            song_file_name = str(element[0])
-                            song_data.song_file_name = song_file_name
+                if len(rows) > 0:
+                    log.debug("---- sr %s -------", song_data.rspl_position)
+                    for element in rows:
+                        song_file_name = str(element[0])
+                        song_data.song_file_name = song_file_name
 
-                            log.debug("row=%s", song_file_name)
-                            self.songs.songs_from_archive_need_to_be_loaded.add(song_data)
-                    else:
-                        log.debug("User must download the song: cdlc_id=%s - %s - %s", cdlc_id, artist, title)
-                        # rs_playlist.set_tag_to_download(self.twitch_channel,
-                        #                                 self.phpsessid,
-                        #                                 song_data.rspl_request_id,
-                        #                                 self.rspl_tags)
-
-                con.commit()
+                        log.debug("row=%s", song_file_name)
+                        self.songs.songs_from_archive_need_to_be_loaded.add(song_data)
+                else:
+                    log.debug("User must download the song: cdlc_id=%s - %s - %s", cdlc_id, artist, title)
+                    # rs_playlist.set_tag_to_download(self.twitch_channel,
+                    #                                 self.phpsessid,
+                    #                                 song_data.rspl_request_id,
+                    #                                 self.rspl_tags)
 
         if len(self.songs.songs_from_archive_need_to_be_loaded) <= 0:
             log.info("---- No new file must be moved and loaded from archive!")

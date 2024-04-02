@@ -1,4 +1,4 @@
-create table main.songs
+create table if not exists songs
 (
     id                      integer not null
         constraint songs_pk
@@ -32,15 +32,15 @@ create table main.songs
     titleNormalized         text
 );
 
-create index main.songs_artist_title_index
-    on main.songs (colArtist, colTitle);
+create index if not exists songs_artist_title_index
+    on songs (colArtist, colTitle);
 
-create index main.songs_artist_title_normalized_index
-    on main.songs (artistNormalized, titleNormalized);
+create index if not exists songs_artist_title_normalized_index
+    on songs (artistNormalized, titleNormalized);
 
-create index main.songs_file_name_index
-    on main.songs (colFileName);
+create index if not exists songs_file_name_index
+    on songs (colFileName);
 
-create unique index main.songs_id_index
-    on main.songs (id);
+create unique index if not exists songs_id_index
+    on songs (id);
 

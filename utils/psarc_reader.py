@@ -9,12 +9,11 @@ import zlib
 
 from Crypto.Cipher import AES
 
-from definitions import PSARC_INFO_FILE_CACHE_DIR
+from definitions import PSARC_INFO_FILE_CACHE_DIR, EXTENSION_PSARC_INFO_JSON
 from modules.song_loader.song_data import SongData
 
 log = logging.getLogger()
-
-EXTENSION_PSARC_INFO_JSON = '.info.json'
+LOG_DEBUG_IS_ENABLED = log.isEnabledFor(logging.DEBUG)
 
 ENTRY_SIZE = 30
 BLOCK_SIZE = 65536
@@ -32,11 +31,11 @@ def extract_psarc(filename_to_extract, song_data_input, write_to_file=False):
     with open(filename_to_extract, 'rb') as psarc:
         entry = __get_psarc_info(psarc)
         if entry is None:
-            # TODO raise exception?
+            # TODO raise exception? If one file is corrupt, it is better not to start.
             log.error('Could not extract any song information from the psarc file: %s', filename_to_extract)
             return None
 
-        if write_to_file:
+        if LOG_DEBUG_IS_ENABLED or write_to_file:
             __write_info_file(entry, filename_to_extract, psarc)
 
         __create_song_data(entry, psarc, song_data_input)
@@ -59,7 +58,7 @@ def __create_song_data(entry, psarc, song_data_input: SongData):
             song_data_input.artist = artist_name
             song_data_input.title = get_song_name(attributes, song_data_dict)
 
-            # TODO return new song_data?s
+            # TODO return new song_data?
             # return SongData(artist=artist, title=title)
             return
 
@@ -67,7 +66,8 @@ def __create_song_data(entry, psarc, song_data_input: SongData):
 
 
 def get_song_data_dict(entry, psarc):
-    return json.loads(__read_entry_data(psarc, entry).decode('utf-8').replace('\\r\\n', ''))
+    data = __read_entry_data(psarc, entry).decode('utf-8').replace('\\r\\n', '')
+    return json.loads(data)
 
 
 def get_attributes(song_data_dict):
@@ -185,11 +185,11 @@ def __get_psarc_info(filestream):
 def __write_info_file(entry, filename_to_extract, psarc):
     # TODO this writes out the data into a file if needed
     json_filename = filename_to_extract + EXTENSION_PSARC_INFO_JSON
-    json_file_path = os.path.join(PSARC_INFO_FILE_CACHE_DIR, os.path.basename(json_filename))
+    info_file_json_path = os.path.join(PSARC_INFO_FILE_CACHE_DIR, os.path.basename(json_filename))
     data_to_write = __read_entry_data(psarc, entry)
-    with open(json_file_path, 'wb') as fstream:
+    with open(info_file_json_path, 'wb') as fstream:
         fstream.write(data_to_write)
-        log.debug('Info file %s created.', json_file_path)
+        log.debug('Info file %s created.', info_file_json_path)
 
 
 def __create_dir_if_not_exists(base_path):
