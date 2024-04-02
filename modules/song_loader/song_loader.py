@@ -177,15 +177,15 @@ class SongLoader:
         return file_utils.get_file_names_from(self.rocksmith_cdlc_dir)
 
     def __clean_up_archive_dir_for_duplicates(self, filenames_from_rs_dir, filenames_from_archive_dir):
-        files_to_clean_up = set(filenames_from_rs_dir).intersection(filenames_from_archive_dir)
+        duplicates = set(filenames_from_rs_dir).intersection(filenames_from_archive_dir)
 
-        if len(files_to_clean_up) > 0:
+        if len(duplicates) > 0:
             log.warning(
                 "Duplicated CDLC files found in the archive and under RS! Files to be deleted from the archive: %s",
-                files_to_clean_up)
+                duplicates)
 
-        for filename in files_to_clean_up:
-            file_utils.delete_file(self.cdlc_archive_dir, filename)
+            for filename in duplicates:
+                file_utils.delete_file(self.cdlc_archive_dir, filename)
 
     def __get_psarc_information_for_new_files_in_dir(self, directory, filenames_from_cache_dir):
         log.info('Reading and updating cache files from directory: %s', directory)
