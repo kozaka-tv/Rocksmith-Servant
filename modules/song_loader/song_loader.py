@@ -57,8 +57,9 @@ class SongLoader:
             # TODO commented out for work
             # TODO commented out for work
             # TODO commented out for work
+            # TODO here, we should read/extract/store all the CDLCs
             self.update_all_cdlc_file_information()
-            self.__get_psarc_information_for_new_files_in_dir(self.cdlc_archive_dir)
+            # self.__get_psarc_information_for_new_files_in_dir(self.cdlc_archive_dir)
 
             self.last_run = time()
 
@@ -136,6 +137,8 @@ class SongLoader:
                     return
 
     def update_all_cdlc_file_information(self):
+        log.info('Updating all CDLC file information')
+
         filenames_from_cache_dir = self.__get_cdlc_filenames_from_cache_dir()
         filenames_from_archive_dir = self.__get_cdlc_filenames_from_archive_dir()
         filenames_from_rs_dir = self.__get_cdlc_filenames_from_rs_dir()
@@ -155,7 +158,7 @@ class SongLoader:
         # TODO not needed!
         # self.__update_cdlc_files_in_archive_dir(filenames_from_archive_dir)
 
-        # ---------- TODO cleanup cache --> Or clean up only at start?
+        # ---------- TODO cleanup cache --> Or clean up only at start? --> Or lower log level
         log.info('Count of files in cache: %s', len(filenames_from_cache_dir))
         log.info('Count of files in archive: %s', len(filenames_from_archive_dir))
         log.info('Count of files in rs: %s', len(filenames_from_rs_dir))
