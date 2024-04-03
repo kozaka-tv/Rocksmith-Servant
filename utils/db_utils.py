@@ -1,6 +1,7 @@
 import sqlite3
 
 from utils import string_utils
+from utils.collection_utils import set_of_the_tuples_first_position
 
 db = sqlite3.connect('./servant.db')
 
@@ -31,3 +32,9 @@ def is_song_by_filename_exists(filename):
     execute = cur.execute("select count(*) from songs where colFilename is ?", ("" + filename))
     fetchone = execute.fetchone()
     return fetchone != 0
+
+
+def all_song_filenames():
+    cur = db.cursor()
+    all_elements_tuple = cur.execute("SELECT distinct colFileName FROM songs").fetchall()
+    return set_of_the_tuples_first_position(all_elements_tuple)

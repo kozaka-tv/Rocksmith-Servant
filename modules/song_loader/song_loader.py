@@ -9,7 +9,8 @@ from modules.database.db_manager import DBManager
 from modules.song_loader.song_data import SongData
 from modules.song_loader.song_loader_utils import playlist_does_not_changed, update_tags, \
     check_cdlc_archive_dir, check_rocksmith_cdlc_dir
-from utils import file_utils, rs_playlist, psarc_reader
+from utils import file_utils, rs_playlist, psarc_reader, db_utils
+from utils.collection_utils import is_not_empty
 from utils.exceptions import BadDirectoryError
 from utils.exceptions import RSPlaylistNotLoggedInError
 from utils.rs_playlist import get_playlist, is_user_not_logged_in
@@ -148,11 +149,13 @@ class SongLoader:
         self.__get_psarc_information_for_new_files_in_dir(self.rocksmith_cdlc_dir, filenames_from_cache_dir)
         self.__get_psarc_information_for_new_files_in_dir(self.cdlc_archive_dir, filenames_from_cache_dir)
 
-        # TODO not needed!
-        # TODO not needed!
-        # TODO not needed!
-        # TODO not needed!
-        # TODO not needed!
+        filenames_in_rs_and_archive_dir = filenames_from_rs_dir.union(filenames_from_archive_dir)
+        filenames_in_db = db_utils.all_song_filenames()
+        self.__clean_up_db_for_missing_songs(filenames_in_rs_and_archive_dir, filenames_in_db)
+
+        # TODO insert missing songs to DB
+        # self.__insert_missing_songs_to_db(filenames_in_rs_and_archive_dir, filenames_in_db)
+
         # TODO not needed!
         # TODO not needed!
         # TODO not needed!
@@ -178,14 +181,24 @@ class SongLoader:
 
     def __clean_up_archive_dir_for_duplicates(self, filenames_from_rs_dir, filenames_from_archive_dir):
         duplicates = set(filenames_from_rs_dir).intersection(filenames_from_archive_dir)
+        if is_not_empty(duplicates):
+            self.__remove_duplicates(duplicates, filenames_from_archive_dir)
 
-        if len(duplicates) > 0:
-            log.warning(
-                "Duplicated CDLC files found in the archive and under RS! Files to be deleted from the archive: %s",
-                duplicates)
+    def __clean_up_db_for_missing_songs(self, filenames_in_rs_and_archive_dir, filenames_in_db):
+        to_delete = filenames_in_db.difference(filenames_in_rs_and_archive_dir)
+        if is_not_empty(to_delete):
+            pass
 
-            for filename in duplicates:
-                file_utils.delete_file(self.cdlc_archive_dir, filename)
+
+        # to_insert = filenames_in_rs_and_archive_dir.difference(filenames_in_db)
+        pass
+
+    def __remove_duplicates(self, duplicates, filenames_from_archive_dir):
+        log.warning("Duplicated CDLC files found in the archive and under RS! Files to be deleted from the archive: %s",
+                    duplicates)
+        for filename in duplicates:
+            file_utils.delete_file(self.cdlc_archive_dir, filename)
+            filenames_from_archive_dir.remove(filename)
 
     def __get_psarc_information_for_new_files_in_dir(self, directory, filenames_from_cache_dir):
         log.info('Reading and updating cache files from directory: %s', directory)
@@ -244,7 +257,7 @@ class SongLoader:
             song_data = self.extract_song_information_from_rs_dir(cdlc_file_name)
             self.songs.loaded_into_rs_with_song_data.add(song_data)
 
-            if len(self.songs.missing_from_archive) > 0:
+            if is_not_empty(self.songs.missing_from_archive):
                 self.songs.missing_from_archive.discard(cdlc_file_name)
 
         log.info('Song data for the %s into Rocksmith loaded CDLC files were extracted.', len(cdlc_files))
@@ -294,7 +307,7 @@ class SongLoader:
 
                 rows = self.db_manager.search_song_in_the_db(artist, title)
 
-                if len(rows) > 0:
+                if is_not_empty(rows):
                     log.debug("---- sr %s -------", song_data.rspl_position)
                     for element in rows:
                         song_file_name = str(element[0])
@@ -344,9 +357,9 @@ class SongLoader:
                     rs_playlist.set_tag_to_download(self.twitch_channel, self.phpsessid, song_data.rspl_request_id,
                                                     self.rspl_tags)
 
-        if len(actually_loaded_songs) > 0:
+        if is_not_empty(actually_loaded_songs):
             log.warning("---- Files newly moved and will be parsed: %s", str(actually_loaded_songs))
-        if len(self.songs.missing_from_archive) > 0:
+        if is_not_empty(self.songs.missing_from_archive):
             log.error("---- Missing files but found in Database: %s", str(self.songs.missing_from_archive))
 
     def set_tag_loaded(self, song_data):
