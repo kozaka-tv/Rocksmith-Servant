@@ -22,7 +22,7 @@ def test_song_data__when_no_input_in_constructor__then_everything_is_empty():
     assert song_data.song_file_name is None
     # TODO do we need this state at all?
     # assert song_data.state is NEW_REQUEST
-    assert len(song_data.tags) is 0
+    assert len(song_data.tags) == 0
     assert song_data.found_in_db is False
     assert song_data.loaded_under_the_game is False
     assert song_data.missing is False
