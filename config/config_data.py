@@ -30,7 +30,8 @@ PHPSESSID_INFO = "The PHPSESSID is needed to get data from your RS Playlist requ
                  "Optionally, use the Tampermonkey script, what could be found under /misc/tampermonkey " + NL + \
                  "with the name: 'RS Playlist enhancer and simplifier.user.js'" + NL + \
                  "or install it from https://greasyfork.org/en/scripts/440738-rs-playlist-enhancer-and-simplifier"
-ERR_MSG_MISSING = "Your PHP Session ID (phpsessid) is missing from the config.ini!{0}{1}".format(NL, PHPSESSID_INFO)
+ERR_MSG_PHPSESSID_MISSING = ("Your PHP Session ID (phpsessid) is missing from the config.ini!{0}{1}"
+                             .format(NL, PHPSESSID_INFO))
 ERR_MSG_PHPSESSID = "Eiter, you are not logged in, into the RSPlaylist, " + \
                     "or your PHP Session ID (phpsessid) is wrong, " + \
                     "or RSPlaylist ist not enabled on your Channel Settings." + NL + \
@@ -124,7 +125,7 @@ class ConfSceneSwitcher:
 def validate_and_get_phpsessid(conf, twitch_channel):
     phpsessid = conf.get(SECTION_SONG_LOADER, "phpsessid")
     if string_utils.is_blank(phpsessid) or phpsessid.startswith('<Enter your'):
-        raise ConfigError(ERR_MSG_MISSING)
+        raise ConfigError(ERR_MSG_PHPSESSID_MISSING)
 
     phpsessid_set = conf.get_set(SECTION_SONG_LOADER, "phpsessid")
 
