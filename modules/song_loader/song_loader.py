@@ -219,10 +219,6 @@ class SongLoader:
         log.info("---------- Extracted %s cdlc information", counter)
         log.debug("Extracted information for the file: %s", cdlc_files)
 
-        # TODO no need to return anything!
-        raise Exception("Extracted information for the file: %s", cdlc_files)
-        # return cdlc_files
-
     def __update_cdlc_files_in_archive_dir(self, cdlc_file_names):
         counter = 0
         for cdlc_file_name in cdlc_file_names:

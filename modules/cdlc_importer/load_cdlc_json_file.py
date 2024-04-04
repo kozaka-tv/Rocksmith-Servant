@@ -121,7 +121,7 @@ class CDLCImporter:
     # TODO need to implement this
     def extract_song_information(self):
         try:
-            log.info("Dummy log: %s", self.enabled)
+            log.error("TODO Dummy log: %s", self.enabled)
 
         except Exception as e:
             log.error("%s Could not import CDLCs to the Database: %s", type(e), e)
