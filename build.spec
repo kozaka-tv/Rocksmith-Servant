@@ -7,7 +7,7 @@ block_cipher = None
 a = Analysis(['run.py'],
              binaries=[],
              datas=[
-             ('./modules/cdlc_importer/create_table_songs.sql', '/modules/cdlc_importer')
+             ('./modules/database/create_table_songs.sql', '/modules/database')
              ],
              hiddenimports=[],
              hookspath=[],

@@ -1,9 +1,9 @@
 import json
 import logging
-import os
 
 from munch import DefaultMunch
 
+from modules.database.db_manager import DBManager
 from utils import file_utils
 
 columns = ['colArtist', 'colTitle', 'colAlbum', 'colKey', 'colArrangements', 'colTunings', 'colSongLength',
@@ -15,47 +15,24 @@ log = logging.getLogger()
 
 
 class CDLCImporter:
-    def __init__(self, config_data, db):
+    def __init__(self, config_data, db_manager: DBManager):
         self.enabled = config_data.cdlc_importer.enabled
         if self.enabled:
             self.cdlc_import_json_file = config_data.cdlc_importer.cdlc_import_json_file
-        # TODO should be behind the enabled check?
-        self.db = db
+
+        self.db = db_manager.db
 
     def load(self):
         if self.enabled:
             log.info("-----------------------------------")
+            # TODO update this log, as in the future no CFSM import file is actually needed,
+            #  if CDLC data is extracted from files
             log.warning("Importing CDLC files from CFSM json file...")
 
-            try:
-                self.init_db()
-            except Exception as e:
-                log.error("%s Database init error: %s", type(e), e)
-                raise e
-
-            try:
-                self.import_cdlc_files()
-            except Exception as e:
-                log.error("%s Could not import CDLCs to the Database: %s", type(e), e)
-                raise e
+            self.import_cdlc_files()
+            self.extract_song_information()
 
             log.info("-----------------------------------")
-
-    def create_tables(self):
-        cursor = self.db.cursor()
-        read = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "create_table_songs.sql"),
-                    encoding="utf-8").read()
-        cursor.executescript(read)
-
-    def init_db(self):
-        cursor = self.db.cursor()
-        cursor.execute("SELECT count(name) FROM sqlite_master WHERE type='table' AND name='songs'")
-        if cursor.fetchone()[0] == 1:
-            log.debug("Songs Table already exists, do not need to create it.")
-        else:
-            log.warning("Songs Table does not exists! Creating...")
-            self.create_tables()
-        self.db.commit()
 
     # def file_datetime(filename):
     #     file_time = os.path.getmtime(filename)
@@ -109,29 +86,43 @@ class CDLCImporter:
         log.debug("... %s songs inserted.", len(songs))
 
     def import_cdlc_files(self):
-        with open(self.cdlc_import_json_file, encoding='utf-8-sig') as json_file:
-            log.info("File to import: %s", json_file.name)
+        try:
+            with open(self.cdlc_import_json_file, encoding='utf-8-sig') as json_file:
+                log.info("File to import: %s", json_file.name)
 
-            # TODO what exactly identifies a song in the DB? colFileName? colKey? colArtistTitleAlbumDate? All?
-            count_songs_to_import = 0
-            songs_to_import = []
-            for cfsm_song_data in self.load_cfsm_song_data(json_file):
-                count_songs_to_import += 1
+                # TODO what exactly identifies a song in the DB? colFileName? colKey? colArtistTitleAlbumDate? All?
+                count_songs_to_import = 0
+                songs_to_import = []
+                for cfsm_song_data in self.load_cfsm_song_data(json_file):
+                    count_songs_to_import += 1
 
-                with self.db:
-                    songs_from_db = self.get_song_from_db_via_file_name(
-                        file_utils.replace_dlc_and_cdlc(cfsm_song_data.colFileName))
+                    with self.db:
+                        songs_from_db = self.get_song_from_db_via_file_name(
+                            file_utils.replace_dlc_and_cdlc(cfsm_song_data.colFileName))
 
-                    if len(songs_from_db) == 0:
-                        log.info("New CDLC found: %s", cfsm_song_data.colFileName)
-                        songs_to_import.append(cfsm_song_data)
+                        if len(songs_from_db) == 0:
+                            log.info("New CDLC found: %s", cfsm_song_data.colFileName)
+                            songs_to_import.append(cfsm_song_data)
 
-            if len(songs_to_import) == 0:
-                log.info(
-                    "All %s songs from the import file is already exists in the Database so "
-                    "nothing must be imported! File: %s", count_songs_to_import, json_file.name)
-            else:
-                log.info("Will import %s new CDLC files into the DB.", len(songs_to_import))
-                self.insert_songs_to_db(songs_to_import)
-                log.info("From %s songs, %s new CDLC were imported into the DB.",
-                         count_songs_to_import, len(songs_to_import))
+                if len(songs_to_import) == 0:
+                    log.info(
+                        "All %s songs from the import file is already exists in the Database so "
+                        "nothing must be imported! File: %s", count_songs_to_import, json_file.name)
+                else:
+                    log.info("Will import %s new CDLC files into the DB.", len(songs_to_import))
+                    self.insert_songs_to_db(songs_to_import)
+                    log.info("From %s songs, %s new CDLC were imported into the DB.",
+                             count_songs_to_import, len(songs_to_import))
+
+        except Exception as e:
+            log.error("%s Could not import CDLCs to the Database: %s", type(e), e)
+            raise e
+
+    # TODO need to implement this
+    def extract_song_information(self):
+        try:
+            log.info("Dummy log: %s", self.enabled)
+
+        except Exception as e:
+            log.error("%s Could not import CDLCs to the Database: %s", type(e), e)
+            raise e

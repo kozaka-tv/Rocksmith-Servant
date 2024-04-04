@@ -7,10 +7,12 @@ import config.log_config
 from config.config_data import ConfigData
 from config.config_reader import ConfigReader
 from modules.cdlc_importer.load_cdlc_json_file import CDLCImporter
+from modules.database.db_manager import DBManager
 from modules.file_manager.cdlc_file_manager import FileManager
 from modules.scene_switcher.scene_switcher import SceneSwitcher
 from modules.setlist.setlist_logger import SetlistLogger
 from modules.song_loader.song_loader import SongLoader
+from modules.song_loader.songs import Songs
 from utils.exceptions import RocksnifferConnectionError, ConfigError, RSPlaylistNotLoggedInError
 from utils.rocksniffer import Rocksniffer
 
@@ -18,8 +20,6 @@ HEARTBEAT = 0.1
 
 config.log_config.config()
 log = logging.getLogger()
-
-db = sqlite3.connect('servant.db')
 
 
 def check_enabled_module_dependencies():
@@ -45,12 +45,15 @@ except ConfigError as e:
     log.error(e)
     exit()
 
+
 # Initializing modules and utils
+db_manager = DBManager()
 sniffer = Rocksniffer(config_data)
 setlist_logger = SetlistLogger(config_data)
 file_manager = FileManager(config_data)
-cdlc_importer = CDLCImporter(config_data, db)
-song_loader = SongLoader(config_data)
+cdlc_importer = CDLCImporter(config_data, db_manager)
+songs = Songs()
+song_loader = SongLoader(config_data, db_manager, songs)
 scene_switcher = SceneSwitcher(config_data)
 check_enabled_module_dependencies()
 
