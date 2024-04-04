@@ -7,11 +7,12 @@ SPACE = ' '
 ARTIST_TITLE_SEPARATOR = " - "
 
 
-def remove_special_chars(text):
+def remove_special_chars(text) -> str:
     if isinstance(text, str):
         # return unicodedata.normalize('NFD', text).encode('ascii', 'ignore')
         result = ''.join(c for c in unicodedata.normalize('NFKD', text) if unicodedata.category(c) != 'Mn')
         return re.sub(REGEXP, SPACE, result).strip()
+    return text
 
 
 def create_artist_minus_title(artist, title):
