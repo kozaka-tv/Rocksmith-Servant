@@ -8,10 +8,10 @@ ARTIST_TITLE_SEPARATOR = " - "
 
 
 def remove_special_chars(text):
-    # return unicodedata.normalize('NFD', text).encode('ascii', 'ignore')
-    result = ''.join(c for c in unicodedata.normalize('NFKD', text) if unicodedata.category(c) != 'Mn')
-    result = re.sub(REGEXP, SPACE, result)
-    return result
+    if isinstance(text, str):
+        # return unicodedata.normalize('NFD', text).encode('ascii', 'ignore')
+        result = ''.join(c for c in unicodedata.normalize('NFKD', text) if unicodedata.category(c) != 'Mn')
+        return re.sub(REGEXP, SPACE, result).strip()
 
 
 def create_artist_minus_title(artist, title):
