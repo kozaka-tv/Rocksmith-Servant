@@ -1,7 +1,7 @@
 import os
 
 from config.config_reader import ConfigReader
-from utils import rs_playlist
+from utils import rs_playlist, string_utils
 from utils.exceptions import ConfigError
 
 SECTION_ROCK_SNIFFER = "RockSniffer"
@@ -24,18 +24,20 @@ TAG_RAIDER_REQ = "rspl_tag_raider_request"
 TAG_VIP_VIEWER_REQ = "rspl_tag_vip_viewer_request"
 
 NL = os.linesep
-ERR_MSG_PHPSESSID = ("You are not logged in, into the RSPlaylist, "
-                     "or your PHP Session ID (phpsessid) is wrong, "
-                     "or RSPlaylist ist not enabled on your Channel Settings.") + NL + \
+PHPSESSID_INFO = "The PHPSESSID is needed to get data from your RS Playlist request page." + NL + \
+                 ("You can have the PHPSESSID from the cookie of your browser after you logged in into the RS Playlist "
+                  "page.") + NL + \
+                 "Optionally, use the Tampermonkey script, what could be found under /misc/tampermonkey " + NL + \
+                 "with the name: 'RS Playlist enhancer and simplifier.user.js'" + NL + \
+                 "or install it from https://greasyfork.org/en/scripts/440738-rs-playlist-enhancer-and-simplifier"
+ERR_MSG_MISSING = "Your PHP Session ID (phpsessid) is missing from the config.ini!{0}{1}".format(NL, PHPSESSID_INFO)
+ERR_MSG_PHPSESSID = "Eiter, you are not logged in, into the RSPlaylist, " + \
+                    "or your PHP Session ID (phpsessid) is wrong, " + \
+                    "or RSPlaylist ist not enabled on your Channel Settings." + NL + \
                     "Please login to RSPlaylist, check your RSPL and Servant configuration and try to start again!" + NL + \
                     "If you still get this error message, check you PHP Session ID in your config.ini!" + NL + \
                     "You may enter more than one ID, separated by ';'" + NL + \
-                    "The PHPSESSID is needed to get data from your RS Playlist request page." + NL + \
-                    "You can have the PHPSESSID from the cookie of your browser " \
-                    "after you logged in into the RS Playlist page." + NL + \
-                    "Optionally, use the Tampermonkey script, what could be found under /misc/tampermonkey " + NL + \
-                    "with the name: 'RS Playlist enhancer and simplifier.user.js'" + NL + \
-                    "or install it from https://greasyfork.org/en/scripts/440738-rs-playlist-enhancer-and-simplifier"
+                    PHPSESSID_INFO
 ERR_MSG_CDLC_IMPORTER = "Please set your directory and file name where the json file is located " + NL + \
                         "what contains all the CDLC information (exported from CFSM) what " + NL + \
                         "the Servant have to import into the database!"
@@ -121,8 +123,8 @@ class ConfSceneSwitcher:
 
 def validate_and_get_phpsessid(conf, twitch_channel):
     phpsessid = conf.get(SECTION_SONG_LOADER, "phpsessid")
-    if phpsessid is None or phpsessid.startswith('<Enter your'):
-        raise ConfigError(ERR_MSG_PHPSESSID)
+    if string_utils.is_blank(phpsessid) or phpsessid.startswith('<Enter your'):
+        raise ConfigError(ERR_MSG_MISSING)
 
     phpsessid_set = conf.get_set(SECTION_SONG_LOADER, "phpsessid")
 

@@ -6,7 +6,7 @@ serialized = {
     },
     "SetlistLogger": {
         "enabled": False,
-        "setlist_path": "<Enter Your Directory where do you want to have your Setlist>",
+        "setlist_path": "<Enter your directory where do you want to have your Setlist>",
     },
     "SongLoader": {
         "enabled": False,
@@ -36,7 +36,7 @@ serialized = {
     "FileManager": {
         "enabled": False,
         "source_directories": "<Enter source directories (separated by ';') from where do you want to move CDLC files>",
-        "destination_directory": "<Enter Your Directory to where do you want to move CDLC files>",
+        "destination_directory": "<Enter your directory to where do you want to move CDLC files>",
         "using_cfsm": False,
     },
     "CDLCImporter": {

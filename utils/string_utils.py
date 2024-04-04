@@ -18,3 +18,11 @@ def create_artist_minus_title(artist, title):
     if artist and title:
         return artist + ARTIST_TITLE_SEPARATOR + title
     return None
+
+
+def is_blank(text: str) -> bool:
+    return not is_not_blank(text)
+
+
+def is_not_blank(text: str) -> bool:
+    return text is not None and bool(len(text.strip()))

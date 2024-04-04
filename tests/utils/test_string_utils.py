@@ -50,3 +50,33 @@ def test_create_artist_minus_title(artist, title, expected):
     actual = string_utils.create_artist_minus_title(artist, title)
 
     assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "text, expected",
+    [
+        (None, True),
+        ("", True),
+        (" ", True),
+        ("TEXT", False),
+    ]
+)
+def test_is_blank(text, expected):
+    actual = string_utils.is_blank(text)
+
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "text, expected",
+    [
+        (None, False),
+        ("", False),
+        (" ", False),
+        ("TEXT", True),
+    ]
+)
+def test_is_not_blank(text, expected):
+    actual = string_utils.is_not_blank(text)
+
+    assert actual == expected
