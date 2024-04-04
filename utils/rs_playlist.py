@@ -1,8 +1,5 @@
 import requests
 
-# EXAMPLE
-# https://rsplaylist.com/ajax/requests.php?channel=kozaka&action=set-tag&id=1305252&tag=8c8c2924&value=true
-# https://rsplaylist.com/ajax/requests.php?channel=kozaka&action=set-tag&id=1305252&tag=8c8c2924&value=false
 RS_PLAYLIST_HOME = "https://rsplaylist.com/ajax/"
 URL_PLAYLIST = RS_PLAYLIST_HOME + "playlist.php?channel=%s"
 URL_REQUESTS = RS_PLAYLIST_HOME + "requests.php?channel=%s"
