@@ -110,7 +110,7 @@ class SongLoader:
     def update_playlist(self):
         new_playlist = get_playlist(self.twitch_channel, self.phpsessid)
 
-        self.__exit_if_user_is_not_logged_in_on_rspl_page(new_playlist)
+        self.__stop_if_user_is_not_logged_in_on_rspl_page(new_playlist)
 
         if self.rsplaylist is None:
             self.rsplaylist = new_playlist
@@ -126,7 +126,7 @@ class SongLoader:
 
         return True
 
-    def __exit_if_user_is_not_logged_in_on_rspl_page(self, new_playlist):
+    def __stop_if_user_is_not_logged_in_on_rspl_page(self, new_playlist):
         for sr in new_playlist["playlist"]:
             for cdlc in sr["dlc_set"]:
                 if is_user_not_logged_in(cdlc):
