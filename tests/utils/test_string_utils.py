@@ -20,7 +20,7 @@ from utils import string_utils
         ("L'Impératrice - L'Impératrice", "L Imperatrice L Imperatrice"),
         ("L'Impératrice - Fou", "L Imperatrice Fou"),
         ("Nirvana/Sungha Jung - Come As You Are", "Nirvana Sungha Jung Come As You Are"),
-        ("The Dillinger Escape Plan - 43% Burnt (Ramen's Ver)", "Nirvana Sungha Jung Come As You Are"),
+        ("The Dillinger Escape Plan - 43% Burnt (Ramen's Ver)", "The Dillinger Escape Plan 43 Burnt Ramen s Ver"),
 
         ("Guns N' Roses - Don`t Cry (Tonight)", "Guns N Roses Don t Cry Tonight"),
         ("Swallow The Sun - Swallow (Horror pt.1)", "Swallow The Sun Swallow Horror pt 1"),
