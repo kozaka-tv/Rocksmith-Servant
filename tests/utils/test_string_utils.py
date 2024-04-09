@@ -80,3 +80,19 @@ def test_is_not_blank(text, expected):
     actual = string_utils.is_not_blank(text)
 
     assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "text, expected",
+    [
+        (None, None),
+        ("", ""),
+        (" ", " "),
+        ("TEXT", "TEXT"),
+        ("TEXT's", "TEXT\\'s"),
+    ]
+)
+def test_escape_single_quote(text, expected):
+    actual = string_utils.escape_single_quote(text)
+
+    assert actual == expected

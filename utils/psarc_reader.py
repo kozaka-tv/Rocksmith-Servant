@@ -9,7 +9,7 @@ import zlib
 
 from Crypto.Cipher import AES
 
-from definitions import PSARC_INFO_FILE_CACHE_DIR, EXTENSION_PSARC_INFO_JSON
+from definitions import PSARC_INFO_FILE_CACHE_DIR, EXT_PSARC_INFO_JSON
 from modules.song_loader.song_data import SongData
 
 log = logging.getLogger()
@@ -184,7 +184,7 @@ def __get_psarc_info(filestream):
 
 def __write_info_file(entry, filename_to_extract, psarc):
     # TODO this writes out the data into a file if needed
-    json_filename = filename_to_extract + EXTENSION_PSARC_INFO_JSON
+    json_filename = filename_to_extract + EXT_PSARC_INFO_JSON
     info_file_json_path = os.path.join(PSARC_INFO_FILE_CACHE_DIR, os.path.basename(json_filename))
     data_to_write = __read_entry_data(psarc, entry)
     with open(info_file_json_path, 'wb') as fstream:

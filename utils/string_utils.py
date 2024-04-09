@@ -27,3 +27,9 @@ def is_blank(text: str) -> bool:
 
 def is_not_blank(text: str) -> bool:
     return text is not None and bool(len(text.strip()))
+
+
+def escape_single_quote(text: str):
+    if text is None:
+        return text
+    return text.replace("'", r"''")

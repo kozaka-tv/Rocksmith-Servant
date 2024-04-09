@@ -3,6 +3,7 @@ import os
 import sqlite3
 
 from utils import string_utils
+from utils.collection_utils import set_of_the_tuples_first_position
 
 DATABASE = './servant.db'
 log = logging.getLogger()
@@ -56,6 +57,30 @@ class DBManager:
 
     def is_song_by_filename_exists(self, filename):
         cur = self.db.cursor()
-        execute = cur.execute("select count(*) from songs where colFilename is ?", ("" + filename))
-        fetchone = execute.fetchone()
+        execute = cur.execute("select count(*) from songs where colFilename = ?", ("" + filename,))
+        fetchone = execute.fetchone()[0]
         return fetchone != 0
+
+    def insert_song(self, song_data):
+        cur = self.db.cursor()
+        sql = (("insert into songs ("
+                "colArtist, "
+                "colTitle, "
+                "colFileName) " +
+                "values ('")
+               + string_utils.escape_single_quote(song_data.artist) + "', '"
+               + string_utils.escape_single_quote(song_data.title) + "', '"
+               + string_utils.escape_single_quote(song_data.song_file_name) + "')")
+        cur.execute(sql)
+        self.db.commit()
+
+    def all_song_filenames(self):
+        cur = self.db.cursor()
+        all_elements_tuple = cur.execute("SELECT distinct colFileName FROM songs").fetchall()
+        return set_of_the_tuples_first_position(all_elements_tuple)
+
+    def delete_song_by_filename(self, to_delete):
+        cur = self.db.cursor()
+        sql = f"delete FROM songs WHERE songs.colFileName in ({','.join(['?'] * len(to_delete))})"
+        cur.execute(sql, tuple(to_delete))
+        self.db.commit()

@@ -29,7 +29,14 @@ class CDLCImporter:
             #  if CDLC data is extracted from files
             log.warning("Importing CDLC files from CFSM json file...")
 
-            self.import_cdlc_files()
+            # TODO commented out STREAM old solution to import CFSM file
+            # TODO commented out STREAM old solution to import CFSM file
+            # TODO commented out STREAM old solution to import CFSM file
+            # TODO commented out STREAM old solution to import CFSM file
+            # TODO commented out STREAM old solution to import CFSM file
+            # self.import_cdlc_files()
+
+            # TODO implement this
             self.extract_song_information()
 
             log.info("-----------------------------------")

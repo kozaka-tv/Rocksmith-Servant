@@ -5,7 +5,8 @@ import pathlib
 import shutil
 from datetime import datetime, timedelta
 
-from definitions import CDLC_FILE_EXT
+from definitions import PATTERN_CDLC_FILE_EXT, PATTERN_CDLC_INFO_FILE_EXT, \
+    EXT_PSARC_INFO_JSON
 from utils.exceptions import BadDirectoryError
 
 DEFAULT_NOT_PARSED_FILE_AGE_SECONDS = 15
@@ -44,7 +45,7 @@ def get_files_from_directories(directories):
 
 def get_files(cdlc_files, directory, older=False, file_age_seconds=DEFAULT_NOT_PARSED_FILE_AGE_SECONDS):
     for root, dir_names, filenames in os.walk(directory):
-        for filename in fnmatch.filter(filenames, CDLC_FILE_EXT):
+        for filename in fnmatch.filter(filenames, PATTERN_CDLC_FILE_EXT):
             file = os.path.join(root, filename)
             if older:
                 if is_file_old(file, file_age_seconds):
@@ -53,7 +54,7 @@ def get_files(cdlc_files, directory, older=False, file_age_seconds=DEFAULT_NOT_P
                 cdlc_files.append(file)
 
 
-def get_file_names_from(directory, extension=CDLC_FILE_EXT):
+def get_file_names_from(directory, extension=PATTERN_CDLC_FILE_EXT):
     log.info('Reading file names from directory: %s', directory)
     if LOG_DEBUG_IS_ENABLED:
         log.debug("----- Files ------------------------------------------")
@@ -61,9 +62,10 @@ def get_file_names_from(directory, extension=CDLC_FILE_EXT):
     cdlc_files = set()
     for root, dir_names, filenames in os.walk(directory):
         for filename in fnmatch.filter(filenames, extension):
+            if extension == PATTERN_CDLC_INFO_FILE_EXT:
+                filename = filename.partition(EXT_PSARC_INFO_JSON)[0]
             cdlc_files.add(filename)
-            if LOG_DEBUG_IS_ENABLED:
-                log.debug(filename)
+            log.debug(filename)
 
     log.info("---------- Found %s files", len(cdlc_files))
 
