@@ -16,7 +16,7 @@ from modules.song_loader.songs import Songs
 from utils.exceptions import RocksnifferConnectionError, ConfigError, RSPlaylistNotLoggedInError
 from utils.rocksniffer import Rocksniffer
 
-HEARTBEAT = 0.1
+HEARTBEAT = 1
 
 config.log_config.config()
 log = logging.getLogger()

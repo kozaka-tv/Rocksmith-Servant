@@ -3,7 +3,7 @@ import os
 import sqlite3
 
 from utils import string_utils
-from utils.collection_utils import set_of_the_tuples_first_position
+from utils.collection_utils import set_of_the_tuples_from_the_first_position
 
 DATABASE = './servant.db'
 log = logging.getLogger()
@@ -39,21 +39,15 @@ class DBManager:
     def __get_songs_from_db(self, artist, title):
         cur = self.db.cursor()
         # TODO add and colTagged != 'ODLC'?
-        execute = cur.execute("SELECT distinct colFileName FROM songs where colArtist like ? and colTitle like ?",
-                              ("%" + artist + "%", "%" + title + "%"))
-        return execute.fetchall()
+        songs = cur.execute("SELECT distinct colFileName FROM songs where colArtist like ? and colTitle like ?",
+                            ("%" + artist + "%", "%" + title + "%")).fetchall()
+        return set_of_the_tuples_from_the_first_position(songs)
 
     def search_song_in_the_db(self, artist, title):
-        rows = self.__get_songs_from_db(artist, title)
-        # TODO hm...maybe remove special chars and do a second query. To load all possible variations?
         # TODO make a special search for similar words in artist and title
-        # So not only if len(rows) <= 0
-        if len(rows) <= 0:
-            # remove special chars
-            artist_norm = string_utils.remove_special_chars(artist)
-            title_norm = string_utils.remove_special_chars(title)
-            rows = self.__get_songs_from_db(artist_norm, title_norm)
-        return rows
+        return self.__get_songs_from_db(artist, title).union(
+            self.__get_songs_from_db(string_utils.remove_special_chars(artist),
+                                     string_utils.remove_special_chars(title)))
 
     def is_song_by_filename_exists(self, filename):
         cur = self.db.cursor()
@@ -77,7 +71,7 @@ class DBManager:
     def all_song_filenames(self):
         cur = self.db.cursor()
         all_elements_tuple = cur.execute("SELECT distinct colFileName FROM songs").fetchall()
-        return set_of_the_tuples_first_position(all_elements_tuple)
+        return set_of_the_tuples_from_the_first_position(all_elements_tuple)
 
     def delete_song_by_filename(self, to_delete):
         cur = self.db.cursor()

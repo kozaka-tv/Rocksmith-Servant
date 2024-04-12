@@ -6,10 +6,10 @@ from config.config_data import ConfigData
 from definitions import PSARC_INFO_FILE_CACHE_DIR, EXT_PSARC_INFO_JSON, PATTERN_CDLC_INFO_FILE_EXT
 from modules.database.db_manager import DBManager
 from modules.song_loader.song_data import SongData
-from modules.song_loader.song_loader_helper import playlist_does_not_changed, update_tags, \
-    check_cdlc_archive_dir, check_rocksmith_cdlc_dir
+from modules.song_loader.song_loader_helper import playlist_does_not_changed, check_cdlc_archive_dir, \
+    check_rocksmith_cdlc_dir, update_tags_in_song_data, is_official
 from utils import file_utils, rs_playlist, psarc_reader
-from utils.collection_utils import is_not_empty
+from utils.collection_utils import is_not_empty, is_empty, repr_in_multi_line
 from utils.exceptions import BadDirectoryError
 from utils.exceptions import RSPlaylistNotLoggedInError
 from utils.rs_playlist import get_playlist, is_user_not_logged_in
@@ -85,17 +85,17 @@ class SongLoader:
 
                 if self.update_playlist():
                     log.info("Playlist has been changed, update songs!")
-                    # TODO update!?
-                    # TODO update!?
-                    # TODO update!?
-                    # TODO update!?
-                    # TODO update!?
-                    # self.update_cdlc_files_in_rs_dir()
+
+                    self.__find_existing_song_filenames_from_db_according_to_the_requests()
+
+                    # TODO do update of DB and listst?
+
+                    self.__calculate_songs_need_to_be_moved_from_archive_to_under_rs()
 
                     # TODO or maybe this should be configurable?
                     # else:  # load songs only in case we are not in game to avoid lagging in game
 
-                    self.move_requested_cdlc_files_to_destination()
+                    self.__move_requested_cdlc_files_from_archive_to_rs()
                 else:
                     # TODO Maybe, this is not completely true! If the file is not parsed, then it will be not checked.
                     #   I think, the logic must be separated.
@@ -151,6 +151,8 @@ class SongLoader:
 
         self.__store_songs_in_db(self.rocksmith_cdlc_dir, filenames_from_rs_dir)
         self.__store_songs_in_db(self.cdlc_archive_dir, filenames_from_archive_dir)
+
+        # TODO store lists in memory (songs)?
 
         # ---------- TODO cleanup cache --> Or clean up only at start? --> Or lower log level
         log.info('Count of files in cache: %s', len(filenames_from_cache_dir))
@@ -295,49 +297,16 @@ class SongLoader:
     # - get_requests from RS playlist
     # - get filenames from DB
     # - move files
-    def move_requested_cdlc_files_to_destination(self):
-        for sr in self.rsplaylist["playlist"]:
-            rspl_request_id = sr['id']
-            for dlc_set in sr["dlc_set"]:
-                rspl_song_id = dlc_set['id']
-                cdlc_id = dlc_set["cdlc_id"]
-                artist = dlc_set["artist"]
-                title = dlc_set["title"]
+    def __move_requested_cdlc_files_from_archive_to_rs(self):
 
-                # TODO if it is possible, do not create always a new SongData. If it is already exists, just reuse it!
-                #      search in a list
-                song_data = SongData(rspl_request_id, cdlc_id, rspl_song_id, artist, title)
-                song_data.rspl_official = dlc_set["official"]
-                song_data.rspl_position = str(sr["position"])
-                log.debug("Request: %s", song_data)
-
-                update_tags(song_data, sr)
-
-                # Do not load official DLC files
-                if song_data.is_official:  # TODO #113 some ODLC-s were here not skipped! Maybe different official id?
-                    log.debug("Skipping ODLC: %s", song_data)
-                    continue
-
-                rows = self.db_manager.search_song_in_the_db(artist, title)
-
-                if is_not_empty(rows):
-                    log.debug("---- sr %s -------", song_data.rspl_position)
-                    for element in rows:
-                        song_file_name = str(element[0])
-                        song_data.song_file_name = song_file_name
-
-                        log.debug("row=%s", song_file_name)
-                        self.songs.songs_from_archive_need_to_be_loaded.add(song_data)
-                else:
-                    log.debug("User must download the song: cdlc_id=%s - %s - %s", cdlc_id, artist, title)
-                    # rs_playlist.set_tag_to_download(self.twitch_channel,
-                    #                                 self.phpsessid,
-                    #                                 song_data.rspl_request_id,
-                    #                                 self.rspl_tags)
-
-        if len(self.songs.songs_from_archive_need_to_be_loaded) <= 0:
-            log.info("---- No new file must be moved and loaded from archive!")
+        if is_empty(self.songs.songs_from_archive_need_to_be_loaded):
+            log.info("---- No file found in db, nothing to move!")
             return
+
+        # TODO RS és ARCHIVUM könyvtárakban keresni a requested song után.
+        #  És ha RS alatt van, akkor LOADED tag-et neki!
+        #  Ha Archivum alatt, moveolni
+        #  Ha sehol, akkor épp töltődik. Várni kell tag, vagy loading tag, ilyesmi
 
         log.info("---- Files to move from archive according to the requests: %s",
                  str(self.songs.songs_from_archive_need_to_be_loaded))
@@ -374,6 +343,77 @@ class SongLoader:
             log.warning("---- Files newly moved and will be parsed: %s", str(actually_loaded_songs))
         if is_not_empty(self.songs.missing_from_archive):
             log.error("---- Missing files but found in Database: %s", str(self.songs.missing_from_archive))
+
+    # TODO refactor this and move parts or the complete method into song_loader_helper.py
+    def __find_existing_song_filenames_from_db_according_to_the_requests(self):
+        for sr in self.rsplaylist["playlist"]:
+            rspl_request_id = sr['id']
+            for dlc_set in sr["dlc_set"]:
+                rspl_song_id = dlc_set['id']
+                cdlc_id = dlc_set["cdlc_id"]
+                artist = dlc_set["artist"]
+                title = dlc_set["title"]
+                official = dlc_set["official"]
+                rspl_position = str(sr["position"])
+
+                # TODO #113 some ODLC-s were here not skipped! Maybe different official id?
+                if is_official(official):
+                    log.info("Skipping ODLC request with cdlc_id=%s - %s - %s", cdlc_id, artist, title)
+                    continue
+
+                songs_in_the_db = self.db_manager.search_song_in_the_db(artist, title)
+
+                if is_empty(songs_in_the_db):
+                    log.info("User must download the song: cdlc_id=%s - %s - %s", cdlc_id, artist, title)
+                    rs_playlist.set_tag_to_download(self.twitch_channel,
+                                                    self.phpsessid,
+                                                    rspl_request_id,
+                                                    self.rspl_tags)
+                    continue
+
+                for song_file_name in songs_in_the_db:
+                    # TODO if it is possible, do not create always a new SongData.
+                    #  If it is already exists, just reuse it, just search in a list
+                    song_data = SongData(rspl_request_id, cdlc_id, rspl_song_id, artist, title, song_file_name)
+                    song_data.rspl_official = official
+                    song_data.rspl_position = rspl_position
+
+                    # TODO is this really needed? It just updates tags in song data
+                    update_tags_in_song_data(song_data, sr)
+
+                    song_data.rspl_official = official
+                    song_data.rspl_position = rspl_position
+
+                    self.songs.requested_songs_found_in_db.add(song_file_name)
+                    self.songs.requested_songs_found_in_db_with_song_data.add(song_data)  # TODO is this really needed?
+
+                    log.debug("Request: %s", song_data)
+
+        log.warning("Existing songs found: %s", repr_in_multi_line(self.songs.requested_songs_found_in_db))
+
+    def __calculate_songs_need_to_be_moved_from_archive_to_under_rs(self):
+        log.info("Calculating songs need to be moved from the archive according to the requests")
+
+        # TODO read always the dir, or just use the list from songs?
+        filenames_from_rs_dir = self.__get_cdlc_filenames_from_rs_dir()
+        difference = self.songs.requested_songs_found_in_db.difference(filenames_from_rs_dir)
+
+        self.songs.songs_from_archive_need_to_be_loaded = set()
+        for song_data in set(self.songs.requested_songs_found_in_db_with_song_data):
+            if song_data.song_file_name in filenames_from_rs_dir:
+                log.info("Already loaded song: cdlc_id=%s - %s - %s",
+                         song_data.cdlc_id, song_data.artist, song_data.title)
+                if self.rspl_tags.tag_loaded not in song_data.tags:
+                    rs_playlist.set_tag_loaded(self.twitch_channel,
+                                               self.phpsessid,
+                                               song_data.rspl_request_id,
+                                               self.rspl_tags)
+
+            elif song_data.song_file_name in difference:
+                self.songs.songs_from_archive_need_to_be_loaded.add(song_data)
+
+        log.info("Songs need to be moved from the archive according to the requests: %s",
+                 str(self.songs.songs_from_archive_need_to_be_loaded))
 
     def __set_tag_loaded(self, song_data):
         rs_playlist.set_tag_loaded(self.twitch_channel,

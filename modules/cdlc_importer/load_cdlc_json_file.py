@@ -27,7 +27,7 @@ class CDLCImporter:
             log.info("-----------------------------------")
             # TODO update this log, as in the future no CFSM import file is actually needed,
             #  if CDLC data is extracted from files
-            log.warning("Importing CDLC files from CFSM json file...")
+            # log.warning("Importing CDLC files from CFSM json file...")
 
             # TODO commented out STREAM old solution to import CFSM file
             # TODO commented out STREAM old solution to import CFSM file
@@ -36,10 +36,10 @@ class CDLCImporter:
             # TODO commented out STREAM old solution to import CFSM file
             # self.import_cdlc_files()
 
-            # TODO implement this
-            self.extract_song_information()
+            # TODO implement this?
+            # self.extract_song_information()
 
-            log.info("-----------------------------------")
+            # log.info("-----------------------------------")
 
     # def file_datetime(filename):
     #     file_time = os.path.getmtime(filename)
