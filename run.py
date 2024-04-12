@@ -1,6 +1,5 @@
 import logging
 import os
-import sqlite3
 from time import sleep
 
 import config.log_config
@@ -16,7 +15,7 @@ from modules.song_loader.songs import Songs
 from utils.exceptions import RocksnifferConnectionError, ConfigError, RSPlaylistNotLoggedInError
 from utils.rocksniffer import Rocksniffer
 
-HEARTBEAT = 1
+HEARTBEAT = 0.1
 
 config.log_config.config()
 log = logging.getLogger()
@@ -44,7 +43,6 @@ try:
 except ConfigError as e:
     log.error(e)
     exit()
-
 
 # Initializing modules and utils
 db_manager = DBManager()
