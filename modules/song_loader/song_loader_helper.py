@@ -28,7 +28,7 @@ def playlist_does_not_changed(old_playlist, new_playlist):
     return False
 
 
-def update_tags(song_data, sr):
+def update_tags_in_song_data(song_data, sr):
     song_data.tags.clear()
     for tag in sr['tags']:
         song_data.tags.add(tag)
@@ -47,3 +47,8 @@ def check_rocksmith_cdlc_dir(dir_to_check):
 def check_dir(dir_to_check, error_msg):
     if dir_to_check is None or dir_to_check.startswith(ENTER_YOUR):
         raise ConfigError(error_msg)
+
+
+def is_official(rspl_official):
+    # TODO is there any other official numbers? Maybe only 0 means non official?
+    return 3 == rspl_official or 4 == rspl_official

@@ -4,6 +4,7 @@ import math
 
 from definitions import TMP_DIR, TMP_DIR_NAME
 from utils import file_utils
+from utils.collection_utils import repr_in_multi_line
 from utils.exceptions import BadDirectoryError
 
 HEARTBEAT = 1
@@ -63,8 +64,8 @@ class FileManager:
         not_enumerated_cdlc_files = self.scan_cdlc_files_in_destination_dir()
 
         if len(not_enumerated_cdlc_files) > 0:
-            log.error("Found %s file(s) which one(s) were not yet parsed so I moving them to tmp now! files: %s"
-                      , len(not_enumerated_cdlc_files), not_enumerated_cdlc_files)
+            log.warning("Found %s file(s) which one(s) were not yet parsed so I moving them to tmp now! Files: %s"
+                        , len(not_enumerated_cdlc_files), repr_in_multi_line(not_enumerated_cdlc_files))
             file_utils.move_files_to(TMP_DIR, not_enumerated_cdlc_files)
             return True
 

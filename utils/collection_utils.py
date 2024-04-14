@@ -1,3 +1,6 @@
+import os
+
+
 def is_empty(collection):
     return not collection
 
@@ -6,5 +9,21 @@ def is_not_empty(collection):
     return bool(collection)
 
 
-def set_of_the_tuples_first_position(tuple_):
-    return set([item[0] for item in tuple_])
+def set_of_the_tuples_from_the_first_position(tuples):
+    if tuples is None:
+        return None
+
+    return set([item[0] for item in tuples])
+
+
+def repr_in_multi_line(collection):
+    if collection is None:
+        return 'None'
+
+    if len(collection) == 0:
+        return ''
+
+    if len(collection) == 1:
+        return os.linesep.join(collection)
+
+    return os.linesep + os.linesep.join(collection)

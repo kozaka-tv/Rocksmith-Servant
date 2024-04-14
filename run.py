@@ -1,6 +1,5 @@
 import logging
 import os
-import sqlite3
 from time import sleep
 
 import config.log_config
@@ -44,7 +43,6 @@ try:
 except ConfigError as e:
     log.error(e)
     exit()
-
 
 # Initializing modules and utils
 db_manager = DBManager()

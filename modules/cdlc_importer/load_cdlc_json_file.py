@@ -27,12 +27,19 @@ class CDLCImporter:
             log.info("-----------------------------------")
             # TODO update this log, as in the future no CFSM import file is actually needed,
             #  if CDLC data is extracted from files
-            log.warning("Importing CDLC files from CFSM json file...")
+            # log.warning("Importing CDLC files from CFSM json file...")
 
-            self.import_cdlc_files()
-            self.extract_song_information()
+            # TODO commented out STREAM old solution to import CFSM file
+            # TODO commented out STREAM old solution to import CFSM file
+            # TODO commented out STREAM old solution to import CFSM file
+            # TODO commented out STREAM old solution to import CFSM file
+            # TODO commented out STREAM old solution to import CFSM file
+            # self.import_cdlc_files()
 
-            log.info("-----------------------------------")
+            # TODO implement this?
+            # self.extract_song_information()
+
+            # log.info("-----------------------------------")
 
     # def file_datetime(filename):
     #     file_time = os.path.getmtime(filename)
@@ -121,7 +128,7 @@ class CDLCImporter:
     # TODO need to implement this
     def extract_song_information(self):
         try:
-            log.info("Dummy log: %s", self.enabled)
+            log.error("TODO Dummy log: %s", self.enabled)
 
         except Exception as e:
             log.error("%s Could not import CDLCs to the Database: %s", type(e), e)
