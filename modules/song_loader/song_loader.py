@@ -39,14 +39,7 @@ class SongLoader:
             self.cdlc_import_json_file = config_data.song_loader.cdlc_import_json_file
             self.songs_to_load = os.path.join(config_data.song_loader.cdlc_dir, config_data.song_loader.cfsm_file_name)
 
-            try:
-                self.__create_directories()
-            except FileNotFoundError as bde:
-                log.error("---------------------------------------")
-                log.error("Directory %s could not be created!", bde.filename)
-                log.error("Please fix the configuration!")
-                log.error("---------------------------------------")
-                raise BadDirectoryError
+            self.__create_directories()
 
             # TODO really it is needed to store and have as input the DBManger + db? Is import not enough?
             self.db_manager = db_manager
@@ -73,10 +66,17 @@ class SongLoader:
         self.__create_directories()
 
     def __create_directories(self):
-        file_utils.create_directory_logged(PSARC_INFO_FILE_CACHE_DIR)
-        file_utils.create_directory_logged(self.cdlc_dir)
-        file_utils.create_directory_logged(self.cdlc_archive_dir)
-        file_utils.create_directory_logged(self.rocksmith_cdlc_dir)
+        try:
+            file_utils.create_directory_logged(PSARC_INFO_FILE_CACHE_DIR)
+            file_utils.create_directory_logged(self.cdlc_dir)
+            file_utils.create_directory_logged(self.cdlc_archive_dir)
+            file_utils.create_directory_logged(self.rocksmith_cdlc_dir)
+        except FileNotFoundError as bde:
+            log.error("---------------------------------------")
+            log.error("Directory %s could not be created!", bde.filename)
+            log.error("Please fix the configuration!")
+            log.error("---------------------------------------")
+            raise BadDirectoryError
 
     def run(self):
         if self.enabled:
