@@ -30,12 +30,12 @@ PHPSESSID_INFO = "The PHPSESSID is needed to get data from your RS Playlist requ
                  "Optionally, use the Tampermonkey script, what could be found under /misc/tampermonkey " + NL + \
                  "with the name: 'RS Playlist enhancer and simplifier.user.js'" + NL + \
                  "or install it from https://greasyfork.org/en/scripts/440738-rs-playlist-enhancer-and-simplifier"
-ERR_MSG_PHPSESSID_MISSING = ("Your PHP Session ID (phpsessid) is missing from the config.ini!{0}{1}"
-                             .format(NL, PHPSESSID_INFO))
+ERR_MSG_PHPSESSID_MISSING = f"Your PHP Session ID (phpsessid) is missing from the config.ini!{NL}{PHPSESSID_INFO}"
 ERR_MSG_PHPSESSID = "Eiter, you are not logged in, into the RSPlaylist, " + \
                     "or your PHP Session ID (phpsessid) is wrong, " + \
                     "or RSPlaylist ist not enabled on your Channel Settings." + NL + \
-                    "Please login to RSPlaylist, check your RSPL and Servant configuration and try to start again!" + NL + \
+                    ("Please login to RSPlaylist, check your RSPL and Servant configuration "
+                     "and try to start again!") + NL + \
                     "If you still get this error message, check you PHP Session ID in your config.ini!" + NL + \
                     "You may enter more than one ID, separated by ';'" + NL + \
                     PHPSESSID_INFO

@@ -179,8 +179,7 @@ class SongLoader:
             self.__remove_duplicates(duplicates, filenames_from_archive_dir)
 
     # TODO move into the helper!?
-    def __clean_up_songs_in_db(self, filenames_in_rs_and_archive_dir,
-                               filenames_in_db):
+    def __clean_up_songs_in_db(self, filenames_in_rs_and_archive_dir, filenames_in_db):
         log.info('Cleaning up songs in DB')
         to_delete = filenames_in_db.difference(filenames_in_rs_and_archive_dir)
         if is_not_empty(to_delete):
