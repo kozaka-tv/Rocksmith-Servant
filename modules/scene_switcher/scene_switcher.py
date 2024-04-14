@@ -10,8 +10,7 @@ class SceneSwitcher:
         """
         self.enabled = config_data.scene_switcher.enabled
         if self.enabled:
-            pass
-        pass
+            log.warning("TODO Scene switcher!")
 
     def update_config(self, config_data):
         self.enabled = config_data.scene_switcher.enabled
