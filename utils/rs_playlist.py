@@ -1,5 +1,7 @@
 import requests
 
+from utils.exceptions import RSPLPlaylistIsNotEnabledError
+
 RS_PLAYLIST_HOME = "https://rsplaylist.com/ajax/"
 URL_PLAYLIST = RS_PLAYLIST_HOME + "playlist.php?channel=%s"
 URL_REQUESTS = RS_PLAYLIST_HOME + "requests.php?channel=%s"
@@ -47,9 +49,17 @@ def set_tag_to_download(twitch_channel, phpsessid, rspl_request_id, rspl_tags):
     unset_tag(twitch_channel, phpsessid, rspl_request_id, rspl_tags.tag_loaded)
 
 
-def is_user_not_logged_in(cdlc):
+def user_is_not_logged_in(playlist):
     try:
-        cdlc['id']
-    except TypeError:
-        return True
-    return False
+        for sr in playlist["playlist"]:
+            for cdlc in sr["dlc_set"]:
+                try:
+                    cdlc['id']
+                except TypeError:
+                    return True
+                return False
+        return None
+    except KeyError:
+        raise RSPLPlaylistIsNotEnabledError
+
+

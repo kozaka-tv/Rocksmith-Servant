@@ -12,7 +12,8 @@ from modules.scene_switcher.scene_switcher import SceneSwitcher
 from modules.setlist.setlist_logger import SetlistLogger
 from modules.song_loader.song_loader import SongLoader
 from modules.song_loader.songs import Songs
-from utils.exceptions import RocksnifferConnectionError, ConfigError, RSPlaylistNotLoggedInError
+from utils.exceptions import RocksnifferConnectionError, ConfigError, RSPLNotLoggedInError, \
+    RSPLPlaylistIsNotEnabledError
 from utils.rocksniffer import Rocksniffer
 
 HEARTBEAT = 0.1
@@ -152,8 +153,9 @@ while True:
         put_the_song_into_the_setlist()
 
     # Catch and log all known exceptions, but keep app alive.
-    except RSPlaylistNotLoggedInError as e:
+    except (RSPLNotLoggedInError, RSPLPlaylistIsNotEnabledError) as e:
         log.error(e)
 
-    except Exception as e:
-        log.error(e)
+    # TODO Temporary commented out to stop on any non expected Exception
+    # except Exception as e:
+    #     log.error(e)

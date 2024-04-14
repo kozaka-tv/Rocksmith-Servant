@@ -11,8 +11,8 @@ from modules.song_loader.song_loader_helper import playlist_does_not_changed, ch
 from utils import file_utils, rs_playlist, psarc_reader
 from utils.collection_utils import is_not_empty, is_empty, repr_in_multi_line
 from utils.exceptions import BadDirectoryError
-from utils.exceptions import RSPlaylistNotLoggedInError
-from utils.rs_playlist import get_playlist, is_user_not_logged_in
+from utils.exceptions import RSPLNotLoggedInError
+from utils.rs_playlist import get_playlist, user_is_not_logged_in
 
 DEFAULT_CDLC_DIR = 'import'
 HEARTBEAT = 5
@@ -81,14 +81,13 @@ class SongLoader:
     def run(self):
         if self.enabled:
             if time() - self.last_run >= HEARTBEAT:
-                # log.info("Load songs according to the requests!")
 
-                if self.update_playlist():
+                if self.playlist_has_been_changed():
                     log.info("Playlist has been changed, update songs!")
 
                     self.__find_existing_song_filenames_from_db_according_to_the_requests()
 
-                    # TODO do update of DB and listst?
+                    # TODO do update of DB and lists?
 
                     self.__calculate_songs_need_to_be_moved_from_archive_to_under_rs()
 
@@ -96,6 +95,7 @@ class SongLoader:
                     # else:  # load songs only in case we are not in game to avoid lagging in game
 
                     self.__move_requested_cdlc_files_from_archive_to_rs()
+
                 else:
                     # TODO Maybe, this is not completely true! If the file is not parsed, then it will be not checked.
                     #   I think, the logic must be separated.
@@ -105,7 +105,7 @@ class SongLoader:
 
                 self.last_run = time()
 
-    def update_playlist(self):
+    def playlist_has_been_changed(self):
         new_playlist = get_playlist(self.twitch_channel, self.phpsessid)
 
         self.__stop_if_user_is_not_logged_in_on_rspl_page(new_playlist)
@@ -125,15 +125,19 @@ class SongLoader:
         return True
 
     def __stop_if_user_is_not_logged_in_on_rspl_page(self, new_playlist):
-        for sr in new_playlist["playlist"]:
-            for cdlc in sr["dlc_set"]:
-                if is_user_not_logged_in(cdlc):
-                    self.rsplaylist = None
-                    self.last_run = time()
-                    log.error("User must be logged in into RS playlist to be able to use the module!")
-                    raise RSPlaylistNotLoggedInError
-                else:
-                    return
+        not_logged_in = user_is_not_logged_in(new_playlist)
+
+        if not_logged_in is None:
+            log.debug("Playlist is empty! Can not tell, that the user is logged in or not!")
+
+        elif not_logged_in:
+            self.rsplaylist = None
+            self.last_run = time()
+            log.error("User is not logged in! Please log in on RSPL!")
+            raise RSPLNotLoggedInError
+
+        else:
+            log.debug("User is logged in and there is at least one request on the list.")
 
     def __init_and_cleanup_songs_data(self):
         log.warning('Initialising and cleaning up all CDLC file information')
@@ -299,7 +303,7 @@ class SongLoader:
     def __move_requested_cdlc_files_from_archive_to_rs(self):
 
         if is_empty(self.songs.songs_from_archive_need_to_be_loaded):
-            log.info("---- No file found in db, nothing to move!")
+            log.info("---- No file found to move from archive under the game.")
             return
 
         # TODO RS és ARCHIVUM könyvtárakban keresni a requested song után.
