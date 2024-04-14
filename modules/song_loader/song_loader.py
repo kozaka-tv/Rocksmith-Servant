@@ -112,7 +112,7 @@ class SongLoader:
 
         if self.rsplaylist is None:
             self.rsplaylist = new_playlist
-            log.info("Initial load of the rsplaylist done...")
+            log.info("Initial load of the playlist is done...")
             return True
 
         if playlist_does_not_changed(self.rsplaylist, new_playlist):
