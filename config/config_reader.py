@@ -2,10 +2,10 @@ import configparser
 import logging
 import os
 import sys
-from distutils import util
 
 from config.config_ini_template import serialized
 from utils import file_utils
+from utils.string_utils import strtobool
 
 CONFIG_DIR_NAME = "config"
 CONFIG_FILE_NAME = "config.ini"
@@ -161,7 +161,7 @@ class ConfigReader:
 
             # Cast to bool
             if cast == bool:
-                return util.strtobool(self.content[section][key].lower())
+                return strtobool(self.content[section][key].lower())
 
             # Else we cast it
             return cast(self.content[section][key])

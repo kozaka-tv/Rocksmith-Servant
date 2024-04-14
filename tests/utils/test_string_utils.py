@@ -96,3 +96,34 @@ def test_escape_single_quote(text, expected):
     actual = string_utils.escape_single_quote(text)
 
     assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "text, expected",
+    [
+        (None, False),
+        ("", False),
+        (" ", False),
+        ("TEXT", False),
+        (" TEXT ", False),
+
+        ("0", False),
+        (" 0 ", False),
+        ("n", False),
+        ("no", False),
+        ("false", False),
+        ("False", False),
+
+        ("1", True),
+        (" 1 ", True),
+        ("y", True),
+        ("yes", True),
+        ("true", True),
+        ("t", True),
+        ("on", True),
+    ]
+)
+def test_strtobool(text, expected):
+    actual = string_utils.strtobool(text)
+
+    assert actual == expected

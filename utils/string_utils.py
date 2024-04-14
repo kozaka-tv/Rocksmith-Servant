@@ -33,3 +33,7 @@ def escape_single_quote(text: str):
     if text is None:
         return text
     return text.replace("'", r"''")
+
+
+def strtobool(value: str) -> bool:
+    return value is not None and value.lower().strip() in ('1', 'y', 'yes', 'true', 't', 'on')
