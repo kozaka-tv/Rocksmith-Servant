@@ -80,14 +80,15 @@ class SongLoader:
 
     def run(self):
         if self.enabled:
+
             if time() - self.last_run >= HEARTBEAT:
+
+                self.__update_songs_in_rs_dir()
 
                 if self.playlist_has_been_changed():
                     log.info("Playlist has been changed, update songs!")
 
                     self.__find_existing_song_filenames_from_db_according_to_the_requests()
-
-                    # TODO do update of DB and lists?
 
                     self.__calculate_songs_need_to_be_moved_from_archive_to_under_rs()
 
@@ -104,6 +105,11 @@ class SongLoader:
                     log.info("No rsplaylist change, nothing to do...")
 
                 self.last_run = time()
+
+    def __update_songs_in_rs_dir(self):
+        filenames_from_rs_dir = self.__get_cdlc_filenames_from_rs_dir()
+        songs = self.__store_and_return_all_the_songs_datas(self.rocksmith_cdlc_dir, filenames_from_rs_dir)
+        self.songs.songs_in_rs.update(songs)
 
     def playlist_has_been_changed(self):
         new_playlist = get_playlist(self.twitch_channel, self.phpsessid)
@@ -142,7 +148,7 @@ class SongLoader:
     def __init_and_cleanup_songs_data(self):
         log.warning('Initialising and cleaning up all CDLC file information')
 
-        filenames_from_cache_dir = self.__get_cdlc_filenames_from_cache_dir()
+        # filenames_from_cache_dir = self.__get_cdlc_filenames_from_cache_dir()
         filenames_from_archive_dir = self.__get_cdlc_filenames_from_archive_dir()
         filenames_from_rs_dir = self.__get_cdlc_filenames_from_rs_dir()
 
@@ -151,22 +157,22 @@ class SongLoader:
         filenames_in_rs_and_archive_dir = filenames_from_rs_dir.union(filenames_from_archive_dir)
         filenames_in_db = self.db_manager.all_song_filenames()
         self.__clean_up_songs_in_db(filenames_in_rs_and_archive_dir, filenames_in_db)
-        self.__clean_up_songs_in_cache(filenames_in_rs_and_archive_dir, filenames_from_cache_dir)
+        # self.__clean_up_songs_in_cache(filenames_in_rs_and_archive_dir, filenames_from_cache_dir)
 
-        self.__store_songs_in_db(self.rocksmith_cdlc_dir, filenames_from_rs_dir)
-        self.__store_songs_in_db(self.cdlc_archive_dir, filenames_from_archive_dir)
+        songs_from_archive = self.__store_and_return_all_the_songs_datas(self.cdlc_archive_dir,
+                                                                         filenames_from_archive_dir)
+        self.songs.songs_in_archive.update(songs_from_archive)
+        songs_from_rs = self.__store_and_return_all_the_songs_datas(self.rocksmith_cdlc_dir, filenames_from_rs_dir)
+        self.songs.songs_in_rs.update(songs_from_rs)
 
         # TODO store lists in memory (songs)?
-        # songs = self.songs
 
+        # ---------- TODO cleanup cache? --> Or clean up only at start? Do we need cache at all?
+        # log.info('Count of files in cache: %s', len(filenames_from_cache_dir))
 
-        # ---------- TODO cleanup cache --> Or clean up only at start? --> Or lower log level
-        log.info('Count of files in cache: %s', len(filenames_from_cache_dir))
-        log.info('Count of files in archive: %s', len(filenames_from_archive_dir))
-        log.info('Count of files in rs: %s', len(filenames_from_rs_dir))
-        # TODO files_in_rs
-        # TODO files_in_cache
-        # TODO cleanup cache
+        #  TODO lower log level?
+        log.info('Count of songs in archive: %s', len(self.songs.songs_in_archive))
+        log.info('Count of songs in rs: %s', len(self.songs.songs_in_rs))
 
     @staticmethod
     def __get_cdlc_filenames_from_cache_dir():
@@ -197,6 +203,7 @@ class SongLoader:
                 filenames_in_db.discard(filename_to_delete)
 
     # TODO move into the helper!?
+    # TODO needed?
     def __clean_up_songs_in_cache(self, filenames_in_rs_and_archive_dir, filenames_from_cache_dir):
         log.info('Cleaning up songs in cache')
         to_delete = filenames_from_cache_dir.difference(filenames_in_rs_and_archive_dir)
@@ -216,26 +223,26 @@ class SongLoader:
             file_utils.delete_file(self.cdlc_archive_dir, filename)
             filenames_from_archive_dir.remove(filename)
 
-    def __store_songs_in_db(self, directory, filenames):
-        log.info('Reading new psarc files from directory: %s', directory)
+    def __store_and_return_all_the_songs_datas(self, directory, filenames):
+        log.info('---------- Loading songs from directory: %s', directory)
 
-        counter = 0
-        # cdlc_files = set()  # TODO needed this set? --> In case we want all data in memory? Then yes.
+        counter_new_songs = 0
+        songs = {}
 
         for filename in filenames:
-            if not self.db_manager.is_song_by_filename_exists(filename):
+            song_data = self.db_manager.search_song_by_filename(filename)
 
+            if song_data is None:
                 song_data = self.__extract_song_information(directory, filename)
                 self.db_manager.insert_song(song_data)
-                # cdlc_files.add(song_data)
-                counter += 1
-                if counter % 100 == 0:
-                    log.info(f"Extracted and inserted {counter} CDLCs into the DB")
+                counter_new_songs += 1
 
-        log.info("---------- Stored %s new song(s) in DB", counter)
+            songs.update({song_data.song_file_name: song_data})
+            if LOG_DEBUG_IS_ENABLED and len(songs) % 100 == 0:
+                log.debug(f"Loaded {len(songs)} songs")
 
-        # TODO needed this return
-        # return cdlc_files
+        log.info("---- Loaded %s songs, and from this, %s new song(s) stored in DB", len(songs), counter_new_songs)
+        return songs
 
     # TODO not used!
     # def __update_cdlc_files_in_archive_dir(self, cdlc_file_names):
@@ -366,7 +373,7 @@ class SongLoader:
                     log.info("Skipping ODLC request with cdlc_id=%s - %s - %s", cdlc_id, artist, title)
                     continue
 
-                songs_in_the_db = self.db_manager.search_song_in_the_db(artist, title)
+                songs_in_the_db = self.db_manager.search_song_by_artist_and_title(artist, title)
 
                 if is_empty(songs_in_the_db):
                     log.info("User must download the song: cdlc_id=%s - %s - %s", cdlc_id, artist, title)
