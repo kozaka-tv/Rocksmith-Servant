@@ -134,7 +134,8 @@ def sniffer_data_not_loaded():
     return not sniffer_data_loaded()
 
 
-cdlc_importer.load()
+# TODO in #158
+# cdlc_importer.load()
 
 # Main 'endless' loop
 while True:

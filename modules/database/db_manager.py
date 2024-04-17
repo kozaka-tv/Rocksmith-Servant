@@ -4,6 +4,7 @@ import sqlite3
 
 from utils import string_utils
 from utils.collection_utils import set_of_the_tuples_from_the_first_position
+from utils.string_utils import remove_special_chars
 
 DATABASE = './servant.db'
 log = logging.getLogger()
@@ -45,9 +46,9 @@ class DBManager:
 
     def search_song_in_the_db(self, artist, title):
         # TODO make a special search for similar words in artist and title
-        return self.__get_songs_from_db(artist, title).union(
-            self.__get_songs_from_db(string_utils.remove_special_chars(artist),
-                                     string_utils.remove_special_chars(title)))
+        songs_from_db_without_special_chars = self.__get_songs_from_db(remove_special_chars(artist),
+                                                                       remove_special_chars(title))
+        return self.__get_songs_from_db(artist, title).union(songs_from_db_without_special_chars)
 
     def is_song_by_filename_exists(self, filename):
         cur = self.db.cursor()

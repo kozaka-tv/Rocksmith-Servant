@@ -157,6 +157,8 @@ class SongLoader:
         self.__store_songs_in_db(self.cdlc_archive_dir, filenames_from_archive_dir)
 
         # TODO store lists in memory (songs)?
+        # songs = self.songs
+
 
         # ---------- TODO cleanup cache --> Or clean up only at start? --> Or lower log level
         log.info('Count of files in cache: %s', len(filenames_from_cache_dir))
