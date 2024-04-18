@@ -23,7 +23,4 @@ def repr_in_multi_line(collection):
     if len(collection) == 0:
         return ''
 
-    if len(collection) == 1:
-        return os.linesep.join(collection)
-
     return os.linesep + os.linesep.join(collection)
