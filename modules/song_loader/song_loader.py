@@ -276,9 +276,9 @@ class SongLoader:
 
         actually_loaded_songs = set()
         for filename, song_data in list(self.songs.songs_from_archive_has_to_be_moved.items()):
-            # TODO is this ever happens? I think not! But it makes sense somewhere else (if not already done!)
-            if filename in self.songs.moved_from_archive:
-                if self.rspl_tags.tag_loaded not in song_data.tags:
+
+            if self.__song_already_moved_from_archive(filename):
+                if self.__has_no_tag_loaded(song_data):
                     self.__set_tag_loaded(song_data)
 
             else:
@@ -312,6 +312,16 @@ class SongLoader:
             log.warning("---- Files newly moved and will be parsed: %s", str(actually_loaded_songs))
         if is_not_empty(self.songs.missing_from_archive):
             log.error("---- Missing files but found in Database: %s", str(self.songs.missing_from_archive))
+
+    def __song_already_moved_from_archive(self, filename):
+        return filename in self.songs.moved_from_archive
+
+    def __do_not_has_the_tag_to_download(self, sr):
+        return self.rspl_tags.tag_to_download not in sr["tags"]
+
+    def __has_no_tag_loaded(self, song_data):
+        return self.rspl_tags.tag_loaded not in song_data.tags
+
 
     # TODO refactor this and move parts or the complete method into song_loader_helper.py
     def __find_existing_song_filenames_from_db_according_to_the_requests(self):
@@ -368,9 +378,6 @@ class SongLoader:
             # TODO debug level?
             log.warning("Existing songs found: %s", repr_in_multi_line(self.songs.requested_songs_found_in_db))
 
-    def __do_not_has_the_tag_to_download(self, sr):
-        return self.rspl_tags.tag_to_download not in sr["tags"]
-
     def __calculate_songs_need_to_be_moved_from_archive_to_under_rs(self):
         log.debug("Calculating songs hast to be moved from the archive according to the requests")
 
@@ -386,7 +393,7 @@ class SongLoader:
                 # TODO #160 - logged many times! Why?
                 # TODO debug level
                 log.info("Already loaded song: %s", song_data)
-                if self.rspl_tags.tag_loaded not in song_data.tags:
+                if self.__has_no_tag_loaded(song_data):
                     rs_playlist.set_tag_loaded(self.twitch_channel,
                                                self.phpsessid,
                                                song_data.rspl_request_id,
