@@ -55,6 +55,7 @@ def get_files(cdlc_files, directory, older=False, file_age_seconds=DEFAULT_NOT_P
 
 
 def get_file_names_from(directory, extension=PATTERN_CDLC_FILE_EXT):
+    # TODO debug level?
     log.info('Reading file names from directory: %s', directory)
 
     cdlc_files = set()
@@ -66,7 +67,8 @@ def get_file_names_from(directory, extension=PATTERN_CDLC_FILE_EXT):
             cdlc_files.add(filename)
             log.debug(filename)
 
-    log.info("---------- Found %s files", len(cdlc_files))
+    # TODO debug level?
+    log.info("-- Found %s files in directory: %s", len(cdlc_files), directory)
 
     return cdlc_files
 

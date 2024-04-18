@@ -401,7 +401,9 @@ class SongLoader:
 
                     log.debug("Request: %s", song_data)
 
-        log.warning("Existing songs found: %s", repr_in_multi_line(self.songs.requested_songs_found_in_db))
+        if is_not_empty(self.songs.requested_songs_found_in_db):
+            # TODO debug level?
+            log.warning("Existing songs found: %s", repr_in_multi_line(self.songs.requested_songs_found_in_db))
 
     def __calculate_songs_need_to_be_moved_from_archive_to_under_rs(self):
         log.info("Calculating songs need to be moved from the archive according to the requests")
