@@ -39,8 +39,8 @@ class FileManager:
 
             elif self.beat_last_run():
                 log.debug("Scan and move files from %s and source dirs...", TMP_DIR_NAME)
-                self.move_downloaded_cdlc_files(self.scan_cdlc_files_in_tmp())
-                self.move_downloaded_cdlc_files(self.scan_cdlc_files_in_source_dirs())
+                self.move_files_to_destination_dir(self.scan_cdlc_files_in_tmp())
+                self.move_files_to_destination_dir(self.scan_cdlc_files_in_source_dirs())
 
                 self.last_run = datetime.datetime.now()
 
@@ -66,8 +66,9 @@ class FileManager:
         non_parsed_files = self.scan_cdlc_files_in_destination_dir()
 
         if is_not_empty(non_parsed_files):
-            log.warning("Found %s file(s) which one(s) were not yet parsed so I moving them to tmp now! Files: %s"
-                        , len(non_parsed_files), repr_in_multi_line(non_parsed_files))
+            log.warning(
+                "Found %s file(s) in %s dir which one(s) were not yet parsed so I moving them to %s now! Files: %s"
+                , len(non_parsed_files), self.destination_directory, TMP_DIR_NAME, repr_in_multi_line(non_parsed_files))
             file_utils.move_files_to(TMP_DIR, non_parsed_files)
             return True
 
@@ -78,8 +79,8 @@ class FileManager:
         cdlc_files = file_utils.get_files_from_directory(TMP_DIR)
 
         if len(cdlc_files) > 0:
-            log.info('Found %s CDLC files in %s directory what is not parsed probably.', len(cdlc_files), TMP_DIR_NAME)
-            log.debug("%s", cdlc_files)
+            log.warning('Found %s CDLC files in %s directory (they were probably not parsed before). Files: %s',
+                        len(cdlc_files), TMP_DIR_NAME, repr_in_multi_line(cdlc_files))
 
         return cdlc_files
 
@@ -106,6 +107,6 @@ class FileManager:
     def scan_cdlc_files_in_destination_dir(self):
         return file_utils.get_not_parsed_files_from_directory(self.destination_directory)
 
-    def move_downloaded_cdlc_files(self, files):
+    def move_files_to_destination_dir(self, files):
         if files and len(files) > 0:
             file_utils.move_files_to(self.destination_directory, files)

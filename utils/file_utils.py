@@ -12,7 +12,6 @@ from utils.exceptions import BadDirectoryError
 DEFAULT_NOT_PARSED_FILE_AGE_SECONDS = 15
 
 log = logging.getLogger()
-LOG_DEBUG_IS_ENABLED = log.isEnabledFor(logging.DEBUG)
 
 
 # TODO refactor all this:
@@ -55,8 +54,7 @@ def get_files(cdlc_files, directory, older=False, file_age_seconds=DEFAULT_NOT_P
 
 
 def get_file_names_from(directory, extension=PATTERN_CDLC_FILE_EXT):
-    # TODO debug level?
-    log.info('Reading file names from directory: %s', directory)
+    log.debug('Reading file names from directory: %s', directory)
 
     cdlc_files = set()
     log.debug("----- Files ------------------------------------------")
@@ -67,8 +65,7 @@ def get_file_names_from(directory, extension=PATTERN_CDLC_FILE_EXT):
             cdlc_files.add(filename)
             log.debug(filename)
 
-    # TODO debug level?
-    log.info("-- Found %s files in directory: %s", len(cdlc_files), directory)
+    log.debug("-- Found %s files in directory: %s", len(cdlc_files), directory)
 
     return cdlc_files
 
@@ -101,7 +98,7 @@ def last_modification_time(path):
 
 
 def move_file(file, destination):
-    if LOG_DEBUG_IS_ENABLED:
+    if log.isEnabledFor(logging.DEBUG):
         log.debug(f"Moving file {file} to {destination} if exists!")
 
     if os.path.exists(file):

@@ -13,7 +13,6 @@ from definitions import PSARC_INFO_FILE_CACHE_DIR, EXT_PSARC_INFO_JSON
 from modules.song_loader.song_data import SongData
 
 log = logging.getLogger()
-LOG_DEBUG_IS_ENABLED = log.isEnabledFor(logging.DEBUG)
 
 ENTRY_SIZE = 30
 BLOCK_SIZE = 65536
@@ -35,7 +34,7 @@ def extract_psarc(filename_to_extract, song_data_input, write_to_file=False):
             log.error('Could not extract any song information from the psarc file: %s', filename_to_extract)
             return None
 
-        if LOG_DEBUG_IS_ENABLED or write_to_file:
+        if log.isEnabledFor(logging.DEBUG) or write_to_file:
             __write_info_file(entry, filename_to_extract, psarc)
 
         __create_song_data(entry, psarc, song_data_input)

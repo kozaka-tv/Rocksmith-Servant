@@ -18,7 +18,6 @@ DEFAULT_CDLC_DIR = 'import'
 HEARTBEAT = 5
 
 log = logging.getLogger()
-LOG_DEBUG_IS_ENABLED = log.isEnabledFor(logging.DEBUG)
 
 
 class SongLoader:
@@ -224,7 +223,7 @@ class SongLoader:
             filenames_from_archive_dir.remove(filename)
 
     def __store_and_return_all_the_songs_datas(self, directory, filenames):
-        log.info('---------- Loading songs from directory: %s', directory)
+        log.debug('Loading songs from directory: %s', directory)
 
         counter_new_songs = 0
         songs = {}
@@ -238,54 +237,11 @@ class SongLoader:
                 counter_new_songs += 1
 
             songs.update({song_data.song_file_name: song_data})
-            if LOG_DEBUG_IS_ENABLED and len(songs) % 100 == 0:
+            if log.isEnabledFor(logging.DEBUG) and len(songs) % 100 == 0:
                 log.debug(f"Loaded {len(songs)} songs")
 
-        log.info("---- Loaded %s songs, and from this, %s new song(s) stored in DB", len(songs), counter_new_songs)
+        log.debug("---- Loaded %s songs, and from this, %s new song(s) stored in DB", len(songs), counter_new_songs)
         return songs
-
-    # TODO not used!
-    # def __update_cdlc_files_in_archive_dir(self, cdlc_file_names):
-    #     counter = 0
-    #     for cdlc_file_name in cdlc_file_names:
-    #         # TODO inline
-    #         song_data = self.__extract_song_information_from_archive_dir(cdlc_file_name)
-    #         self.songs.archive.add(song_data)
-    #         counter += 1
-    #         if counter % 500 == 0:
-    #             log.info(f"Extracted {counter} CDLCs")
-    #
-    #         # if len(self.songs.missing_from_archive) > 0:
-    #         #     self.songs.missing_from_archive.discard(cdlc_file_name)
-    #
-    #     log.info('Song data for the %s into Rocksmith loaded CDLC files were extracted.', len(cdlc_file_names))
-    #
-    #     return cdlc_file_names
-
-    # TODO not used!
-    # def update_cdlc_files_in_rs_dir(self):
-    #     cdlc_files = self.__get_cdlc_filenames_from_rs_dir()
-    #
-    #     for cdlc_file_name in cdlc_files:
-    #         self.songs.loaded_into_rs.add(cdlc_file_name)
-    #
-    #         TODO temporary commented out because this is a draft!
-    #         TODO temporary commented out because this is a draft!
-    #         TODO temporary commented out because this is a draft!
-    #         TODO temporary commented out because this is a draft!
-    #         song_data = self.__extract_song_information_from_rs_dir(cdlc_file_name)
-    #         self.songs.loaded_into_rs_with_song_data.add(song_data)
-    #
-    #         if is_not_empty(self.songs.missing_from_archive):
-    #             self.songs.missing_from_archive.discard(cdlc_file_name)
-    #
-    #     log.info('Song data for the %s into Rocksmith loaded CDLC files were extracted.', len(cdlc_files))
-
-    # def __extract_song_information_from_rs_dir(self, cdlc_file_name: str):
-    #     return self.__extract_song_information(self.rocksmith_cdlc_dir, cdlc_file_name)
-
-    # def __extract_song_information_from_archive_dir(self, cdlc_file_name: str):
-    #     return self.__extract_song_information(self.cdlc_archive_dir, cdlc_file_name)
 
     @staticmethod
     def __extract_song_information(directory, cdlc_file_name: str):
@@ -296,13 +252,6 @@ class SongLoader:
 
         psarc_reader.extract_psarc(file_path_to_extract, song_data)
 
-        # TODO write_to_file is True here, to keep the json in the cache. Is this not always True?
-        # psarc_reader.extract_psarc(file_path_to_extract, song_data, True)
-        # if LOG_DEBUG_IS_ENABLED:
-        #     psarc_reader.extract_psarc(file_path_to_extract, song_data, True)
-        # else:
-        #     psarc_reader.extract_psarc(file_path_to_extract, song_data)
-
         return song_data
 
     # TODO refactor this. it should be like
@@ -311,8 +260,9 @@ class SongLoader:
     # - move files
     def __move_requested_cdlc_files_from_archive_to_rs(self):
 
-        if is_empty(self.songs.songs_from_archive_need_to_be_loaded):
-            log.info("---- No file found to move from archive under the game.")
+        if is_empty(self.songs.songs_from_archive_has_to_be_moved):
+            # TODO debug level
+            log.info("---- No file found to move from archive to RS directory.")
             return
 
         # TODO RS és ARCHIVUM könyvtárakban keresni a requested song után.
@@ -320,22 +270,26 @@ class SongLoader:
         #  Ha Archivum alatt, moveolni
         #  Ha sehol, akkor épp töltődik. Várni kell tag, vagy loading tag, ilyesmi
 
+        # TODO debug level?? or info is ok?
         log.info("---- Files to move from archive according to the requests: %s",
-                 str(self.songs.songs_from_archive_need_to_be_loaded))
+                 repr_in_multi_line(self.songs.songs_from_archive_has_to_be_moved))
 
         actually_loaded_songs = set()
-        for song_data in self.songs.songs_from_archive_need_to_be_loaded:
-            if song_data.song_file_name in self.songs.loaded_into_rs:
-
+        for filename, song_data in list(self.songs.songs_from_archive_has_to_be_moved.items()):
+            # TODO is this ever happens? I think not! But it makes sense somewhere else (if not already done!)
+            if filename in self.songs.moved_from_archive:
                 if self.rspl_tags.tag_loaded not in song_data.tags:
                     self.__set_tag_loaded(song_data)
+
             else:
-                song_to_move = os.path.join(self.cdlc_archive_dir, song_data.song_file_name)
+                song_to_move = os.path.join(self.cdlc_archive_dir, filename)
                 moved = file_utils.move_file(song_to_move, self.destination_directory)
                 if moved:
-                    log.debug("The song were moved from the archive to under RS. Moved file: %s", song_to_move)
-                    self.songs.loaded_into_rs.add(song_data.song_file_name)
-                    actually_loaded_songs.add(song_data.song_file_name)
+                    # TODO debug level
+                    log.info("The song were moved from the archive into RS directory. Moved file: %s", song_to_move)
+                    self.songs.moved_from_archive.update(
+                        {filename: self.songs.songs_from_archive_has_to_be_moved.pop(filename)})
+                    actually_loaded_songs.add(filename)
                     # TODO this takes 1 sec for each call. If we have a list of 30 songs, it could take 30 seconds!
                     #   Do it only once!
                     rs_playlist.set_tag_loaded(self.twitch_channel,
@@ -343,15 +297,18 @@ class SongLoader:
                                                song_data.rspl_request_id,
                                                self.rspl_tags)
                 else:
-                    log.debug("Could not move file: %s", song_to_move)
-                    self.songs.missing_from_archive.add(song_data.song_file_name)
-                    song_data.missing = True
-                    # TODO this takes 1 sec for each call. If we have a list of 30 songs, it could take 30 seconds!
-                    #   Do it only once!
-                    rs_playlist.set_tag_to_download(self.twitch_channel, self.phpsessid, song_data.rspl_request_id,
-                                                    self.rspl_tags)
+                    log.error("Could not move file! Song exists in DB, but there is no file in archive: %s",
+                              song_to_move)
+                    self.songs.missing_from_archive.update(
+                        {filename: self.songs.songs_from_archive_has_to_be_moved.pop(filename)})
 
-        if is_not_empty(actually_loaded_songs):
+                    if self.rspl_tags.tag_to_download not in song_data.tags:
+                        rs_playlist.set_tag_to_download(self.twitch_channel,
+                                                        self.phpsessid,
+                                                        song_data.rspl_request_id,
+                                                        self.rspl_tags)
+
+        if is_not_empty(self.songs.moved_from_archive):
             log.warning("---- Files newly moved and will be parsed: %s", str(actually_loaded_songs))
         if is_not_empty(self.songs.missing_from_archive):
             log.error("---- Missing files but found in Database: %s", str(self.songs.missing_from_archive))
@@ -376,11 +333,17 @@ class SongLoader:
                 songs_in_the_db = self.db_manager.search_song_by_artist_and_title(artist, title)
 
                 if is_empty(songs_in_the_db):
-                    log.info("User must download the song: cdlc_id=%s - %s - %s", cdlc_id, artist, title)
-                    rs_playlist.set_tag_to_download(self.twitch_channel,
-                                                    self.phpsessid,
-                                                    rspl_request_id,
-                                                    self.rspl_tags)
+                    if self.__do_not_has_the_tag_to_download(sr):
+                        # TODO info level?
+                        log.warning("User must download the song: rspl_position=%s cdlc_id=%s - %s - %s",
+                                    rspl_position, cdlc_id, artist, title)
+                        rs_playlist.set_tag_to_download(self.twitch_channel,
+                                                        self.phpsessid,
+                                                        rspl_request_id,
+                                                        self.rspl_tags)
+                        # TODO debug level!
+                        log.info("Tag is set! rspl_position=%s cdlc_id=%s - %s - %s",
+                                 rspl_position, cdlc_id, artist, title)
                     continue
 
                 for song_file_name in songs_in_the_db:
@@ -396,38 +359,47 @@ class SongLoader:
                     song_data.rspl_official = official
                     song_data.rspl_position = rspl_position
 
-                    self.songs.requested_songs_found_in_db.add(song_file_name)
-                    self.songs.requested_songs_found_in_db_with_song_data.add(song_data)  # TODO is this really needed?
+                    self.songs.requested_songs_found_in_db.update({song_data.song_file_name: song_data})
 
-                    log.debug("Request: %s", song_data)
+                    # TODO debug level!
+                    log.info("Request found in DB: %s", song_data)
 
         if is_not_empty(self.songs.requested_songs_found_in_db):
             # TODO debug level?
             log.warning("Existing songs found: %s", repr_in_multi_line(self.songs.requested_songs_found_in_db))
 
+    def __do_not_has_the_tag_to_download(self, sr):
+        return self.rspl_tags.tag_to_download not in sr["tags"]
+
     def __calculate_songs_need_to_be_moved_from_archive_to_under_rs(self):
-        log.info("Calculating songs need to be moved from the archive according to the requests")
+        log.debug("Calculating songs hast to be moved from the archive according to the requests")
 
         # TODO read always the dir, or just use the list from songs?
         filenames_from_rs_dir = self.__get_cdlc_filenames_from_rs_dir()
-        difference = self.songs.requested_songs_found_in_db.difference(filenames_from_rs_dir)
+        # TODO is this difference actually hits in filenames_from_archive_dir? If not in RS dir, then in archive it is.
+        difference = set(self.songs.requested_songs_found_in_db).difference(filenames_from_rs_dir)
 
-        self.songs.songs_from_archive_need_to_be_loaded = set()
-        for song_data in set(self.songs.requested_songs_found_in_db_with_song_data):
-            if song_data.song_file_name in filenames_from_rs_dir:
-                log.info("Already loaded song: cdlc_id=%s - %s - %s",
-                         song_data.cdlc_id, song_data.artist, song_data.title)
+        # TODO is this reset of the dict necessary?
+        self.songs.songs_from_archive_has_to_be_moved = dict[str, SongData]()
+        for filename, song_data in self.songs.requested_songs_found_in_db.items():
+            if filename in filenames_from_rs_dir:
+                # TODO #160 - logged many times! Why?
+                # TODO debug level
+                log.info("Already loaded song: %s", song_data)
                 if self.rspl_tags.tag_loaded not in song_data.tags:
                     rs_playlist.set_tag_loaded(self.twitch_channel,
                                                self.phpsessid,
                                                song_data.rspl_request_id,
                                                self.rspl_tags)
 
-            elif song_data.song_file_name in difference:
-                self.songs.songs_from_archive_need_to_be_loaded.add(song_data)
+            elif filename in difference:
+                self.songs.songs_from_archive_has_to_be_moved.update({filename: song_data})
 
-        log.info("Songs need to be moved from the archive according to the requests: %s",
-                 str(self.songs.songs_from_archive_need_to_be_loaded))
+            # TODO what if it is NOT in difference? --> Then DB must be updated as the file is missing but it is in DB.
+
+        if is_not_empty(self.songs.songs_from_archive_has_to_be_moved):
+            log.info("Songs from archive has to be moved according to the requests: %s",
+                     repr_in_multi_line(self.songs.songs_from_archive_has_to_be_moved))
 
     def __set_tag_loaded(self, song_data):
         rs_playlist.set_tag_loaded(self.twitch_channel,
