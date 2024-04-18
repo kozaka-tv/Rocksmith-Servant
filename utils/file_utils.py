@@ -56,10 +56,9 @@ def get_files(cdlc_files, directory, older=False, file_age_seconds=DEFAULT_NOT_P
 
 def get_file_names_from(directory, extension=PATTERN_CDLC_FILE_EXT):
     log.info('Reading file names from directory: %s', directory)
-    if LOG_DEBUG_IS_ENABLED:
-        log.debug("----- Files ------------------------------------------")
 
     cdlc_files = set()
+    log.debug("----- Files ------------------------------------------")
     for root, dir_names, filenames in os.walk(directory):
         for filename in fnmatch.filter(filenames, extension):
             if extension == PATTERN_CDLC_INFO_FILE_EXT:

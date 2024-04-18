@@ -93,10 +93,12 @@ def test_set_of_the_tuples_from_the_first_position__with_2_tuples_and_int_in_the
     [
         (None, 'None'),
         (set(), ''),
-        (['my first line'], 'my first line'),
-        (['my first line', 'my second line'], '\r\nmy first line\r\nmy second line'),
+        (['line1'], 'line1'),
+        (['line1', 'line2'], '\r\nline1\r\nline2'),
+        (['line1', 'line2', 'line3'], '\r\nline1\r\nline2\r\nline3'),
     ]
 )
 def test_repr_in_multi_line(test_input, expected):
     actual = collection_utils.repr_in_multi_line(test_input)
+    print(actual)
     assert actual == expected

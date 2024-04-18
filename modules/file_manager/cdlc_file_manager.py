@@ -4,7 +4,7 @@ import math
 
 from definitions import TMP_DIR, TMP_DIR_NAME
 from utils import file_utils
-from utils.collection_utils import repr_in_multi_line
+from utils.collection_utils import repr_in_multi_line, is_not_empty
 from utils.exceptions import BadDirectoryError
 
 HEARTBEAT = 1
@@ -35,17 +35,7 @@ class FileManager:
     def run(self):
         if self.enabled:
             if self.beat_last_run_not_parsed():
-                log.debug("Scan and move not parsed files... ")
-                moved = self.move_not_parsed_files_to_tmp()
-
-                if moved:
-                    log.debug("Files were moved... ")
-                    self.last_run = datetime.datetime.now()
-                    self.last_run_not_parsed = self.last_run
-                else:
-                    log.debug("Nothing moved... ")
-                    self.last_run = datetime.datetime.now()
-                    self.last_run_not_parsed = self.last_run
+                self.__move_non_parsed_files_to_tmp_dir()
 
             elif self.beat_last_run():
                 log.debug("Scan and move files from %s and source dirs...", TMP_DIR_NAME)
@@ -54,6 +44,18 @@ class FileManager:
 
                 self.last_run = datetime.datetime.now()
 
+    def __move_non_parsed_files_to_tmp_dir(self):
+        log.debug("Scan and move files which were not parsed by CFSM.")
+        moved = self.move_not_parsed_files_to_tmp()
+        if moved:
+            log.debug("Found non parsed files which were now moved... ")
+            self.last_run = datetime.datetime.now()
+            self.last_run_not_parsed = self.last_run
+        else:
+            log.debug("Nothing moved... ")
+            self.last_run = datetime.datetime.now()
+            self.last_run_not_parsed = self.last_run
+
     def beat_last_run(self):
         return math.floor((datetime.datetime.now() - self.last_run).seconds) >= HEARTBEAT
 
@@ -61,12 +63,12 @@ class FileManager:
         return math.floor((datetime.datetime.now() - self.last_run_not_parsed).seconds) >= HEARTBEAT_NOT_PARSED
 
     def move_not_parsed_files_to_tmp(self):
-        not_enumerated_cdlc_files = self.scan_cdlc_files_in_destination_dir()
+        non_parsed_files = self.scan_cdlc_files_in_destination_dir()
 
-        if len(not_enumerated_cdlc_files) > 0:
+        if is_not_empty(non_parsed_files):
             log.warning("Found %s file(s) which one(s) were not yet parsed so I moving them to tmp now! Files: %s"
-                        , len(not_enumerated_cdlc_files), repr_in_multi_line(not_enumerated_cdlc_files))
-            file_utils.move_files_to(TMP_DIR, not_enumerated_cdlc_files)
+                        , len(non_parsed_files), repr_in_multi_line(non_parsed_files))
+            file_utils.move_files_to(TMP_DIR, non_parsed_files)
             return True
 
         return False

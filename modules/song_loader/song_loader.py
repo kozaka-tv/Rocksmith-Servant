@@ -83,7 +83,7 @@ class SongLoader:
 
             if time() - self.last_run >= HEARTBEAT:
 
-                self.__update_songs_in_rs_dir()
+                self.__update_songs_from_rs_dir()
 
                 if self.playlist_has_been_changed():
                     log.info("Playlist has been changed, update songs!")
@@ -106,7 +106,7 @@ class SongLoader:
 
                 self.last_run = time()
 
-    def __update_songs_in_rs_dir(self):
+    def __update_songs_from_rs_dir(self):
         filenames_from_rs_dir = self.__get_cdlc_filenames_from_rs_dir()
         songs = self.__store_and_return_all_the_songs_datas(self.rocksmith_cdlc_dir, filenames_from_rs_dir)
         self.songs.songs_in_rs.update(songs)
