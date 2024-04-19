@@ -39,13 +39,13 @@ def unset_tag(twitch_channel, phpsessid, rspl_request_id, tag_id):
 
 def set_tag_loaded(twitch_channel, phpsessid, rspl_request_id, rspl_tags):
     set_tag(twitch_channel, phpsessid, rspl_request_id, rspl_tags.tag_loaded)
-    # TODO remove tag 'to download'?
+    # TODO remove tag 'tag_to_download'?
     unset_tag(twitch_channel, phpsessid, rspl_request_id, rspl_tags.tag_to_download)
 
 
 def set_tag_to_download(twitch_channel, phpsessid, rspl_request_id, rspl_tags):
     set_tag(twitch_channel, phpsessid, rspl_request_id, rspl_tags.tag_to_download)
-    # TODO remove tag 'loaded'?
+    # TODO remove tag 'tag_loaded'?
     unset_tag(twitch_channel, phpsessid, rspl_request_id, rspl_tags.tag_loaded)
 
 

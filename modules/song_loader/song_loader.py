@@ -302,7 +302,7 @@ class SongLoader:
                     self.songs.missing_from_archive.update(
                         {filename: self.songs.songs_from_archive_has_to_be_moved.pop(filename)})
 
-                    if self.rspl_tags.tag_to_download not in song_data.tags:
+                    if self.__has_no_tag_to_download(song_data):
                         rs_playlist.set_tag_to_download(self.twitch_channel,
                                                         self.phpsessid,
                                                         song_data.rspl_request_id,
@@ -316,12 +316,14 @@ class SongLoader:
     def __song_already_moved_from_archive(self, filename):
         return filename in self.songs.moved_from_archive
 
-    def __do_not_has_the_tag_to_download(self, sr):
-        return self.rspl_tags.tag_to_download not in sr["tags"]
-
     def __has_no_tag_loaded(self, song_data):
         return self.rspl_tags.tag_loaded not in song_data.tags
 
+    def __has_no_tag_to_download(self, song_data):
+        return self.rspl_tags.tag_to_download not in song_data.tags
+
+    def __do_not_has_the_tag_to_download(self, sr):
+        return self.rspl_tags.tag_to_download not in sr["tags"]
 
     # TODO refactor this and move parts or the complete method into song_loader_helper.py
     def __find_existing_song_filenames_from_db_according_to_the_requests(self):
