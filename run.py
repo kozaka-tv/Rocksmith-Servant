@@ -157,6 +157,6 @@ while True:
     except (RSPLNotLoggedInError, RSPLPlaylistIsNotEnabledError) as e:
         log.error(e)
 
-    # TODO Temporary commented out to stop on any non expected Exception
-    # except Exception as e:
-    #     log.error(e)
+    # Catch all unchecked Exceptions, but keep app alive.
+    except Exception as e:
+        log.error(e)
