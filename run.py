@@ -159,4 +159,4 @@ while True:
 
     # Catch all unchecked Exceptions, but keep app alive.
     except Exception as e:
-        log.error(e)
+        log.exception(e)
