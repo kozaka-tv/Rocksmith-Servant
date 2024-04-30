@@ -34,19 +34,19 @@ class FileManager:
 
     def run(self):
         if self.enabled:
-            if self.beat_last_run_not_parsed():
+            if self.__beat_last_run_not_parsed():
                 self.__move_non_parsed_files_to_tmp_dir()
 
-            elif self.beat_last_run():
+            elif self.__beat_last_run():
                 log.debug("Scan and move files from %s and source dirs...", TMP_DIR_NAME)
-                self.move_files_to_destination_dir(self.scan_cdlc_files_in_tmp())
-                self.move_files_to_destination_dir(self.scan_cdlc_files_in_source_dirs())
+                self.__move_files_to_destination_dir(self.__scan_cdlc_files_in_tmp())
+                self.__move_files_to_destination_dir(self.__scan_cdlc_files_in_source_dirs())
 
                 self.last_run = datetime.datetime.now()
 
     def __move_non_parsed_files_to_tmp_dir(self):
         log.debug("Scan and move files which were not parsed by CFSM.")
-        moved = self.move_not_parsed_files_to_tmp()
+        moved = self.__move_not_parsed_files_to_tmp()
         if moved:
             log.debug("Found non parsed files which were now moved... ")
             self.last_run = datetime.datetime.now()
@@ -56,14 +56,14 @@ class FileManager:
             self.last_run = datetime.datetime.now()
             self.last_run_not_parsed = self.last_run
 
-    def beat_last_run(self):
+    def __beat_last_run(self):
         return math.floor((datetime.datetime.now() - self.last_run).seconds) >= HEARTBEAT
 
-    def beat_last_run_not_parsed(self):
+    def __beat_last_run_not_parsed(self):
         return math.floor((datetime.datetime.now() - self.last_run_not_parsed).seconds) >= HEARTBEAT_NOT_PARSED
 
-    def move_not_parsed_files_to_tmp(self):
-        non_parsed_files = self.scan_cdlc_files_in_destination_dir()
+    def __move_not_parsed_files_to_tmp(self):
+        non_parsed_files = self.__scan_cdlc_files_in_destination_dir()
 
         if is_not_empty(non_parsed_files):
             log.warning(
@@ -75,16 +75,16 @@ class FileManager:
         return False
 
     @staticmethod
-    def scan_cdlc_files_in_tmp():
+    def __scan_cdlc_files_in_tmp():
         cdlc_files = file_utils.get_files_from_directory(TMP_DIR)
 
         if len(cdlc_files) > 0:
-            log.warning('Found %s CDLC files in %s directory (they were probably not parsed before). Files: %s',
-                        len(cdlc_files), TMP_DIR_NAME, repr_in_multi_line(cdlc_files))
+            log.error('Found %s CDLC files in %s directory (they were probably not parsed before). Files: %s',
+                      len(cdlc_files), TMP_DIR_NAME, repr_in_multi_line(cdlc_files))
 
         return cdlc_files
 
-    def scan_cdlc_files_in_source_dirs(self):
+    def __scan_cdlc_files_in_source_dirs(self):
 
         try:
             cdlc_files = file_utils.get_files_from_directories(self.source_directories)
@@ -104,9 +104,9 @@ class FileManager:
 
         return cdlc_files
 
-    def scan_cdlc_files_in_destination_dir(self):
+    def __scan_cdlc_files_in_destination_dir(self):
         return file_utils.get_not_parsed_files_from_directory(self.destination_directory)
 
-    def move_files_to_destination_dir(self, files):
+    def __move_files_to_destination_dir(self, files):
         if files and len(files) > 0:
             file_utils.move_files_to(self.destination_directory, files)
