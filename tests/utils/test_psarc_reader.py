@@ -2,17 +2,9 @@ import os
 
 import pytest
 
+from base_test import CDLC_DIR
 from modules.song_loader.song_data import SongData
 from utils.psarc_reader import extract_psarc
-
-# TODO change to more modern Pathlib
-# from pathlib import Path
-# THIS_DIR = Path(__file__).parent
-# TESTDATA_PATH = THIS_DIR.parent / 'testdata'
-# CDLC_PATH = TESTDATA_PATH / 'cdlc'
-THIS_DIR = os.path.dirname(__file__)
-TESTDATA_DIR = os.path.join(THIS_DIR, '..', 'testdata')
-CDLC_DIR = os.path.join(TESTDATA_DIR, 'cdlc')
 
 
 @pytest.mark.parametrize(
