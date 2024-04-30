@@ -89,7 +89,9 @@ def test_is_not_blank(text, expected):
         ("", ""),
         (" ", " "),
         ("TEXT", "TEXT"),
-        ("TEXT's", "TEXT\\'s"),
+        ("TEXT's", "TEXT''s"),
+        ("TEXT's more'text", "TEXT''s more''text"),
+        ("TEXT and just a '", "TEXT and just a ''"),
     ]
 )
 def test_escape_single_quote(text, expected):

@@ -1,16 +1,27 @@
+import os
+
 import pytest
 
 from modules.song_loader.song_data import SongData
 from utils.psarc_reader import extract_psarc
 
+# TODO change to more modern Pathlib
+# from pathlib import Path
+# THIS_DIR = Path(__file__).parent
+# TESTDATA_PATH = THIS_DIR.parent / 'testdata'
+# CDLC_PATH = TESTDATA_PATH / 'cdlc'
+THIS_DIR = os.path.dirname(__file__)
+TESTDATA_DIR = os.path.join(THIS_DIR, '..', 'testdata')
+CDLC_DIR = os.path.join(TESTDATA_DIR, 'cdlc')
+
 
 @pytest.mark.parametrize(
     "test_input, expected",
     [
-        ("..\\tests\\test_data\\AC-DC_Big-Gun_v3_5_DD_p.psarc", "AC/DC"),
-        ("..\\tests\\test_data\\BABYMETAL_ONE-(English)_v1_4_p.psarc", "BABYMETAL"),
-        ("..\\tests\\test_data\\Depresszió_Itt-Az-Én-Időm_v1_p.psarc", "Depresszió"),
-        ("..\\tests\\test_data\\Sybreed-_Doomsday-Party_v1_p.psarc", "Sybreed ")
+        (os.path.join(CDLC_DIR, "AC-DC_Big-Gun_v3_5_DD_p.psarc"), "AC/DC"),
+        (os.path.join(CDLC_DIR, "BABYMETAL_ONE-(English)_v1_4_p.psarc"), "BABYMETAL"),
+        (os.path.join(CDLC_DIR, "Depresszió_Itt-Az-Én-Időm_v1_p.psarc"), "Depresszió"),
+        (os.path.join(CDLC_DIR, "Sybreed-_Doomsday-Party_v1_p.psarc"), "Sybreed ")
     ]
 )
 def test_artist(test_input, expected):
@@ -24,10 +35,10 @@ def test_artist(test_input, expected):
 @pytest.mark.parametrize(
     "test_input, expected",
     [
-        ("..\\tests\\test_data\\AC-DC_Big-Gun_v3_5_DD_p.psarc", "Big Gun"),
-        ("..\\tests\\test_data\\BABYMETAL_ONE-(English)_v1_4_p.psarc", "THE ONE (English)"),
-        ("..\\tests\\test_data\\Depresszió_Itt-Az-Én-Időm_v1_p.psarc", "Itt Az Én Időm"),
-        ("..\\tests\\test_data\\Sybreed-_Doomsday-Party_v1_p.psarc", "Doomsday Party")
+        (os.path.join(CDLC_DIR, "AC-DC_Big-Gun_v3_5_DD_p.psarc"), "Big Gun"),
+        (os.path.join(CDLC_DIR, "BABYMETAL_ONE-(English)_v1_4_p.psarc"), "THE ONE (English)"),
+        (os.path.join(CDLC_DIR, "Depresszió_Itt-Az-Én-Időm_v1_p.psarc"), "Itt Az Én Időm"),
+        (os.path.join(CDLC_DIR, "Sybreed-_Doomsday-Party_v1_p.psarc"), "Doomsday Party")
     ]
 )
 def test_title(test_input, expected):
