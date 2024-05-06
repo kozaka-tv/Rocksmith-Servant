@@ -61,5 +61,3 @@ def user_is_not_logged_in(playlist):
         return None
     except KeyError:
         raise RSPLPlaylistIsNotEnabledError
-
-
