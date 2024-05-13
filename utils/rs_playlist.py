@@ -25,28 +25,28 @@ def get_settings(twitch_channel, phpsessid):
     return requests.get(URL_SETTINGS % twitch_channel, cookies={'PHPSESSID': phpsessid}).json()
 
 
-def set_tag(twitch_channel, phpsessid, rspl_request_id, tag_id):
+def __set_tag(twitch_channel, phpsessid, rspl_request_id, tag_id):
     url = URL_TAG_SET % (twitch_channel, rspl_request_id, tag_id)
     cookies = {'PHPSESSID': phpsessid}
     requests.put(url, cookies=cookies).json()
 
 
-def unset_tag(twitch_channel, phpsessid, rspl_request_id, tag_id):
+def __unset_tag(twitch_channel, phpsessid, rspl_request_id, tag_id):
     url = URL_TAG_UNSET % (twitch_channel, rspl_request_id, tag_id)
     cookies = {'PHPSESSID': phpsessid}
     requests.put(url, cookies=cookies).json()
 
 
 def set_tag_loaded(twitch_channel, phpsessid, rspl_request_id, rspl_tags):
-    set_tag(twitch_channel, phpsessid, rspl_request_id, rspl_tags.tag_loaded)
     # TODO remove tag 'tag_to_download'?
-    unset_tag(twitch_channel, phpsessid, rspl_request_id, rspl_tags.tag_to_download)
+    __unset_tag(twitch_channel, phpsessid, rspl_request_id, rspl_tags.tag_to_download)
+    __set_tag(twitch_channel, phpsessid, rspl_request_id, rspl_tags.tag_loaded)
 
 
 def set_tag_to_download(twitch_channel, phpsessid, rspl_request_id, rspl_tags):
-    set_tag(twitch_channel, phpsessid, rspl_request_id, rspl_tags.tag_to_download)
     # TODO remove tag 'tag_loaded'?
-    unset_tag(twitch_channel, phpsessid, rspl_request_id, rspl_tags.tag_loaded)
+    __unset_tag(twitch_channel, phpsessid, rspl_request_id, rspl_tags.tag_loaded)
+    __set_tag(twitch_channel, phpsessid, rspl_request_id, rspl_tags.tag_to_download)
 
 
 def user_is_not_logged_in(playlist):
