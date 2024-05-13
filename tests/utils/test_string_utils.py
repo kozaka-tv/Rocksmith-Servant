@@ -129,3 +129,19 @@ def test_strtobool(text, expected):
     actual = string_utils.strtobool(text)
 
     assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "time, expected",
+    [
+        (None, None),
+        (3, '3.00'),
+        (5.1, '5.10'),
+        (6.05, '6.05'),
+        (10.123, '10.12'),
+    ]
+)
+def test_time_float_to_string(time, expected):
+    actual = string_utils.time_float_to_string(time)
+
+    assert actual == expected

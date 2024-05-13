@@ -3,6 +3,7 @@ import os
 
 from deepdiff import DeepDiff
 
+from utils import collection_utils
 from utils.exceptions import ConfigError
 
 ENTER_YOUR = '<Enter your'
@@ -52,3 +53,11 @@ def check_dir(dir_to_check, error_msg):
 def is_official(rspl_official):
     # TODO is there any other official numbers? Maybe only 0 means non official?
     return 3 == rspl_official or 4 == rspl_official
+
+
+def log_new_songs_found(new_songs):
+    if new_songs:
+        if len(new_songs) > 10:
+            log.warning("%s new files found", len(new_songs))
+        else:
+            collection_utils.repr_in_multi_line(new_songs)
