@@ -57,7 +57,7 @@ def is_official(rspl_official):
 
 def log_new_songs_found(new_songs):
     if new_songs:
-        if len(new_songs) > 10:
-            log.warning("%s new files found", len(new_songs))
+        if len(new_songs) > 20:
+            log.info("%s new files found", len(new_songs))
         else:
-            collection_utils.repr_in_multi_line(new_songs)
+            log.info("%s new files found! Files: %s", len(new_songs), collection_utils.repr_in_multi_line(new_songs))
