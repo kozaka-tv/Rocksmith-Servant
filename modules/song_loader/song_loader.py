@@ -37,7 +37,6 @@ class SongLoader:
             self.source_directories = config_data.file_manager.source_directories
             self.rocksmith_cdlc_dir = check_rocksmith_cdlc_dir(config_data.song_loader.rocksmith_cdlc_dir)
             self.allow_load_when_in_game = config_data.song_loader.allow_load_when_in_game
-            self.cdlc_import_json_file = config_data.song_loader.cdlc_import_json_file
             self.songs_to_load = os.path.join(config_data.song_loader.cdlc_dir, config_data.song_loader.cfsm_file_name)
 
             self.__create_directories()
@@ -63,7 +62,6 @@ class SongLoader:
         self.rocksmith_cdlc_dir = check_rocksmith_cdlc_dir(config_data.song_loader.rocksmith_cdlc_dir)
         self.allow_load_when_in_game = config_data.song_loader.allow_load_when_in_game
         self.phpsessid = config_data.song_loader.phpsessid
-        self.cdlc_import_json_file = config_data.song_loader.cdlc_import_json_file
         self.songs_to_load = os.path.join(config_data.song_loader.cdlc_dir, config_data.song_loader.cfsm_file_name)
 
         self.__create_directories()

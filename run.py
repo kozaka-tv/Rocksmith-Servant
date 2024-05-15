@@ -51,8 +51,6 @@ except ConfigError as e:
 sniffer = Rocksniffer(config_data)
 setlist_logger = SetlistLogger(config_data)
 file_manager = FileManager(config_data)
-# TODO in #158
-# cdlc_importer = CDLCImporter(config_data, db_manager)
 songs = Songs()
 song_loader = SongLoader(config_data, songs)
 scene_switcher = SceneSwitcher(config_data)
@@ -136,9 +134,6 @@ def sniffer_data_not_loaded():
     return not sniffer_data_loaded()
 
 
-# TODO in #158
-# cdlc_importer.load()
-
 def manage_songs():
     song_loader.set_db_manager(DBManager())  # because of Threading, we must set DB here
 
@@ -183,11 +178,7 @@ while True:
         # Sleep a bit to avoid too fast processing
         sleep(HEARTBEAT)
 
-        # TODO
         update_config()
-
-        # TODO
-        # scene_switcher.run()
 
     # Catch all unchecked Exceptions, but keep app alive.
     except Exception as e:
