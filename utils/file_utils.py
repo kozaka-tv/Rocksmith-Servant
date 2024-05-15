@@ -12,7 +12,6 @@ from utils.exceptions import BadDirectoryError
 DEFAULT_NOT_PARSED_FILE_AGE_SECONDS = 15
 
 log = logging.getLogger()
-LOG_DEBUG_IS_ENABLED = log.isEnabledFor(logging.DEBUG)
 
 
 # TODO refactor all this:
@@ -54,22 +53,27 @@ def get_files(cdlc_files, directory, older=False, file_age_seconds=DEFAULT_NOT_P
                 cdlc_files.append(file)
 
 
-def get_file_names_from(directory, extension=PATTERN_CDLC_FILE_EXT):
-    log.info('Reading file names from directory: %s', directory)
-    if LOG_DEBUG_IS_ENABLED:
-        log.debug("----- Files ------------------------------------------")
+def get_file_names_from(directory, extension=PATTERN_CDLC_FILE_EXT) -> set:
+    log.debug('Reading file names from directory: %s', directory)
+    is_info_file_ext_to_remove = extension == PATTERN_CDLC_INFO_FILE_EXT
 
     cdlc_files = set()
+
+    log.debug("----- Files ------------------------------------------")
     for root, dir_names, filenames in os.walk(directory):
         for filename in fnmatch.filter(filenames, extension):
-            if extension == PATTERN_CDLC_INFO_FILE_EXT:
-                filename = filename.partition(EXT_PSARC_INFO_JSON)[0]
-            cdlc_files.add(filename)
-            log.debug(filename)
+            if is_info_file_ext_to_remove:
+                cdlc_files.add(filename_without_info_json_ext(filename))
+            else:
+                cdlc_files.add(filename)
 
-    log.info("---------- Found %s files", len(cdlc_files))
+    log.debug("-- Found %s files in directory: %s", len(cdlc_files), directory)
 
     return cdlc_files
+
+
+def filename_without_info_json_ext(filename: str) -> str:
+    return filename.partition(EXT_PSARC_INFO_JSON)[0]
 
 
 def is_file_old(filename, old_file_age):
@@ -100,7 +104,7 @@ def last_modification_time(path):
 
 
 def move_file(file, destination):
-    if LOG_DEBUG_IS_ENABLED:
+    if log.isEnabledFor(logging.DEBUG):
         log.debug(f"Moving file {file} to {destination} if exists!")
 
     if os.path.exists(file):

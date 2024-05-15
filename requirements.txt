@@ -11,5 +11,7 @@ ordered-set
 zstandard==0.22.0
 pycryptodome==3.20.0
 
-pytest==8.1.1
+pytest==8.2.0
 fuzzywuzzy~=0.18.0
+
+watchdog

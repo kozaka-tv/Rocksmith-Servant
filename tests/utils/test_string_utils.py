@@ -89,7 +89,9 @@ def test_is_not_blank(text, expected):
         ("", ""),
         (" ", " "),
         ("TEXT", "TEXT"),
-        ("TEXT's", "TEXT\\'s"),
+        ("TEXT's", "TEXT''s"),
+        ("TEXT's more'text", "TEXT''s more''text"),
+        ("TEXT and just a '", "TEXT and just a ''"),
     ]
 )
 def test_escape_single_quote(text, expected):
@@ -125,5 +127,21 @@ def test_escape_single_quote(text, expected):
 )
 def test_strtobool(text, expected):
     actual = string_utils.strtobool(text)
+
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "time, expected",
+    [
+        (None, None),
+        (3, '3.00'),
+        (5.1, '5.10'),
+        (6.05, '6.05'),
+        (10.123, '10.12'),
+    ]
+)
+def test_time_float_to_string(time, expected):
+    actual = string_utils.time_float_to_string(time)
 
     assert actual == expected

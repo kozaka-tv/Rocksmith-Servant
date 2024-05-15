@@ -139,7 +139,6 @@ dmypy.json
 /import/
 /temp/
 /cdlc_archive/
-/modules/song_loader/log/
 /servant.db
 /tmp/
 /parser_test.db

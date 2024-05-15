@@ -1,21 +1,24 @@
 import logging
 import os
+import threading
 from time import sleep
 
 import config.log_config
 from config.config_data import ConfigData
 from config.config_reader import ConfigReader
-from modules.cdlc_importer.load_cdlc_json_file import CDLCImporter
 from modules.database.db_manager import DBManager
 from modules.file_manager.cdlc_file_manager import FileManager
 from modules.scene_switcher.scene_switcher import SceneSwitcher
 from modules.setlist.setlist_logger import SetlistLogger
 from modules.song_loader.song_loader import SongLoader
 from modules.song_loader.songs import Songs
-from utils.exceptions import RocksnifferConnectionError, ConfigError, RSPlaylistNotLoggedInError
+from utils.exceptions import RocksnifferConnectionError, ConfigError, RSPLNotLoggedInError, \
+    RSPLPlaylistIsNotEnabledError
 from utils.rocksniffer import Rocksniffer
 
-HEARTBEAT = 0.1
+HEARTBEAT = 1
+HEARTBEAT_MANAGE_SONGS = 1
+HEARTBEAT_UPDATE_GAME_INFO_AND_SETLIST = 0.1
 
 config.log_config.config()
 log = logging.getLogger()
@@ -45,13 +48,13 @@ except ConfigError as e:
     exit()
 
 # Initializing modules and utils
-db_manager = DBManager()
 sniffer = Rocksniffer(config_data)
 setlist_logger = SetlistLogger(config_data)
 file_manager = FileManager(config_data)
-cdlc_importer = CDLCImporter(config_data, db_manager)
+# TODO in #158
+# cdlc_importer = CDLCImporter(config_data, db_manager)
 songs = Songs()
-song_loader = SongLoader(config_data, db_manager, songs)
+song_loader = SongLoader(config_data, songs)
 scene_switcher = SceneSwitcher(config_data)
 check_enabled_module_dependencies()
 
@@ -133,27 +136,59 @@ def sniffer_data_not_loaded():
     return not sniffer_data_loaded()
 
 
-cdlc_importer.load()
+# TODO in #158
+# cdlc_importer.load()
 
-# Main 'endless' loop
+def manage_songs():
+    song_loader.set_db_manager(DBManager())  # because of Threading, we must set DB here
+
+    while True:
+        try:
+            file_manager.run()
+            song_loader.run()
+            sleep(HEARTBEAT_MANAGE_SONGS)
+
+        # Catch and log all known exceptions, but keep app alive.
+        except (RSPLNotLoggedInError, RSPLPlaylistIsNotEnabledError) as ex:
+            log.error(ex)
+
+        # Catch all unchecked Exceptions, but keep app alive.
+        except Exception as ex:
+            log.exception(ex)
+
+
+def update_game_info_and_setlist():
+    while True:
+        try:
+            update_game_information()
+            put_the_song_into_the_setlist()
+            sleep(HEARTBEAT_UPDATE_GAME_INFO_AND_SETLIST)
+
+        # Catch all unchecked Exceptions, but keep app alive.
+        except Exception as ex:
+            log.exception(ex)
+
+
+manage_songs_thread = threading.Thread(target=manage_songs)
+manage_songs_thread.daemon = True
+manage_songs_thread.start()
+
+update_game_info_and_setlist_thread = threading.Thread(target=update_game_info_and_setlist)
+update_game_info_and_setlist_thread.daemon = True
+update_game_info_and_setlist_thread.start()
+
 while True:
 
     try:
         # Sleep a bit to avoid too fast processing
         sleep(HEARTBEAT)
 
+        # TODO
         update_config()
 
         # TODO
         # scene_switcher.run()
-        file_manager.run()
-        song_loader.run()
-        update_game_information()
-        put_the_song_into_the_setlist()
 
-    # Catch and log all known exceptions, but keep app alive.
-    except RSPlaylistNotLoggedInError as e:
-        log.error(e)
-
+    # Catch all unchecked Exceptions, but keep app alive.
     except Exception as e:
-        log.error(e)
+        log.exception(e)

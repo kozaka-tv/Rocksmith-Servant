@@ -37,3 +37,9 @@ def escape_single_quote(text: str):
 
 def strtobool(value: str) -> bool:
     return value is not None and value.lower().strip() in ('1', 'y', 'yes', 'true', 't', 'on')
+
+
+def time_float_to_string(time: float):
+    if time is None:
+        return None
+    return "%.2f" % round(time, 2)

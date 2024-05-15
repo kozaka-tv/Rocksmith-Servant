@@ -108,6 +108,7 @@ class RSPLTags:
         self.tag_to_download = get_tag_validated(conf, TAG_TO_DOWNLOAD)
         self.tag_downloaded = get_tag(conf, TAG_DOWNLOADED)
         self.tag_loaded = get_tag_validated(conf, TAG_LOADED)
+
         self.tag_new_viewer_request = get_tag(conf, TAG_NEW_VIEWER_REQ)
         self.tag_raider_request = get_tag(conf, TAG_RAIDER_REQ)
         self.tag_vip_viewer_request = get_tag(conf, TAG_VIP_VIEWER_REQ)

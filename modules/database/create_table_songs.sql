@@ -14,7 +14,7 @@ create table if not exists songs
     colRepairStatus         text,
     colSongYear             text,
     colSongVolume           text,
-    colFileName             text,
+    colFileName             text unique,
     colFileDate             text,
     colAppID                text,
     colPackageAuthor        text,

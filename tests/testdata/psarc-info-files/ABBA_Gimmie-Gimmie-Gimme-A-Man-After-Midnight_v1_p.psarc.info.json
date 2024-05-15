@@ -1,0 +1,68 @@
+{
+  "Entries": {
+    "5B53E1A80B3443E5A0247A798FAD096E": {
+      "Attributes": {
+        "AlbumArt": "urn:image:dds:album_abbagimmiegimmiegimmeamanafter",
+        "AlbumName": "Voulez-Vous",
+        "AlbumNameSort": "Voulez Vous",
+        "ArrangementName": "Bass",
+        "ArtistName": "ABBA",
+        "ArtistNameSort": "ABBA",
+        "CapoFret": 0.0,
+        "CentOffset": 0.0,
+        "DLC": true,
+        "DLCKey": "ABBAGimmieGimmieGimmeAManAfter",
+        "DNA_Chords": 0.0,
+        "DNA_Riffs": 0.0,
+        "DNA_Solo": 0.0,
+        "EasyMastery": 0.177777778,
+        "LeaderboardChallengeRating": 0,
+        "ManifestUrn": "urn:database:json-db:abbagimmiegimmiegimmeamanafter_bass",
+        "MasterID_RDV": 752271168,
+        "MediumMastery": 0.643386243,
+        "NotesEasy": 168.0,
+        "NotesHard": 945.0,
+        "NotesMedium": 608.0,
+        "Representative": 1,
+        "RouteMask": 4,
+        "Shipping": true,
+        "SKU": "",
+        "SongDiffEasy": 0.228488275,
+        "SongDiffHard": 0.321311637,
+        "SongDiffMed": 0.413454975,
+        "SongDifficulty": 0.321311637,
+        "SongKey": "ABBAGimmieGimmieGimmeAManAfter",
+        "SongLength": 294.107,
+        "SongName": "Gimmie Gimmie Gimme (A Man After Midnight)",
+        "SongNameSort": "Gimmie Gimmie Gimme A Man After Midnight",
+        "SongYear": 1979,
+        "Tuning": {
+          "string0": 0,
+          "string1": 0,
+          "string2": 0,
+          "string3": 0,
+          "string4": 0,
+          "string5": 0
+        },
+        "PersistentID": "5B53E1A80B3443E5A0247A798FAD096E"
+      }
+    },
+    "FC764DD706D74A478DF2A0DEBB9995FF": {
+      "Attributes": {
+        "AlbumArt": "urn:image:dds:album_abbagimmiegimmiegimmeamanafter",
+        "ArrangementName": "Vocals",
+        "CapoFret": 0.0,
+        "DLC": true,
+        "DLCKey": "ABBAGimmieGimmieGimmeAManAfter",
+        "LeaderboardChallengeRating": 0,
+        "ManifestUrn": "urn:database:json-db:abbagimmiegimmiegimmeamanafter_vocals",
+        "MasterID_RDV": 2030331246,
+        "Shipping": true,
+        "SKU": "",
+        "SongKey": "ABBAGimmieGimmieGimmeAManAfter",
+        "PersistentID": "FC764DD706D74A478DF2A0DEBB9995FF"
+      }
+    }
+  },
+  "InsertRoot": "Static.Songs.Headers"
+}

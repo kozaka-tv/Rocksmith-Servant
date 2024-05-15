@@ -17,6 +17,7 @@ handlers:
     formatter: logging
     filename: ./log/servant.log
     when: midnight
+    backupCount: 15
     encoding: utf8
   colour:
     class: logging.StreamHandler
