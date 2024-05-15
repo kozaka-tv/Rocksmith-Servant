@@ -22,7 +22,7 @@ log = logging.getLogger()
 
 
 class SongLoader:
-    def __init__(self, config_data: ConfigData, db_manager: DBManager, songs):
+    def __init__(self, config_data: ConfigData, songs):
         self.enabled = config_data.song_loader.enabled
         if self.enabled:
             self.twitch_channel = config_data.song_loader.twitch_channel
@@ -43,13 +43,15 @@ class SongLoader:
             self.__create_directories()
 
             # TODO really it is needed to store and have as input the DBManger + db? Is import not enough?
-            self.db_manager = db_manager
-            self.db = db_manager.db
+            self.db_manager = None
+            self.db = None
             self.songs = songs
 
-            self.__init_and_cleanup_songs_data()
+            self.last_run = None
 
-            self.last_run = time()
+    def set_db_manager(self, db_manager: DBManager):
+        self.db_manager = db_manager
+        self.db = self.db_manager.db
 
     def update_config(self, config_data):
         self.enabled = config_data.song_loader.enabled
@@ -81,6 +83,8 @@ class SongLoader:
 
     def run(self):
         if self.enabled:
+
+            self.__init_and_cleanup_songs_data_at_first_run()
 
             time_waited = time() - self.last_run
 
@@ -165,31 +169,34 @@ class SongLoader:
         else:
             log.debug("User is logged in and there is at least one request on the list.")
 
-    def __init_and_cleanup_songs_data(self):
-        log.warning('Initialising and cleaning up all CDLC file information')
+    def __init_and_cleanup_songs_data_at_first_run(self):
+        if self.last_run is None:
+            self.last_run = time()
 
-        # filenames_from_cache_dir = self.__get_cdlc_filenames_from_cache_dir()
-        filenames_from_archive_dir = self.__get_cdlc_filenames_from_archive_dir()
-        filenames_from_rs_dir = self.__get_cdlc_filenames_from_rs_dir()
+            log.warning('Initialising and cleaning up all CDLC file information')
 
-        self.__clean_up_archive_dir_for_duplicates(filenames_from_rs_dir, filenames_from_archive_dir)
+            # filenames_from_cache_dir = self.__get_cdlc_filenames_from_cache_dir()
+            filenames_from_archive_dir = self.__get_cdlc_filenames_from_archive_dir()
+            filenames_from_rs_dir = self.__get_cdlc_filenames_from_rs_dir()
 
-        filenames_in_rs_and_archive_dir = filenames_from_rs_dir.union(filenames_from_archive_dir)
-        filenames_in_db = self.db_manager.all_song_filenames()
-        self.__clean_up_songs_in_db(filenames_in_rs_and_archive_dir, filenames_in_db)
-        # self.__clean_up_songs_in_cache(filenames_in_rs_and_archive_dir, filenames_from_cache_dir)
+            self.__clean_up_archive_dir_for_duplicates(filenames_from_rs_dir, filenames_from_archive_dir)
 
-        self.__store_and_return_all_the_new_song_datas(self.cdlc_archive_dir, self.songs.songs_in_archive)
-        self.__store_and_return_all_the_new_song_datas(self.rocksmith_cdlc_dir, self.songs.songs_in_rs)
+            filenames_in_rs_and_archive_dir = filenames_from_rs_dir.union(filenames_from_archive_dir)
+            filenames_in_db = self.db_manager.all_song_filenames()
+            self.__clean_up_songs_in_db(filenames_in_rs_and_archive_dir, filenames_in_db)
+            # self.__clean_up_songs_in_cache(filenames_in_rs_and_archive_dir, filenames_from_cache_dir)
 
-        # TODO store lists in memory (songs)?
+            self.__store_and_return_all_the_new_song_datas(self.cdlc_archive_dir, self.songs.songs_in_archive)
+            self.__store_and_return_all_the_new_song_datas(self.rocksmith_cdlc_dir, self.songs.songs_in_rs)
 
-        # ---------- TODO cleanup cache? --> Or clean up only at start? Do we need cache at all?
-        # log.info('Count of files in cache: %s', len(filenames_from_cache_dir))
+            # TODO store lists in memory (songs)?
 
-        #  TODO lower log level?
-        log.info('Count of songs in archive: %s', len(self.songs.songs_in_archive))
-        log.info('Count of songs in rs: %s', len(self.songs.songs_in_rs))
+            # ---------- TODO cleanup cache? --> Or clean up only at start? Do we need cache at all?
+            # log.info('Count of files in cache: %s', len(filenames_from_cache_dir))
+
+            #  TODO lower log level?
+            log.info('Count of songs in archive: %s', len(self.songs.songs_in_archive))
+            log.info('Count of songs in rs: %s', len(self.songs.songs_in_rs))
 
     # TODO needed?
     @staticmethod
