@@ -38,17 +38,5 @@ serialized = {
         "source_directories": "<Enter source directories (separated by ';') from where do you want to move CDLC files>",
         "destination_directory": "<Enter your directory to where do you want to move CDLC files>",
         "using_cfsm": False,
-    },
-    "OBSWebSocket": {
-        "host": "localhost",
-        "port": 4444,
-        "pass": "",
-    },
-    "Behaviour": {
-        "cooldown": 3,
-        "paused": "<PauseSceneName>",
-        "in_game": "<InGameSceneName>",
-        "in_menu": "<MenuSceneName>",
-        "forbidden_switch_on_scenes": "<IntroSceneName; OutroSceneName>",
     }
 }

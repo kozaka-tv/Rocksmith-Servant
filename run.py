@@ -33,9 +33,6 @@ log.warning("-------------------------------------------------------------------
 log.warning("----- SERVANT IS STARTING ----------------------------------------------")
 log.warning("------------------------------------------------------------------------")
 
-# OBS
-# Behaviour
-
 # Key name definitions
 KEY_ENABLED = "enabled"
 
@@ -57,10 +54,6 @@ scene_switcher = SceneSwitcher(config_data)
 check_enabled_module_dependencies()
 
 
-# TODO OBS
-# TODO Behaviour
-
-
 def update_config():
     if conf.reload_if_changed():
         config_data_updated = ConfigData(conf)
@@ -70,8 +63,6 @@ def update_config():
         song_loader.update_config(config_data_updated)
         scene_switcher.update_config(config_data_updated)
         file_manager.update_config(config_data_updated)
-        # TODO OBS
-        # TODO Behaviour
 
         check_enabled_module_dependencies()
 
@@ -89,8 +80,7 @@ def get_debug_message():
         modules_str += scene_switcher.__class__.__name__ + os.linesep
     if file_manager.enabled:
         modules_str += file_manager.__class__.__name__ + os.linesep
-    # TODO OBS
-    # TODO Behaviour
+
     modules_str += "---------------" + os.linesep
 
     sniffer_str = "Song: {sniffer.artistName} - {sniffer.songName} " \

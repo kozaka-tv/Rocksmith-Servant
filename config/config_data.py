@@ -9,8 +9,6 @@ SECTION_SETLIST_LOGGER = "SetlistLogger"
 SECTION_SONG_LOADER = "SongLoader"
 SECTION_SCENE_SWITCHER = "SceneSwitcher"
 SECTION_FILE_MANAGER = "FileManager"
-# OBS
-# Behaviour
 
 # Key name definitions
 KEY_ENABLED = "enabled"
@@ -104,10 +102,6 @@ class RSPLTags:
 class ConfSceneSwitcher:
     def __init__(self, conf):
         self.enabled = conf.get_bool(SECTION_SCENE_SWITCHER, KEY_ENABLED)
-
-
-# TODO OBS
-# TODO Behaviour
 
 
 def validate_and_get_phpsessid(conf, twitch_channel):
