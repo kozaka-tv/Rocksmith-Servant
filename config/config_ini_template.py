@@ -39,12 +39,6 @@ serialized = {
         "destination_directory": "<Enter your directory to where do you want to move CDLC files>",
         "using_cfsm": False,
     },
-    "CDLCImporter": {
-        "enabled": False,
-        "cdlc_import_json_file": "<Enter your directory, where do you want put your json file from CFSM, "
-                                 "what contains all your CDLC files need to be imported into the Servant database"
-                                 "You have to export from CFSM only the delta, only the newly enumerated songs>"
-    },
     "OBSWebSocket": {
         "host": "localhost",
         "port": 4444,
