@@ -94,7 +94,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           tag_name: ${{ github.ref }}
-          name: Release ${{ github.ref }}
+          name: ${{ github.ref_name }}
           files: |
             ./artifacts/*.exe
             ./artifacts/*.bin
