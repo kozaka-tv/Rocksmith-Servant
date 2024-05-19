@@ -88,6 +88,10 @@ jobs:
       - name: List files after download
         run: ls -R ./artifacts
 
+      # Rename Windows artifact to a suitable name
+      - name: Rename Windows artifact
+        run: mv ./artifacts/run.exe ./artifacts/RocksmithServant-${{ github.ref_name }}.exe
+
       # Create a GitHub release using softprops/action-gh-release
       - name: Release
         uses: softprops/action-gh-release@v2
