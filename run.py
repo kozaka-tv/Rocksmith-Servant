@@ -1,6 +1,7 @@
 import logging
 import os
 import threading
+import argparse
 from time import sleep
 
 import config.log_config
@@ -20,9 +21,16 @@ HEARTBEAT = 1
 HEARTBEAT_MANAGE_SONGS = 1
 HEARTBEAT_UPDATE_GAME_INFO_AND_SETLIST = 0.1
 
+# Argument parsing
+parser = argparse.ArgumentParser(description='Servant script for managing Rocksmith sessions.')
+parser.add_argument('-c', '--config', type=str, required=False, help='Configuration file path',
+                    default='config/config.ini')
+args = parser.parse_args()
+
 config.log_config.config()
 log = logging.getLogger()
 
+log.info("Configfile: " + args.config)
 
 def check_enabled_module_dependencies():
     if song_loader.enabled and not file_manager.enabled:
@@ -37,7 +45,7 @@ log.warning("-------------------------------------------------------------------
 KEY_ENABLED = "enabled"
 
 # Initializing configuration
-conf = ConfigReader()
+conf = ConfigReader(args.config)
 try:
     config_data = ConfigData(conf)
 except ConfigError as e:
