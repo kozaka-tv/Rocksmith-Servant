@@ -1,7 +1,7 @@
+import argparse
 import logging
 import os
 import threading
-import argparse
 from time import sleep
 
 import config.log_config
@@ -30,7 +30,8 @@ args = parser.parse_args()
 config.log_config.config()
 log = logging.getLogger()
 
-log.info("Configfile: " + args.config)
+log.info('Configfile: %s', args.config)
+
 
 def check_enabled_module_dependencies():
     if song_loader.enabled and not file_manager.enabled:

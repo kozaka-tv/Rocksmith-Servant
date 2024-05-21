@@ -1,6 +1,5 @@
 import os
 
-from config.config_reader import ConfigReader
 from utils import rs_playlist, string_utils
 from utils.exceptions import ConfigError
 
