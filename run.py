@@ -1,9 +1,9 @@
-import argparse
 import logging
 import os
 import threading
 from time import sleep
 
+import config.log_config
 import config.log_config
 from config.config_data import ConfigData
 from config.config_reader import ConfigReader
@@ -13,6 +13,7 @@ from modules.scene_switcher.scene_switcher import SceneSwitcher
 from modules.setlist.setlist_logger import SetlistLogger
 from modules.song_loader.song_loader import SongLoader
 from modules.song_loader.songs import Songs
+from utils.cmd_line_parser import parse_args
 from utils.exceptions import RocksnifferConnectionError, ConfigError, RSPLNotLoggedInError, \
     RSPLPlaylistIsNotEnabledError
 from utils.rocksniffer import Rocksniffer
@@ -21,12 +22,7 @@ HEARTBEAT = 1
 HEARTBEAT_MANAGE_SONGS = 1
 HEARTBEAT_UPDATE_GAME_INFO_AND_SETLIST = 0.1
 
-# Argument parsing
-parser = argparse.ArgumentParser(description='Servant script for managing Rocksmith sessions.')
-parser.add_argument('-c', '--config', type=str, required=False, help='Configuration file path',
-                    default='config/config.ini')
-args = parser.parse_args()
-config_file_path = args.config
+config_file_path = parse_args()
 
 config.log_config.config()
 log = logging.getLogger()
