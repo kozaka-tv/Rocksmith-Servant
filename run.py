@@ -128,8 +128,8 @@ def sniffer_data_not_loaded():
     return not sniffer_data_loaded()
 
 
-def manage_songs(db_file_path):
-    song_loader.set_db_manager(DBManager(db_file_path))  # because of Threading, we must set DB here
+def manage_songs(db_file):
+    song_loader.set_db_manager(DBManager(db_file))  # because of Threading, we must set DB here
     while True:
         try:
             file_manager.run()
