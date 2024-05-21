@@ -15,7 +15,6 @@ from utils.exceptions import RSPLNotLoggedInError
 from utils.rs_playlist import get_playlist, user_is_not_logged_in
 from utils.string_utils import time_float_to_string
 
-DEFAULT_CDLC_DIR = 'import'
 HEARTBEAT = 5
 
 log = logging.getLogger()
@@ -29,8 +28,6 @@ class SongLoader:
             self.phpsessid = config_data.song_loader.phpsessid
             self.rsplaylist = None
             self.rsplaylist_updated = True
-            # TODO not needed?
-            self.cdlc_dir = os.path.join(config_data.song_loader.cdlc_dir)
             self.rspl_tags = config_data.song_loader.rspl_tags
             self.cdlc_archive_dir = check_cdlc_archive_dir(config_data.song_loader.cdlc_archive_dir)
             self.destination_dir = config_data.song_loader.destination_dir
@@ -53,7 +50,6 @@ class SongLoader:
 
     def update_config(self, config_data):
         self.enabled = config_data.song_loader.enabled
-        self.cdlc_dir = os.path.join(config_data.song_loader.cdlc_dir)
         self.rspl_tags = config_data.song_loader.rspl_tags
         self.cdlc_archive_dir = check_cdlc_archive_dir(config_data.song_loader.cdlc_archive_dir)
         self.destination_dir = config_data.song_loader.destination_dir
@@ -66,7 +62,6 @@ class SongLoader:
     def __create_directories(self):
         try:
             file_utils.create_directory_logged(PSARC_INFO_FILE_CACHE_DIR)
-            file_utils.create_directory_logged(self.cdlc_dir)
             file_utils.create_directory_logged(self.cdlc_archive_dir)
             file_utils.create_directory_logged(self.rocksmith_cdlc_dir)
         except FileNotFoundError as bde:

@@ -79,7 +79,6 @@ class ConfSongLoader:
         if self.enabled:
             self.twitch_channel = conf.get(SECTION_SONG_LOADER, "twitch_channel")
             self.phpsessid = validate_and_get_phpsessid(conf, self.twitch_channel)
-            self.cdlc_dir = conf.get(SECTION_SONG_LOADER, "cdlc_dir")
             self.rspl_tags = RSPLTags(conf)
             self.cdlc_archive_dir = conf.get(SECTION_SONG_LOADER, "cdlc_archive_dir")
             self.destination_dir = conf.get(SECTION_FILE_MANAGER, "destination_dir")
