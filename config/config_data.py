@@ -81,7 +81,6 @@ class ConfSongLoader:
             self.phpsessid = validate_and_get_phpsessid(conf, self.twitch_channel)
             self.cdlc_dir = conf.get(SECTION_SONG_LOADER, "cdlc_dir")
             self.rspl_tags = RSPLTags(conf)
-            self.cfsm_file_name = conf.get(SECTION_SONG_LOADER, "cfsm_file_name")
             self.cdlc_archive_dir = conf.get(SECTION_SONG_LOADER, "cdlc_archive_dir")
             self.destination_dir = conf.get(SECTION_FILE_MANAGER, "destination_dir")
             self.rocksmith_cdlc_dir = conf.get(SECTION_SONG_LOADER, "rocksmith_cdlc_dir")

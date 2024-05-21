@@ -23,7 +23,6 @@ serialized = {
                                    "raider streamer and enter to here>",
         "rspl_tag_vip_viewer_request": "<Create a tag in RS Playlist for song which one has been requested by a "
                                        "channel VIP viewer and enter to here>",
-        "cfsm_file_name": "SongsMasterGrid.json",
         "cdlc_archive_dir": "<Enter your CDLC archive directory, where you store all of your downloaded CDLCs>",
         "rocksmith_cdlc_dir": "<Enter your Rocksmith CDLC directory, where you have all the loaded CDLC songs>",
         "allow_load_when_in_game": True,
