@@ -7,4 +7,5 @@ def parse_args():
                         default='config/config.ini')
     args = parser.parse_args()
     config = args.config
+
     return config
