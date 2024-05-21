@@ -22,14 +22,14 @@ class FileManager:
         if self.enabled:
             self.last_run = datetime.datetime.now()
             self.last_run_not_parsed = self.last_run
-            self.source_directories = config_data.file_manager.source_directories
-            self.destination_directory = config_data.file_manager.destination_directory
+            self.download_dirs = config_data.file_manager.download_dirs
+            self.destination_dir = config_data.file_manager.destination_dir
             self.using_cfsm = config_data.file_manager.using_cfsm
 
     def update_config(self, config_data):
         self.enabled = config_data.file_manager.enabled
-        self.source_directories = config_data.file_manager.source_directories
-        self.destination_directory = config_data.file_manager.destination_directory
+        self.download_dirs = config_data.file_manager.download_dirs
+        self.destination_dir = config_data.file_manager.destination_dir
         self.using_cfsm = config_data.file_manager.using_cfsm
 
     def run(self):
@@ -40,7 +40,7 @@ class FileManager:
             elif self.__beat_last_run():
                 log.debug("Scan and move files from %s and source dirs...", TMP_DIR_NAME)
                 self.__move_files_to_destination_dir(self.__scan_cdlc_files_in_tmp())
-                self.__move_files_to_destination_dir(self.__scan_cdlc_files_in_source_dirs())
+                self.__move_files_to_destination_dir(self.__scan_cdlc_files_in_download_dirs())
 
                 self.last_run = datetime.datetime.now()
 
@@ -68,7 +68,7 @@ class FileManager:
         if is_not_empty(non_parsed_files):
             log.warning(
                 "Found %s file(s) in %s dir which one(s) were not yet parsed so I moving them to %s now! Files: %s"
-                , len(non_parsed_files), self.destination_directory, TMP_DIR_NAME, repr_in_multi_line(non_parsed_files))
+                , len(non_parsed_files), self.destination_dir, TMP_DIR_NAME, repr_in_multi_line(non_parsed_files))
             file_utils.move_files_to(TMP_DIR, non_parsed_files)
             return True
 
@@ -84,18 +84,18 @@ class FileManager:
 
         return cdlc_files
 
-    def __scan_cdlc_files_in_source_dirs(self):
+    def __scan_cdlc_files_in_download_dirs(self):
 
         try:
-            cdlc_files = file_utils.get_files_from_directories(self.source_directories)
+            cdlc_files = file_utils.get_files_from_directories(self.download_dirs)
         except BadDirectoryError as bde:
             log.error("---------------------------------------")
-            log.error("Bad definition of the section FileManager of key source_directories!")
+            log.error("Bad definition of the section FileManager of key download_dirs!")
             log.error("Directory %s is bad or could not be reached, therefore it will be not checked anymore.",
                       format(bde.directory))
             log.error("Please fix the configuration!")
             log.error("---------------------------------------")
-            self.source_directories.discard(bde.directory)
+            self.download_dirs.discard(bde.directory)
             return
 
         if len(cdlc_files) > 0:
@@ -105,8 +105,8 @@ class FileManager:
         return cdlc_files
 
     def __scan_cdlc_files_in_destination_dir(self):
-        return file_utils.get_not_parsed_files_from_directory(self.destination_directory)
+        return file_utils.get_not_parsed_files_from_directory(self.destination_dir)
 
     def __move_files_to_destination_dir(self, files):
         if files and len(files) > 0:
-            file_utils.move_files_to(self.destination_directory, files)
+            file_utils.move_files_to(self.destination_dir, files)

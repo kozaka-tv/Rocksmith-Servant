@@ -35,8 +35,8 @@ serialized = {
     },
     "FileManager": {
         "enabled": False,
-        "source_directories": "<Enter source directories (separated by ';') from where do you want to move CDLC files>",
-        "destination_directory": "<Enter your directory to where do you want to move CDLC files>",
+        "download_dirs": "<Enter source directories (separated by ';') from where do you want to move CDLC files>",
+        "destination_dir": "<Enter your directory to where do you want to move CDLC files>",
         "using_cfsm": False,
     }
 }
