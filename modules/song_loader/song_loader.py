@@ -29,6 +29,7 @@ class SongLoader:
             self.phpsessid = config_data.song_loader.phpsessid
             self.rsplaylist = None
             self.rsplaylist_updated = True
+            # TODO not needed?
             self.cdlc_dir = os.path.join(config_data.song_loader.cdlc_dir)
             self.rspl_tags = config_data.song_loader.rspl_tags
             self.cfsm_file_name = config_data.song_loader.cfsm_file_name
