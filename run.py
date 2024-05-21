@@ -17,10 +17,6 @@ from utils.exceptions import RocksnifferConnectionError, ConfigError, RSPLNotLog
     RSPLPlaylistIsNotEnabledError
 from utils.rocksniffer import Rocksniffer
 
-HEARTBEAT = 1
-HEARTBEAT_MANAGE_SONGS = 1
-HEARTBEAT_UPDATE_GAME_INFO_AND_SETLIST = 0.1
-
 try:
     config_file_path, db_file_path = parse_args()
 except ValueError as e:
@@ -34,16 +30,16 @@ log.warning("-------------------------------------------------------------------
 log.warning("----- SERVANT IS STARTING ----------------------------------------------")
 log.warning("------------------------------------------------------------------------")
 
+HEARTBEAT = 1
+HEARTBEAT_MANAGE_SONGS = 1
+HEARTBEAT_UPDATE_GAME_INFO_AND_SETLIST = 0.1
+
 
 def check_enabled_module_dependencies():
     if song_loader.enabled and not file_manager.enabled:
         raise ConfigError("Please enable FileManager if you wanna use the SongLoader!")
 
 
-# Key name definitions
-KEY_ENABLED = "enabled"
-
-# Initializing configuration
 conf = ConfigReader(config_file_path)
 try:
     config_data = ConfigData(conf)

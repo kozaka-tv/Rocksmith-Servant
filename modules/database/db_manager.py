@@ -13,8 +13,9 @@ log = logging.getLogger()
 class DBManager:
 
     def __init__(self, db_file):
-        self.dirname = self.__get_db_dirname()
         log.info('Database path: %s', db_file)
+
+        self.dirname = self.__get_db_dirname()
 
         self.db = sqlite3.connect(db_file)
         self.__init_db()

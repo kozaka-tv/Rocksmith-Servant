@@ -19,6 +19,8 @@ class ConfigTemplateError(Exception):
 
 class ConfigReader:
     def __init__(self, config_file):
+        log.info('Configfile path: %s', self.config_file)
+
         self.config_template_file = "config_ini_template.py"
 
         self.config_file = config_file
@@ -26,9 +28,7 @@ class ConfigReader:
         self.config_filename = os.path.basename(config_file)
         self.config_abspath = os.path.abspath(config_file)
 
-        log.info('Configfile path: %s', self.config_file)
         file_utils.create_directory_logged(self.config_dirname)
-
         log.warning('Initialising %s from %s ...', self.config_filename, self.config_dirname)
 
         self.last_modified = None
