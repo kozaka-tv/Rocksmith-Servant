@@ -4,7 +4,6 @@ import threading
 from time import sleep
 
 import config.log_config
-import config.log_config
 from config.config_data import ConfigData
 from config.config_reader import ConfigReader
 from modules.database.db_manager import DBManager
@@ -134,6 +133,7 @@ def sniffer_data_not_loaded():
 
 def manage_songs(db_file):
     song_loader.set_db_manager(DBManager(db_file))  # because of Threading, we must set DB here
+
     while True:
         try:
             file_manager.run()
