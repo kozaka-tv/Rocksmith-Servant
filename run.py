@@ -22,7 +22,11 @@ HEARTBEAT = 1
 HEARTBEAT_MANAGE_SONGS = 1
 HEARTBEAT_UPDATE_GAME_INFO_AND_SETLIST = 0.1
 
-config_file_path, db_file_path = parse_args()
+try:
+    config_file_path, db_file_path = parse_args()
+except ValueError as e:
+    print(f"Error: {e}")
+    exit(1)
 
 config.log_config.config()
 log = logging.getLogger()

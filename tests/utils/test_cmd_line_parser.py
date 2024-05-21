@@ -2,8 +2,7 @@ import unittest
 from unittest.mock import patch
 from utils.cmd_line_parser import parse_args
 
-
-class TestParseArgs(unittest.TestCase):
+class TestCmdLineParser(unittest.TestCase):
 
     @patch('sys.argv', ['run.py'])
     def test_defaults(self):
@@ -29,6 +28,17 @@ class TestParseArgs(unittest.TestCase):
         self.assertEqual(config, 'custom_config.ini')
         self.assertEqual(database, 'custom_servant.db')
 
+    @patch('sys.argv', ['run.py', '-c', 'custom_config.txt'])
+    def test_invalid_config_extension(self):
+        with self.assertRaises(ValueError) as cm:
+            parse_args()
+        self.assertEqual(str(cm.exception), "The configuration file must have a '.ini' extension.")
+
+    @patch('sys.argv', ['run.py', '-db', 'custom_servant.txt'])
+    def test_invalid_database_extension(self):
+        with self.assertRaises(ValueError) as cm:
+            parse_args()
+        self.assertEqual(str(cm.exception), "The database file must have a '.db' extension.")
 
 if __name__ == '__main__':
     unittest.main()

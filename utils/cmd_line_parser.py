@@ -8,6 +8,13 @@ def parse_args():
     parser.add_argument('-db', '--database', type=str, required=False, help=' file path',
                         default='servant.db')
     args = parser.parse_args()
+
     config = args.config
     database = args.database
+
+    if not config.endswith('.ini'):
+        raise ValueError("The configuration file must have a '.ini' extension.")
+    if not database.endswith('.db'):
+        raise ValueError("The database file must have a '.db' extension.")
+
     return config, database
