@@ -22,7 +22,7 @@ HEARTBEAT = 1
 HEARTBEAT_MANAGE_SONGS = 1
 HEARTBEAT_UPDATE_GAME_INFO_AND_SETLIST = 0.1
 
-config_file_path = parse_args()
+config_file_path, db_file_path = parse_args()
 
 config.log_config.config()
 log = logging.getLogger()
@@ -30,9 +30,6 @@ log = logging.getLogger()
 log.warning("------------------------------------------------------------------------")
 log.warning("----- SERVANT IS STARTING ----------------------------------------------")
 log.warning("------------------------------------------------------------------------")
-
-# TODO log this out in the config module not here
-log.info('Configfile path: %s', config_file_path)
 
 
 def check_enabled_module_dependencies():
@@ -131,9 +128,8 @@ def sniffer_data_not_loaded():
     return not sniffer_data_loaded()
 
 
-def manage_songs():
-    song_loader.set_db_manager(DBManager())  # because of Threading, we must set DB here
-
+def manage_songs(db_file_path):
+    song_loader.set_db_manager(DBManager(db_file_path))  # because of Threading, we must set DB here
     while True:
         try:
             file_manager.run()
@@ -161,7 +157,7 @@ def update_game_info_and_setlist():
             log.exception(ex)
 
 
-manage_songs_thread = threading.Thread(target=manage_songs)
+manage_songs_thread = threading.Thread(target=manage_songs, args=(db_file_path,))
 manage_songs_thread.daemon = True
 manage_songs_thread.start()
 

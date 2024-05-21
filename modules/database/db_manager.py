@@ -7,16 +7,16 @@ from utils import string_utils
 from utils.collection_utils import set_of_the_tuples_from_the_first_position
 from utils.string_utils import remove_special_chars
 
-DATABASE = './servant.db'
 log = logging.getLogger()
 
 
 class DBManager:
 
-    def __init__(self):
+    def __init__(self, db_file):
         self.dirname = self.__get_db_dirname()
+        log.info('Database path: %s', db_file)
 
-        self.db = sqlite3.connect(DATABASE)
+        self.db = sqlite3.connect(db_file)
         self.__init_db()
 
     def __init_db(self):
