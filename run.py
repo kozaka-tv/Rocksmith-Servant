@@ -26,11 +26,17 @@ parser = argparse.ArgumentParser(description='Servant script for managing Rocksm
 parser.add_argument('-c', '--config', type=str, required=False, help='Configuration file path',
                     default='config/config.ini')
 args = parser.parse_args()
+config_file_path = args.config
 
 config.log_config.config()
 log = logging.getLogger()
 
-log.info('Configfile: %s', args.config)
+log.warning("------------------------------------------------------------------------")
+log.warning("----- SERVANT IS STARTING ----------------------------------------------")
+log.warning("------------------------------------------------------------------------")
+
+# TODO log this out in the config module not here
+log.info('Configfile path: %s', config_file_path)
 
 
 def check_enabled_module_dependencies():
@@ -38,15 +44,11 @@ def check_enabled_module_dependencies():
         raise ConfigError("Please enable FileManager if you wanna use the SongLoader!")
 
 
-log.warning("------------------------------------------------------------------------")
-log.warning("----- SERVANT IS STARTING ----------------------------------------------")
-log.warning("------------------------------------------------------------------------")
-
 # Key name definitions
 KEY_ENABLED = "enabled"
 
 # Initializing configuration
-conf = ConfigReader(args.config)
+conf = ConfigReader(config_file_path)
 try:
     config_data = ConfigData(conf)
 except ConfigError as e:
