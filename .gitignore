@@ -136,7 +136,6 @@ dmypy.json
 /log/
 **/log/
 /setlist/
-/import/
 /temp/
 /tmp/
 /cdlc_archive/

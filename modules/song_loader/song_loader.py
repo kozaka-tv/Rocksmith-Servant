@@ -15,7 +15,6 @@ from utils.exceptions import RSPLNotLoggedInError
 from utils.rs_playlist import get_playlist, user_is_not_logged_in
 from utils.string_utils import time_float_to_string
 
-DEFAULT_CDLC_DIR = 'import'
 HEARTBEAT = 5
 
 log = logging.getLogger()
@@ -29,15 +28,12 @@ class SongLoader:
             self.phpsessid = config_data.song_loader.phpsessid
             self.rsplaylist = None
             self.rsplaylist_updated = True
-            self.cdlc_dir = os.path.join(config_data.song_loader.cdlc_dir)
             self.rspl_tags = config_data.song_loader.rspl_tags
-            self.cfsm_file_name = config_data.song_loader.cfsm_file_name
             self.cdlc_archive_dir = check_cdlc_archive_dir(config_data.song_loader.cdlc_archive_dir)
             self.destination_dir = config_data.song_loader.destination_dir
             self.download_dirs = config_data.file_manager.download_dirs
             self.rocksmith_cdlc_dir = check_rocksmith_cdlc_dir(config_data.song_loader.rocksmith_cdlc_dir)
             self.allow_load_when_in_game = config_data.song_loader.allow_load_when_in_game
-            self.songs_to_load = os.path.join(config_data.song_loader.cdlc_dir, config_data.song_loader.cfsm_file_name)
 
             self.__create_directories()
 
@@ -54,22 +50,18 @@ class SongLoader:
 
     def update_config(self, config_data):
         self.enabled = config_data.song_loader.enabled
-        self.cdlc_dir = os.path.join(config_data.song_loader.cdlc_dir)
         self.rspl_tags = config_data.song_loader.rspl_tags
-        self.cfsm_file_name = config_data.song_loader.cfsm_file_name
         self.cdlc_archive_dir = check_cdlc_archive_dir(config_data.song_loader.cdlc_archive_dir)
         self.destination_dir = config_data.song_loader.destination_dir
         self.rocksmith_cdlc_dir = check_rocksmith_cdlc_dir(config_data.song_loader.rocksmith_cdlc_dir)
         self.allow_load_when_in_game = config_data.song_loader.allow_load_when_in_game
         self.phpsessid = config_data.song_loader.phpsessid
-        self.songs_to_load = os.path.join(config_data.song_loader.cdlc_dir, config_data.song_loader.cfsm_file_name)
 
         self.__create_directories()
 
     def __create_directories(self):
         try:
             file_utils.create_directory_logged(PSARC_INFO_FILE_CACHE_DIR)
-            file_utils.create_directory_logged(self.cdlc_dir)
             file_utils.create_directory_logged(self.cdlc_archive_dir)
             file_utils.create_directory_logged(self.rocksmith_cdlc_dir)
         except FileNotFoundError as bde:
