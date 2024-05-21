@@ -33,8 +33,8 @@ class SongLoader:
             self.rspl_tags = config_data.song_loader.rspl_tags
             self.cfsm_file_name = config_data.song_loader.cfsm_file_name
             self.cdlc_archive_dir = check_cdlc_archive_dir(config_data.song_loader.cdlc_archive_dir)
-            self.destination_directory = config_data.song_loader.destination_directory
-            self.source_directories = config_data.file_manager.source_directories
+            self.destination_dir = config_data.song_loader.destination_dir
+            self.download_dirs = config_data.file_manager.download_dirs
             self.rocksmith_cdlc_dir = check_rocksmith_cdlc_dir(config_data.song_loader.rocksmith_cdlc_dir)
             self.allow_load_when_in_game = config_data.song_loader.allow_load_when_in_game
             self.songs_to_load = os.path.join(config_data.song_loader.cdlc_dir, config_data.song_loader.cfsm_file_name)
@@ -58,7 +58,7 @@ class SongLoader:
         self.rspl_tags = config_data.song_loader.rspl_tags
         self.cfsm_file_name = config_data.song_loader.cfsm_file_name
         self.cdlc_archive_dir = check_cdlc_archive_dir(config_data.song_loader.cdlc_archive_dir)
-        self.destination_directory = config_data.song_loader.destination_directory
+        self.destination_dir = config_data.song_loader.destination_dir
         self.rocksmith_cdlc_dir = check_rocksmith_cdlc_dir(config_data.song_loader.rocksmith_cdlc_dir)
         self.allow_load_when_in_game = config_data.song_loader.allow_load_when_in_game
         self.phpsessid = config_data.song_loader.phpsessid
@@ -120,18 +120,18 @@ class SongLoader:
                 log.debug("Waiting for heartbeat ... waited: %s seconds", time_float_to_string(time_waited))
 
     def __update_songs_from_download_dir(self):
-        cdlc_files = file_utils.get_files_from_directories(self.source_directories)
-        for source_directory in self.source_directories:
-            self.__store_and_return_all_the_new_song_datas(self.source_directory, self.songs.songs_in_tmp)
+        cdlc_files = file_utils.get_files_from_directories(self.download_dirs)
+        for source_dir in self.download_dirs:
+            self.__store_and_return_all_the_new_song_datas(source_dir, self.songs.songs_in_tmp)
 
     def __update_songs_from_rs_dir(self):
         self.__store_and_return_all_the_new_song_datas(self.rocksmith_cdlc_dir, self.songs.songs_in_rs)
 
     def __update_songs_from_import_dir(self):
-        self.__store_and_return_all_the_new_song_datas(self.destination_directory, self.songs.songs_in_import)
+        self.__store_and_return_all_the_new_song_datas(self.destination_dir, self.songs.songs_in_import)
 
     def __update_songs_from_tmp_dir(self):
-        self.__store_and_return_all_the_new_song_datas(self.destination_directory, self.songs.songs_in_tmp)
+        self.__store_and_return_all_the_new_song_datas(self.destination_dir, self.songs.songs_in_tmp)
 
     def playlist_has_been_changed(self):
         new_playlist = get_playlist(self.twitch_channel, self.phpsessid)
@@ -334,7 +334,7 @@ class SongLoader:
 
             else:
                 song_to_move = os.path.join(self.cdlc_archive_dir, filename)
-                moved = file_utils.move_file(song_to_move, self.destination_directory)
+                moved = file_utils.move_file(song_to_move, self.destination_dir)
                 if moved:
                     # TODO debug level
                     log.info("The song were moved from the archive into RS directory. Moved file: %s", song_to_move)

@@ -66,8 +66,8 @@ class ConfSetlistLogger:
 class ConfFileManager:
     def __init__(self, conf):
         self.enabled = conf.get_bool(SECTION_FILE_MANAGER, KEY_ENABLED)
-        self.source_directories = conf.get_set(SECTION_FILE_MANAGER, "source_directories")
-        self.destination_directory = conf.get(SECTION_FILE_MANAGER, "destination_directory")
+        self.download_dirs = conf.get_set(SECTION_FILE_MANAGER, "download_dirs")
+        self.destination_dir = conf.get(SECTION_FILE_MANAGER, "destination_dir")
         self.using_cfsm = conf.get(SECTION_FILE_MANAGER, "using_cfsm")
 
 
@@ -81,7 +81,7 @@ class ConfSongLoader:
             self.rspl_tags = RSPLTags(conf)
             self.cfsm_file_name = conf.get(SECTION_SONG_LOADER, "cfsm_file_name")
             self.cdlc_archive_dir = conf.get(SECTION_SONG_LOADER, "cdlc_archive_dir")
-            self.destination_directory = conf.get(SECTION_FILE_MANAGER, "destination_directory")
+            self.destination_dir = conf.get(SECTION_FILE_MANAGER, "destination_dir")
             self.rocksmith_cdlc_dir = conf.get(SECTION_SONG_LOADER, "rocksmith_cdlc_dir")
             self.allow_load_when_in_game = conf.get_bool(SECTION_SONG_LOADER, "allow_load_when_in_game")
 

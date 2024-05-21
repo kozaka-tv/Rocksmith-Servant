@@ -1,17 +1,17 @@
 colorama~=0.4.5
 setuptools==69.5.1
-requests==2.31.0
+requests==2.32.1
 munch==4.0.0
 deepdiff==7.0.1
 colorlog==6.8.2
 pyyaml==6.0.1
 wheel==0.43.0
-twine==5.0.0
+twine==5.1.0
 ordered-set
 zstandard==0.22.0
 pycryptodome==3.20.0
 
-pytest==8.2.0
+pytest==8.2.1
 fuzzywuzzy~=0.18.0
 
 watchdog
