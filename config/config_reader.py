@@ -76,7 +76,6 @@ class ConfigReader:
         log.info('RockSniffer.host = %s', str(self.get('RockSniffer', 'host')))
         log.info('RockSniffer.port = %s', str(self.get('RockSniffer', 'port')))
 
-        log.info('SongLoader.cfsm_file_name = %s', str(self.get('SongLoader', 'cfsm_file_name')))
         log.info('SongLoader.cdlc_archive_dir = %s', str(self.get('SongLoader', 'cdlc_archive_dir')))
         log.info('SongLoader.rocksmith_cdlc_dir = %s', str(self.get('SongLoader', 'rocksmith_cdlc_dir')))
         log.info('SongLoader.allow_load_when_in_game = %s', str(self.get('SongLoader', 'allow_load_when_in_game')))
