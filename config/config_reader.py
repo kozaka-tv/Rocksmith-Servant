@@ -13,8 +13,8 @@ log = logging.getLogger()
 
 
 class ConfigTemplateError(Exception):
-    def __init__(self, config_template_file, section, key):
-        super().__init__(ERROR_MSG, config_template_file, section, key)
+    def __init__(self, section, key):
+        super().__init__(ERROR_MSG, 'config_ini_template.py', section, key)
 
 
 class ConfigReader:
@@ -40,11 +40,11 @@ class ConfigReader:
         if self.last_modification_time == 0:
             self.save()
             log.error(
-                'Because this is the first run, and no %s file was found, I created a configuration file for '
-                'you from a template in: %s', self.config_filename, self.config_dirname)
+                'Because this is the first run, and no configuration file was found, '
+                'I just created the %s configuration file for you!', self.config_abspath)
             log.info(
                 'Please change the values in the %s file according to your needs, and then relaunch Rocksmith Servant!',
-                self.config_filename)
+                self.config_abspath)
             log.warning('...press any key to exit this program.')
             input()
             sys.exit()
@@ -174,7 +174,7 @@ class ConfigReader:
             else:
                 new_key = serialized[section][key]
         except KeyError:
-            raise ConfigTemplateError('config_ini_template.py', section, key)
+            raise ConfigTemplateError(section, key)
 
         # Replace and save the config value with a default value according to type
         self.content[section][key] = new_key
