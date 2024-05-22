@@ -19,7 +19,7 @@ class ConfigTemplateError(Exception):
 
 class ConfigReader:
     def __init__(self, config_file):
-        log.info('Configfile path: %s', self.config_file)
+        log.info('Configfile path: %s', config_file)
 
         self.config_template_file = "config_ini_template.py"
 
