@@ -1,5 +1,7 @@
-import pytest
 from unittest.mock import patch
+
+import pytest
+
 from utils.cmd_line_parser import parse_args
 
 
