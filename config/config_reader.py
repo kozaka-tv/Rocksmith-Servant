@@ -7,29 +7,25 @@ from config.config_ini_template import serialized
 from utils import file_utils
 from utils.string_utils import strtobool
 
-CONFIG_DIR_NAME = "config"
-CONFIG_FILE_NAME = "config.ini"
-CONFIG_TEMPLATE_FILE_NAME = "config_ini_template.py"
-PATH_CONFIG_DIR = os.path.dirname(os.path.abspath(os.path.join(CONFIG_DIR_NAME, CONFIG_FILE_NAME)))
-PATH_CONFIG_FILE = os.path.join(PATH_CONFIG_DIR, CONFIG_FILE_NAME)
-PATH_CONFIG_TEMPLATE_FILE = os.path.join(PATH_CONFIG_DIR, CONFIG_TEMPLATE_FILE_NAME)
-
-ERROR_MSG = "Error retrieving value from %s for section [%s] with key [%s]."
+ERROR_MSG = 'Error retrieving value from %s for section [%s] with key [%s].'
 
 log = logging.getLogger()
 
 
 class ConfigTemplateError(Exception):
     def __init__(self, section, key):
-        super().__init__(ERROR_MSG, PATH_CONFIG_TEMPLATE_FILE, section, key)
+        super().__init__(ERROR_MSG, 'config_ini_template.py', section, key)
 
 
 class ConfigReader:
-    def __init__(self):
+    def __init__(self, config_file):
+        self.config_file = config_file
+        self.config_dirname = os.path.dirname(config_file)
+        self.config_filename = os.path.basename(config_file)
+        self.config_abspath = os.path.abspath(config_file)
 
-        file_utils.create_directory_logged(PATH_CONFIG_DIR)
-
-        log.warning('Initialising %s from %s ...', CONFIG_FILE_NAME, PATH_CONFIG_FILE)
+        file_utils.create_directory_logged(self.config_dirname)
+        log.warning('Loading config from %s ...', self.config_abspath)
 
         self.last_modified = None
 
@@ -44,11 +40,11 @@ class ConfigReader:
         if self.last_modification_time == 0:
             self.save()
             log.error(
-                'Because this is the first run, and no %s file was found, I created a configuration file for '
-                'you from a template in: %s', CONFIG_FILE_NAME, PATH_CONFIG_FILE)
+                'Because this is the first run, and no configuration file was found, '
+                'I just created the %s configuration file for you!', self.config_abspath)
             log.info(
                 'Please change the values in the %s file according to your needs, and then relaunch Rocksmith Servant!',
-                CONFIG_FILE_NAME)
+                self.config_abspath)
             log.warning('...press any key to exit this program.')
             input()
             sys.exit()
@@ -59,11 +55,11 @@ class ConfigReader:
         :return: Config Object
         """
         config = self.get_default_config_ini()
-        config.read(PATH_CONFIG_FILE, encoding="UTF-8")
+        config.read(self.config_file, encoding="UTF-8")
         self.last_modified = self.last_modification_time
 
         if self.last_modified != 0:
-            log.warning('%s has been loaded!', PATH_CONFIG_FILE)
+            log.warning('%s has been loaded!', self.config_file)
 
         return config
 
@@ -111,14 +107,14 @@ class ConfigReader:
         """
         Write the config to the specified path
         """
-        with open(PATH_CONFIG_FILE, 'w', encoding="utf-8") as configfile:
+        with open(self.config_abspath, 'w', encoding="utf-8") as configfile:
             self.content.write(configfile)
 
     @property
     def last_modification_time(self):
         """ Return last modified time of the config """
         try:
-            return os.stat(PATH_CONFIG_FILE).st_mtime
+            return os.stat(self.config_abspath).st_mtime
         except FileNotFoundError:
             return 0
 
@@ -186,11 +182,10 @@ class ConfigReader:
 
         log.warning("Bad value has been replaced with the default: %s", new_key)
 
-    @staticmethod
-    def log_bad_value_message(section, key, cast):
-        log.error(ERROR_MSG, PATH_CONFIG_FILE, section, key)
+    def log_bad_value_message(self, section, key, cast):
+        log.error(ERROR_MSG, self.config_abspath, section, key)
         if cast == bool:
-            log.info("For this type of key, please use either False, No, 0 or True, Yes, 1")
+            log.warning("For this type of key, please use either False, No, 0 or True, Yes, 1")
 
     def reload_if_changed(self):
         if self.config_changed_and_reloaded():

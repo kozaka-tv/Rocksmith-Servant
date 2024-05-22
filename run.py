@@ -12,16 +12,27 @@ from modules.scene_switcher.scene_switcher import SceneSwitcher
 from modules.setlist.setlist_logger import SetlistLogger
 from modules.song_loader.song_loader import SongLoader
 from modules.song_loader.songs import Songs
+from utils.cmd_line_parser import parse_args
 from utils.exceptions import RocksnifferConnectionError, ConfigError, RSPLNotLoggedInError, \
     RSPLPlaylistIsNotEnabledError
 from utils.rocksniffer import Rocksniffer
 
-HEARTBEAT = 1
-HEARTBEAT_MANAGE_SONGS = 1
-HEARTBEAT_UPDATE_GAME_INFO_AND_SETLIST = 0.1
+try:
+    config_file_path, db_file_path = parse_args()
+except ValueError as e:
+    print(f"Error: {e}")
+    exit(1)
 
 config.log_config.config()
 log = logging.getLogger()
+
+log.warning("------------------------------------------------------------------------")
+log.warning("----- SERVANT IS STARTING ----------------------------------------------")
+log.warning("------------------------------------------------------------------------")
+
+HEARTBEAT = 1
+HEARTBEAT_MANAGE_SONGS = 1
+HEARTBEAT_UPDATE_GAME_INFO_AND_SETLIST = 0.1
 
 
 def check_enabled_module_dependencies():
@@ -29,15 +40,7 @@ def check_enabled_module_dependencies():
         raise ConfigError("Please enable FileManager if you wanna use the SongLoader!")
 
 
-log.warning("------------------------------------------------------------------------")
-log.warning("----- SERVANT IS STARTING ----------------------------------------------")
-log.warning("------------------------------------------------------------------------")
-
-# Key name definitions
-KEY_ENABLED = "enabled"
-
-# Initializing configuration
-conf = ConfigReader()
+conf = ConfigReader(config_file_path)
 try:
     config_data = ConfigData(conf)
 except ConfigError as e:
@@ -124,8 +127,8 @@ def sniffer_data_not_loaded():
     return not sniffer_data_loaded()
 
 
-def manage_songs():
-    song_loader.set_db_manager(DBManager())  # because of Threading, we must set DB here
+def manage_songs(db_file):
+    song_loader.set_db_manager(DBManager(db_file))  # because of Threading, we must set DB here
 
     while True:
         try:
@@ -154,7 +157,7 @@ def update_game_info_and_setlist():
             log.exception(ex)
 
 
-manage_songs_thread = threading.Thread(target=manage_songs)
+manage_songs_thread = threading.Thread(target=manage_songs, args=(db_file_path,))
 manage_songs_thread.daemon = True
 manage_songs_thread.start()
 
