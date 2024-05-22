@@ -7,7 +7,7 @@ from config.config_ini_template import serialized
 from utils import file_utils
 from utils.string_utils import strtobool
 
-ERROR_MSG = "Error retrieving value from %s for section [%s] with key [%s]."
+ERROR_MSG = 'Error retrieving value from %s for section [%s] with key [%s].'
 
 log = logging.getLogger()
 
@@ -19,17 +19,13 @@ class ConfigTemplateError(Exception):
 
 class ConfigReader:
     def __init__(self, config_file):
-        log.info('Configfile path: %s', config_file)
-
-        self.config_template_file = "config_ini_template.py"
-
         self.config_file = config_file
         self.config_dirname = os.path.dirname(config_file)
         self.config_filename = os.path.basename(config_file)
         self.config_abspath = os.path.abspath(config_file)
 
         file_utils.create_directory_logged(self.config_dirname)
-        log.warning('Initialising %s from %s ...', self.config_filename, self.config_dirname)
+        log.warning('Loading config from %s ...', self.config_abspath)
 
         self.last_modified = None
 
@@ -178,7 +174,7 @@ class ConfigReader:
             else:
                 new_key = serialized[section][key]
         except KeyError:
-            raise ConfigTemplateError(self.config_template_file, section, key)
+            raise ConfigTemplateError('config_ini_template.py', section, key)
 
         # Replace and save the config value with a default value according to type
         self.content[section][key] = new_key
@@ -189,7 +185,7 @@ class ConfigReader:
     def log_bad_value_message(self, section, key, cast):
         log.error(ERROR_MSG, self.config_abspath, section, key)
         if cast == bool:
-            log.info("For this type of key, please use either False, No, 0 or True, Yes, 1")
+            log.warning("For this type of key, please use either False, No, 0 or True, Yes, 1")
 
     def reload_if_changed(self):
         if self.config_changed_and_reloaded():
