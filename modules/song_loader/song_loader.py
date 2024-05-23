@@ -263,7 +263,7 @@ class SongLoader:
                     # TODO debug log level
                     log.warning('New song added to DB: %s', song_data)
 
-                songs.update({song_data.song_file_name: song_data})
+                songs.update({song_data.song_filename: song_data})
                 if log.isEnabledFor(logging.DEBUG) and len(songs) % 100 == 0:
                     log.info(f"Loaded {len(songs)} songs...")
 
@@ -282,7 +282,7 @@ class SongLoader:
 
             for missing_song in missing:
                 pop = songs_to_update.pop(missing_song, None)
-                removed[pop.song_file_name] = pop
+                removed[pop.song_filename] = pop
                 pass
 
         return removed
@@ -290,7 +290,7 @@ class SongLoader:
     @staticmethod
     def __extract_song_information(directory, cdlc_file_name: str):
         song_data = SongData()
-        song_data.song_file_name = cdlc_file_name
+        song_data.song_filename = cdlc_file_name
         file_path_to_extract = os.path.join(directory, cdlc_file_name)
 
         psarc_reader.extract_psarc(file_path_to_extract, song_data)
@@ -404,10 +404,10 @@ class SongLoader:
                                  rspl_position, cdlc_id, artist, title)
                     continue
 
-                for song_file_name in songs_in_the_db:
+                for song_filename in songs_in_the_db:
                     # TODO if it is possible, do not create always a new SongData.
                     #  If it is already exists, just reuse it, just search in a list
-                    song_data = SongData(rspl_request_id, cdlc_id, rspl_song_id, artist, title, song_file_name)
+                    song_data = SongData(rspl_request_id, cdlc_id, rspl_song_id, artist, title, song_filename)
                     song_data.rspl_official = official
                     song_data.rspl_position = rspl_position
 
@@ -417,7 +417,7 @@ class SongLoader:
                     song_data.rspl_official = official
                     song_data.rspl_position = rspl_position
 
-                    self.songs.requested_songs_found_in_db.update({song_data.song_file_name: song_data})
+                    self.songs.requested_songs_found_in_db.update({song_data.song_filename: song_data})
 
                     # TODO debug level!
                     log.info("Request found in DB: %s", song_data)
