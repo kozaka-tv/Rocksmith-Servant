@@ -61,7 +61,7 @@ class DBManager:
             return None
 
         song_data = SongData()
-        song_data.song_file_name = song[0]
+        song_data.song_filename = song[0]
         song_data.artist = song[1]
         song_data.title = song[2]
 
@@ -82,7 +82,7 @@ class DBManager:
                 "values ('")
                + string_utils.escape_single_quote(song_data.artist) + "', '"
                + string_utils.escape_single_quote(song_data.title) + "', '"
-               + string_utils.escape_single_quote(song_data.song_file_name) + "')")
+               + string_utils.escape_single_quote(song_data.song_filename) + "')")
         cur.execute(sql)
         self.db.commit()
 

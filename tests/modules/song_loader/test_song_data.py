@@ -1,6 +1,6 @@
 from modules.song_loader.song_data import SongData
 
-SONG_FILE_NAME = "my_super_song.psarc"
+SONG_FILENAME = "my_super_song.psarc"
 
 ARTIST = "My Artist"
 TITLE = "My Title"
@@ -20,7 +20,7 @@ def test_song_data__when_no_input_in_constructor__then_everything_is_empty():
 
     assert song_data is not None
 
-    assert song_data.song_file_name is None
+    assert song_data.song_filename is None
 
     assert song_data.artist is None
     assert song_data.title is None
@@ -35,9 +35,9 @@ def test_song_data__when_no_input_in_constructor__then_everything_is_empty():
     assert len(song_data.tags) == 0
 
 
-def test_song_data__when_song_file_name_is_given__then_song_file_name_is_set():
-    song_data = SongData(song_file_name=SONG_FILE_NAME)
-    assert song_data.song_file_name == SONG_FILE_NAME
+def test_song_data__when_song_filename_is_given__then_song_filename_is_set():
+    song_data = SongData(song_filename=SONG_FILENAME)
+    assert song_data.song_filename == SONG_FILENAME
 
 
 def test_song_data__when_artist_is_given__then_artist_is_set():
@@ -115,20 +115,10 @@ def test_tags__when_tags_is_set__then_return_tags():
     assert song_data.tags == TAGS
 
 
-# TODO
-# def test__eq__():
-#     assert False
-
-
-# TODO
-# def test__hash__():
-#     assert False
-
-
 def test__ref__():
     song_data = SongData()
 
-    song_data.song_file_name = SONG_FILE_NAME
+    song_data.song_filename = SONG_FILENAME
 
     song_data.artist = ARTIST
     song_data.title = TITLE
@@ -144,11 +134,11 @@ def test__ref__():
 
     actual = str(song_data)
 
-    assert (actual == ('<SongData: song_file_name=my_super_song.psarc, artist=My Artist, title=My '
+    assert (actual == ('<SongData: song_filename=my_super_song.psarc, artist=My Artist, title=My '
                        'Title, artist_title=My Artist - My Title, rspl_request_id=1, cdlc_id=3, '
                        "rspl_song_id=666, rspl_official=True, rspl_position=4, tags={'tag2', "
                        "'tag1'}>")
-            or actual == ('<SongData: song_file_name=my_super_song.psarc, artist=My Artist, title=My '
+            or actual == ('<SongData: song_filename=my_super_song.psarc, artist=My Artist, title=My '
                           'Title, artist_title=My Artist - My Title, rspl_request_id=1, cdlc_id=3, '
                           "rspl_song_id=666, rspl_official=True, rspl_position=4, tags={'tag1', "
                           "'tag2'}>"))

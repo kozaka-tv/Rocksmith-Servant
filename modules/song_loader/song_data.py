@@ -4,9 +4,9 @@ from utils import string_utils
 class SongData:
 
     def __init__(self, rspl_request_id=None, cdlc_id=None, rspl_song_id=None, artist=None, title=None,
-                 song_file_name=None):
+                 song_filename=None):
 
-        self.song_file_name = song_file_name
+        self.song_filename = song_filename
 
         self.artist = artist
         self.title = title
@@ -28,7 +28,7 @@ class SongData:
     # TODO rspl_request_id? or cdlc_id? or something else?
     # def __eq__(self, other):
     # return self.rspl_request_id == other.rspl_request_id
-    # return self.song_file_name == other.song_file_name
+    # return self.song_filename == other.song_filename
 
     # def __hash__(self):
     #     return hash(self.rspl_request_id)
@@ -36,8 +36,8 @@ class SongData:
     def __repr__(self):
         rep = '<SongData: '
 
-        if self.song_file_name:
-            rep += f"song_file_name={self.song_file_name}, "
+        if self.song_filename:
+            rep += f"song_filename={self.song_filename}, "
 
         if self.artist:
             rep += f"artist={self.artist}, "
