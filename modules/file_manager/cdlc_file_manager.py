@@ -2,7 +2,7 @@ import datetime
 import logging
 import math
 
-from definitions import TMP_DIR, TMP_DIR_NAME
+from definitions import TMP_DIR
 from utils import file_utils
 from utils.collection_utils import repr_in_multi_line, is_not_empty
 from utils.exceptions import BadDirectoryError
@@ -38,7 +38,6 @@ class FileManager:
                 self.__move_non_parsed_files_to_tmp_dir()
 
             elif self.__beat_last_run():
-                log.debug("Scan and move files from %s and source dirs...", TMP_DIR_NAME)
                 self.__move_files_to_destination_dir(self.__scan_cdlc_files_in_tmp())
                 self.__move_files_to_destination_dir(self.__scan_cdlc_files_in_download_dirs())
 
@@ -80,7 +79,7 @@ class FileManager:
 
         if len(cdlc_files) > 0:
             log.error('Found %s CDLC files in %s directory (they were probably not parsed before). Files: %s',
-                      len(cdlc_files), TMP_DIR_NAME, repr_in_multi_line(cdlc_files))
+                      len(cdlc_files), TMP_DIR, repr_in_multi_line(cdlc_files))
 
         return cdlc_files
 
