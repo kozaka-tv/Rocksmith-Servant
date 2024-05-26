@@ -3,7 +3,7 @@ import os
 from time import time
 
 from config.config_data import ConfigData
-from definitions import PSARC_INFO_FILE_CACHE_DIR, EXT_PSARC_INFO_JSON, PATTERN_CDLC_INFO_FILE_EXT
+from definitions import PSARC_INFO_FILE_CACHE_DIR, EXT_PSARC_INFO_JSON, PATTERN_CDLC_INFO_FILE_EXT, TMP_DIR
 from modules.database.db_manager import DBManager
 from modules.song_loader.song_data import SongData
 from modules.song_loader.song_loader_helper import playlist_does_not_changed, check_cdlc_archive_dir, \
@@ -61,6 +61,7 @@ class SongLoader:
 
     def __create_directories(self):
         try:
+            file_utils.create_directory_logged(TMP_DIR)
             file_utils.create_directory_logged(PSARC_INFO_FILE_CACHE_DIR)
             file_utils.create_directory_logged(self.cdlc_archive_dir)
             file_utils.create_directory_logged(self.rocksmith_cdlc_dir)

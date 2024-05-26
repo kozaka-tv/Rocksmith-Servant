@@ -68,7 +68,7 @@ class FileManager:
         if is_not_empty(non_parsed_files):
             log.warning(
                 "Found %s file(s) in %s dir which one(s) were not yet parsed so I moving them to %s now! Files: %s"
-                , len(non_parsed_files), self.destination_dir, TMP_DIR_NAME, repr_in_multi_line(non_parsed_files))
+                , len(non_parsed_files), self.destination_dir, TMP_DIR, repr_in_multi_line(non_parsed_files))
             file_utils.move_files_to(TMP_DIR, non_parsed_files)
             return True
 
