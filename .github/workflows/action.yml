@@ -2,8 +2,8 @@ name: Build-All-Platforms
 
 on:
   push:
-    branches: ['main']
-    tags:      # Added to trigger the workflow on version tags
+    branches: [ 'main' ]
+    tags: # Added to trigger the workflow on version tags
       - 'v*'
   pull_request:
   workflow_dispatch:
@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest]
+        os: [ windows-latest ]
         # Uncomment to add macOS and Ubuntu builds
         # os: [macos-latest, ubuntu-latest, windows-latest]
 
