@@ -31,6 +31,7 @@ log.warning("-------------------------------------------------------------------
 log.warning("----- SERVANT IS STARTING ----------------------------------------------")
 log.warning("------------------------------------------------------------------------")
 
+# TODO remove this later!
 log.warning('program_location=%s', os.path.abspath(sys.argv[0]))
 log.warning('call_location=%s',  os.getcwd())
 log.warning('containing_directory=%s',   os.path.dirname(os.path.abspath(sys.argv[0])))
