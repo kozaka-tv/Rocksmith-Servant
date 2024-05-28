@@ -18,6 +18,17 @@ from utils.exceptions import RocksnifferConnectionError, ConfigError, RSPLNotLog
     RSPLPlaylistIsNotEnabledError
 from utils.rocksniffer import Rocksniffer
 
+# TODO remove?!
+print('CWD ORIG: ' + os.getcwd())
+
+if getattr(sys, 'frozen', False):
+    application_path = os.path.dirname(sys.executable)
+    print('application_path={}'.format(application_path))
+    os.chdir(application_path)
+
+print('CWD: ' + os.getcwd())
+
+
 try:
     config_file_path, db_file_path = parse_args()
 except ValueError as e:
