@@ -37,6 +37,20 @@ log.warning('call_location=%s', os.getcwd())
 log.warning('containing_directory=%s', os.path.dirname(os.path.abspath(sys.argv[0])))
 log.warning('os.path.dirname(__file__)=%s', os.path.dirname(__file__))
 
+config_name = 'myapp.cfg'
+application_path = ''
+
+# determine if application is a script file or frozen exe
+if getattr(sys, 'frozen', False):
+    application_path = os.path.dirname(sys.executable)
+elif __file__:
+    application_path = os.path.dirname(__file__)
+
+config_path = os.path.join(application_path, config_name)
+log.warning('XX application_path=%s', application_path)
+log.warning('XX config_path=%s', config_path)
+
+
 HEARTBEAT = 1
 HEARTBEAT_MANAGE_SONGS = 1
 HEARTBEAT_UPDATE_GAME_INFO_AND_SETLIST = 0.1
