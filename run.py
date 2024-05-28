@@ -60,7 +60,7 @@ if getattr(sys, 'frozen', False):
 else:
     application_path_2 = os.path.dirname(os.path.abspath(__file__))
 
-log.warning('Py3 application_path_2=%s', application_path_2)
+log.warning('Py3 - application_path_2=%s', application_path_2)
 
 
 
