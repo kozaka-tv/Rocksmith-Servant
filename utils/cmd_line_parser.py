@@ -1,8 +1,6 @@
 import argparse
 import os
 
-from definitions import ROOT_DIR
-
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Servant script for managing Rocksmith sessions.')
@@ -13,11 +11,11 @@ def parse_args():
 
     args = parser.parse_args()
 
-    config = os.path.join(ROOT_DIR, args.config)
+    config = os.path.join(args.config)
     if not config.endswith('.ini'):
         raise ValueError("The configuration file must have a '.ini' extension.")
 
-    database = os.path.join(ROOT_DIR, args.database)
+    database = os.path.join(args.database)
     if not database.endswith('.db'):
         raise ValueError("The database file must have a '.db' extension.")
 

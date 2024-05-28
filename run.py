@@ -16,18 +16,10 @@ from modules.song_loader.songs import Songs
 from utils.cmd_line_parser import parse_args
 from utils.exceptions import RocksnifferConnectionError, ConfigError, RSPLNotLoggedInError, \
     RSPLPlaylistIsNotEnabledError
+from utils.project_dir_setter import set_project_directory
 from utils.rocksniffer import Rocksniffer
 
-# TODO remove?!
-print('CWD ORIG: ' + os.getcwd())
-
-if getattr(sys, 'frozen', False):
-    application_path = os.path.dirname(sys.executable)
-    print('application_path={}'.format(application_path))
-    os.chdir(application_path)
-
-print('CWD: ' + os.getcwd())
-
+set_project_directory()
 
 try:
     config_file_path, db_file_path = parse_args()
@@ -72,9 +64,6 @@ else:
     application_path_2 = os.path.dirname(os.path.abspath(__file__))
 
 log.warning('Py3 - application_path_2=%s', application_path_2)
-
-
-
 
 HEARTBEAT = 1
 HEARTBEAT_MANAGE_SONGS = 1
