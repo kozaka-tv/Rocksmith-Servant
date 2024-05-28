@@ -1,6 +1,7 @@
 import os
+import sys
 
-ROOT_DIR = os.getcwd()
+ROOT_DIR = os.path.dirname(os.path.abspath(sys.argv[0]))
 
 TMP_DIR = os.path.join(ROOT_DIR, "tmp")
 CACHE_DIR = os.path.join(ROOT_DIR, "cache")
