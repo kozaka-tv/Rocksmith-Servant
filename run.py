@@ -15,7 +15,10 @@ from modules.song_loader.songs import Songs
 from utils.cmd_line_parser import parse_args
 from utils.exceptions import RocksnifferConnectionError, ConfigError, RSPLNotLoggedInError, \
     RSPLPlaylistIsNotEnabledError
+from utils.project_dir_setter import set_project_directory
 from utils.rocksniffer import Rocksniffer
+
+set_project_directory()
 
 try:
     config_file_path, db_file_path = parse_args()

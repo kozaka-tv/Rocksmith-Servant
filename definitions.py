@@ -1,18 +1,16 @@
 import os
+import sys
 
-TMP_DIR_NAME = "tmp"
-CACHE_DIR_NAME = "cache"
-PSARC_INFO_FILES_DIR_NAME = "psarc-info-files"
+ROOT_DIR = os.path.dirname(os.path.abspath(sys.argv[0]))
 
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-TMP_DIR = os.path.join(ROOT_DIR, TMP_DIR_NAME)
-CACHE_DIR = os.path.join(ROOT_DIR, CACHE_DIR_NAME)
-PSARC_INFO_FILE_CACHE_DIR = os.path.join(CACHE_DIR, PSARC_INFO_FILES_DIR_NAME)
+TMP_DIR = os.path.join(ROOT_DIR, "tmp")
+CACHE_DIR = os.path.join(ROOT_DIR, "cache")
+PSARC_INFO_FILE_CACHE_DIR = os.path.join(CACHE_DIR, "psarc-info-files")
 
 EXT_CDLC_FILE = '.psarc'
 EXT_PSARC_INFO_JSON = '.info.json'
 EXT_CDLC_INFO_FILE = EXT_CDLC_FILE + EXT_PSARC_INFO_JSON
 
-ASTERIX = '*'
-PATTERN_CDLC_FILE_EXT = ASTERIX + EXT_CDLC_FILE
-PATTERN_CDLC_INFO_FILE_EXT = ASTERIX + EXT_CDLC_INFO_FILE
+ASTERISK = '*'
+PATTERN_CDLC_FILE_EXT = ASTERISK + EXT_CDLC_FILE
+PATTERN_CDLC_INFO_FILE_EXT = ASTERISK + EXT_CDLC_INFO_FILE
