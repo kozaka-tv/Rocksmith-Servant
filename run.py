@@ -1,6 +1,5 @@
 import logging
 import os
-import sys
 import threading
 from time import sleep
 
@@ -33,37 +32,6 @@ log = logging.getLogger()
 log.warning("------------------------------------------------------------------------")
 log.warning("----- SERVANT IS STARTING ----------------------------------------------")
 log.warning("------------------------------------------------------------------------")
-
-# TODO remove this later!
-log.warning('program_location=%s', os.path.abspath(sys.argv[0]))
-log.warning('call_location=%s', os.getcwd())
-log.warning('containing_directory=%s', os.path.dirname(os.path.abspath(sys.argv[0])))
-log.warning('os.path.dirname(__file__)=%s', os.path.dirname(__file__))
-
-config_name = 'myapp.cfg'
-application_path = ''
-
-# determine if application is a script file or frozen exe
-if getattr(sys, 'frozen', False):
-    application_path = os.path.dirname(sys.executable)
-elif __file__:
-    application_path = os.path.dirname(__file__)
-
-config_path = os.path.join(application_path, config_name)
-log.warning('XX application_path=%s', application_path)
-log.warning('XX config_path=%s', config_path)
-
-# ------------
-application_path_2 = ''
-if getattr(sys, 'frozen', False):
-    # If the application is run as a bundle, the PyInstaller bootloader
-    # extends the sys module by a flag frozen=True and sets the app
-    # path into variable _MEIPASS'.
-    application_path_2 = sys._MEIPASS
-else:
-    application_path_2 = os.path.dirname(os.path.abspath(__file__))
-
-log.warning('Py3 - application_path_2=%s', application_path_2)
 
 HEARTBEAT = 1
 HEARTBEAT_MANAGE_SONGS = 1

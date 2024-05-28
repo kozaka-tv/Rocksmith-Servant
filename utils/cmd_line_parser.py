@@ -11,11 +11,11 @@ def parse_args():
 
     args = parser.parse_args()
 
-    config = os.path.join(args.config)
+    config = args.config
     if not config.endswith('.ini'):
         raise ValueError("The configuration file must have a '.ini' extension.")
 
-    database = os.path.join(args.database)
+    database = args.database
     if not database.endswith('.db'):
         raise ValueError("The database file must have a '.db' extension.")
 
