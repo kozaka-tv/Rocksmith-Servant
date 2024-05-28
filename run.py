@@ -50,6 +50,20 @@ config_path = os.path.join(application_path, config_name)
 log.warning('XX application_path=%s', application_path)
 log.warning('XX config_path=%s', config_path)
 
+# ------------
+application_path_2 = ''
+if getattr(sys, 'frozen', False):
+    # If the application is run as a bundle, the PyInstaller bootloader
+    # extends the sys module by a flag frozen=True and sets the app
+    # path into variable _MEIPASS'.
+    application_path_2 = sys._MEIPASS
+else:
+    application_path_2 = os.path.dirname(os.path.abspath(__file__))
+
+log.warning('Py3 application_path_2=%s', application_path_2)
+
+
+
 
 HEARTBEAT = 1
 HEARTBEAT_MANAGE_SONGS = 1
