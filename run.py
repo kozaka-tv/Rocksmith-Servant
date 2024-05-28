@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 import threading
 from time import sleep
 
@@ -29,6 +30,11 @@ log = logging.getLogger()
 log.warning("------------------------------------------------------------------------")
 log.warning("----- SERVANT IS STARTING ----------------------------------------------")
 log.warning("------------------------------------------------------------------------")
+
+log.warning('program_location=%s', os.path.abspath(sys.argv[0]))
+log.warning('call_location=%s',  os.getcwd())
+log.warning('containing_directory=%s',   os.path.dirname(os.path.abspath(sys.argv[0])))
+
 
 HEARTBEAT = 1
 HEARTBEAT_MANAGE_SONGS = 1
