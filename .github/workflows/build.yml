@@ -1,0 +1,50 @@
+name: Build for Windows
+
+on:
+  push:
+    branches: [ 'main' ]
+    tags: # Added to trigger the workflow on version tags
+      - 'v*'
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      # Check-out repository
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          architecture: 'x64'
+          cache: 'pip'
+          cache-dependency-path: |
+            **/requirements*.txt
+
+      # Install dependencies
+      - name: Install Dependencies and Build
+        run: |
+          python -m pip install --user virtualenv
+          virtualenv .venv
+          . .venv/Scripts/activate
+          pip install pyinstaller
+          pip install -r requirements.txt
+          # if the following part is separate build-step, pyinstaller is not recognized.
+          echo '===============BUILD==============='
+          pyinstaller -y --onefile --hidden-import=yaml --hidden-import=yaml.loader --hidden-import=colorlog `
+          --paths=.\.venv\Lib\site-packages\ --add-data "config/log_config.yaml;config" `
+          --add-data "modules/database/create_table_songs.sql;modules/database" `
+          --add-data "modules/database/create_table_songs_enhanced.sql;modules/database" `
+          --distpath . run.py
+
+      # Upload artifacts
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ runner.os }} Build
+          path: |
+            *.exe
