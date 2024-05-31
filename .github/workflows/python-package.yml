@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ "3.11" ]
+        python-version: [ "3.12" ]
 
     steps:
       - uses: actions/checkout@v4
@@ -37,6 +37,5 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       - name: Test with pytest
         run: |
-          pytest
-      - name: Build EXE from Python Script
-        uses: Nuitka/Nuitka-Action@v0.5
+          
+          PYTHONPATH=$PWD pytest
