@@ -8,7 +8,7 @@ from utils.cmd_line_parser import parse_args
 @patch('sys.argv', ['run.py'])
 def test_defaults():
     config, database = parse_args()
-    assert config == 'config/config.ini'
+    assert config == 'config.ini'
     assert database == 'servant.db'
 
 
