@@ -30,14 +30,14 @@ def test_custom_config_with_config():
 @patch('sys.argv', ['run.py', '-db', 'custom_servant.db'])
 def test_custom_database_with_db():
     config, database = parse_args()
-    assert config == 'config/config.ini'
+    assert config == 'config' + os.sep + 'config.ini'
     assert database == 'custom_servant.db'
 
 
 @patch('sys.argv', ['run.py', '--database', 'custom_servant.db'])
 def test_custom_database_with_database():
     config, database = parse_args()
-    assert config == 'config/config.ini'
+    assert config == 'config' + os.sep + 'config.ini'
     assert database == 'custom_servant.db'
 
 
