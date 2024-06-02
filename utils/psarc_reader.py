@@ -11,6 +11,7 @@ from Crypto.Cipher import AES
 
 from definitions import PSARC_INFO_FILE_CACHE_DIR, EXT_PSARC_INFO_JSON
 from modules.song_loader.song_data import SongData
+from utils import file_utils
 
 log = logging.getLogger()
 
@@ -26,6 +27,9 @@ ATTR_SONG_NAME = 'SongName'
 
 def extract_psarc(filename_to_extract, song_data_input, write_to_file=False):
     log.debug('Extracting %s', filename_to_extract)
+
+    if log.isEnabledFor(logging.DEBUG) or write_to_file:
+        file_utils.create_directory_logged(PSARC_INFO_FILE_CACHE_DIR)
 
     with open(filename_to_extract, 'rb') as psarc:
         entry = __get_psarc_info(psarc)
@@ -182,7 +186,6 @@ def __get_psarc_info(filestream):
 
 
 def __write_info_file(entry, filename_to_extract, psarc):
-    # TODO this writes out the data into a file if needed
     json_filename = filename_to_extract + EXT_PSARC_INFO_JSON
     info_file_json_path = os.path.join(PSARC_INFO_FILE_CACHE_DIR, os.path.basename(json_filename))
     data_to_write = __read_entry_data(psarc, entry)
@@ -191,15 +194,5 @@ def __write_info_file(entry, filename_to_extract, psarc):
         log.debug('Info file %s created.', info_file_json_path)
 
 
-def __create_dir_if_not_exists(base_path):
-    if not os.path.exists(base_path):
-        os.makedirs(base_path)
-
-
 def __is_song_info_file(file_name):
-    # TODO keep only one file what is used later on
     return file_name.find('.hsan') > -1
-    # TODO remove unused
-    # return True
-    # return file_name.find('manifests/songs_dlc') > -1 and file_name.find('.hsan') > -1
-    # return file_name.find('songs/arr') > -1 or file_name.find('manifests/songs_dlc') > -1
