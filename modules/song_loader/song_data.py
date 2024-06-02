@@ -22,16 +22,7 @@ class SongData:
 
     @property
     def is_official(self):
-        # TODO is there any other official numbers? Maybe only 0 means non official?
         return 3 == self.rspl_official or 4 == self.rspl_official
-
-    # TODO rspl_request_id? or cdlc_id? or something else?
-    # def __eq__(self, other):
-    # return self.rspl_request_id == other.rspl_request_id
-    # return self.song_filename == other.song_filename
-
-    # def __hash__(self):
-    #     return hash(self.rspl_request_id)
 
     def __repr__(self):
         rep = '<SongData: '

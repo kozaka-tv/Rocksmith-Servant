@@ -41,13 +41,11 @@ class DBManager:
 
     def __get_songs_from_db(self, artist, title):
         cur = self.db.cursor()
-        # TODO add and colTagged != 'ODLC'?
         songs = cur.execute("SELECT distinct colFileName FROM songs where colArtist like ? and colTitle like ?",
                             ("%" + artist + "%", "%" + title + "%")).fetchall()
         return set_of_the_tuples_from_the_first_position(songs)
 
     def search_song_by_artist_and_title(self, artist, title):
-        # TODO make a special search for similar words in artist and title
         songs_from_db_without_special_chars = self.__get_songs_from_db(remove_special_chars(artist),
                                                                        remove_special_chars(title))
         return self.__get_songs_from_db(artist, title).union(songs_from_db_without_special_chars)

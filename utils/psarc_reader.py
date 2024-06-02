@@ -34,7 +34,6 @@ def extract_psarc(filename_to_extract, song_data_input, write_to_file=False):
     with open(filename_to_extract, 'rb') as psarc:
         entry = __get_psarc_info(psarc)
         if entry is None:
-            # TODO raise exception? If one file is corrupt, it is better not to start.
             log.error('Could not extract any song information from the psarc file: %s', filename_to_extract)
             return None
 
@@ -45,7 +44,6 @@ def extract_psarc(filename_to_extract, song_data_input, write_to_file=False):
         log.debug("Song data with the extracted information: %s", song_data_input)
 
 
-# TODO make song_data_input optional. If not exists, default is a new object and that is returned?
 def __create_song_data(entry, psarc, song_data_input: SongData):
     song_data_dict = get_song_data_dict(entry, psarc)
 
@@ -60,9 +58,6 @@ def __create_song_data(entry, psarc, song_data_input: SongData):
         if artist_name is not None:
             song_data_input.artist = artist_name
             song_data_input.title = get_song_name(attributes, song_data_dict)
-
-            # TODO return new song_data?
-            # return SongData(artist=artist, title=title)
             return
 
     raise Exception("Could not extract useful attribute information from: %s", song_data_dict)

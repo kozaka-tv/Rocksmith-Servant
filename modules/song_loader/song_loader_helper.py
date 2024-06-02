@@ -51,7 +51,6 @@ def check_dir(dir_to_check, error_msg):
 
 
 def is_official(rspl_official):
-    # TODO is there any other official numbers? Maybe only 0 means non official?
     return 3 == rspl_official or 4 == rspl_official
 
 
