@@ -11,6 +11,7 @@ from Crypto.Cipher import AES
 
 from definitions import PSARC_INFO_FILE_CACHE_DIR, EXT_PSARC_INFO_JSON
 from modules.song_loader.song_data import SongData
+from utils import file_utils
 
 log = logging.getLogger()
 
@@ -26,6 +27,9 @@ ATTR_SONG_NAME = 'SongName'
 
 def extract_psarc(filename_to_extract, song_data_input, write_to_file=False):
     log.debug('Extracting %s', filename_to_extract)
+
+    if log.isEnabledFor(logging.DEBUG) or write_to_file:
+        file_utils.create_directory_logged(PSARC_INFO_FILE_CACHE_DIR)
 
     with open(filename_to_extract, 'rb') as psarc:
         entry = __get_psarc_info(psarc)
