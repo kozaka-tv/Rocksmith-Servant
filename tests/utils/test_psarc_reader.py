@@ -2,8 +2,8 @@ import os
 
 import pytest
 
-from base_test import CDLC_DIR
 from modules.song_loader.song_data import SongData
+from tests.base_test import CDLC_DIR
 from utils.psarc_reader import extract_psarc
 
 
