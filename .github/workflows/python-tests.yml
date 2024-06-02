@@ -4,8 +4,7 @@
 name: Run tests
 
 on:
-  push:
-    branches: [ "*" ]
+  push
 
 jobs:
   pytest:
