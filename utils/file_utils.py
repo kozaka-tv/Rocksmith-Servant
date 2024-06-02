@@ -15,9 +15,6 @@ DEFAULT_NOT_PARSED_FILE_AGE_SECONDS = 15
 log = logging.getLogger()
 
 
-# TODO refactor all this:
-# cdlc_files = [] >> get_files(cdlc_files, directory) >> why like this? This method should just return the new set.
-# or was it not recursive? And that's the why it is like that?
 def get_files_from_directory(directory):
     cdlc_files = []
     get_files(cdlc_files, directory)
@@ -128,13 +125,6 @@ def delete_file(directory, file):
             os.remove(file_path)
         return True
     return False
-
-
-# TODO remove if not used
-def file_datetime_formatted(filename):
-    file_time = os.path.getmtime(filename)
-    formatted_time = datetime.fromtimestamp(file_time)
-    return formatted_time
 
 
 def create_directory(directory_to_create):

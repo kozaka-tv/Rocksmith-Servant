@@ -38,13 +38,11 @@ def __unset_tag(twitch_channel, phpsessid, rspl_request_id, tag_id):
 
 
 def set_tag_loaded(twitch_channel, phpsessid, rspl_request_id, rspl_tags):
-    # TODO remove tag 'tag_to_download'?
     __unset_tag(twitch_channel, phpsessid, rspl_request_id, rspl_tags.tag_to_download)
     __set_tag(twitch_channel, phpsessid, rspl_request_id, rspl_tags.tag_loaded)
 
 
 def set_tag_to_download(twitch_channel, phpsessid, rspl_request_id, rspl_tags):
-    # TODO remove tag 'tag_loaded'?
     __unset_tag(twitch_channel, phpsessid, rspl_request_id, rspl_tags.tag_loaded)
     __set_tag(twitch_channel, phpsessid, rspl_request_id, rspl_tags.tag_to_download)
 

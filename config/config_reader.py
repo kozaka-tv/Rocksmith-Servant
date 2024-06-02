@@ -4,7 +4,7 @@ import os
 import sys
 
 from config.config_ini_template import serialized
-from utils import file_utils, string_utils
+from utils import file_utils
 from utils.string_utils import strtobool
 
 ERROR_MSG = 'Error retrieving value from %s for section [%s] with key [%s].'
@@ -29,7 +29,6 @@ class ConfigReader:
 
         self.last_modified = None
 
-        # TODO remove content later and use variables only?
         self.content = self.load_content_from_config()
 
         self.if_needed_create_config_from_template_and_then_stop()
@@ -63,8 +62,6 @@ class ConfigReader:
 
         return config
 
-    # TODO actually this should be used by all the modules to log config out. Config, Debug, Run.
-    # TODO enhance with other values? Or make a debug part in the module itself? Would be better!
     def log_config(self):
         log.warning('------- CONFIG ------------------------------------------------')
         self.log_enabled_modules()

@@ -20,7 +20,6 @@ class Rocksniffer:
         self.albumName = None
         self.songLength = None
         self.albumYear = None
-        # TODO add last artist, song, etc. values? Needed?
 
         self.samples = [0, 0, 0]
 

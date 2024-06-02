@@ -13,7 +13,7 @@ log = logging.getLogger()
 
 
 class SetlistLogger:
-    # TODO add params like file location
+
     def __init__(self, config_data):
         """
         Setlist Logger
@@ -21,7 +21,6 @@ class SetlistLogger:
         # Init setlist directory and file
         self.enabled = config_data.setlist_logger.enabled
         if self.enabled:
-            # TODO this should be maybe in run?
             self.create_setlist_directory()
             self.file_name = setlist_file_name()
             self.write_to_setlist_file(LOG_SEPARATOR)
@@ -29,13 +28,11 @@ class SetlistLogger:
             self.write_to_setlist_file(LOG_SEPARATOR)
 
         self.setlist_path = config_data.setlist_logger.setlist_path
-        # TODO
         self.log_file_name = "TODO.txt"
         self.setlist = []
         self.last_song = None
 
     def update_config(self, config_data):
-        # TODO use enabled, and do nothing if disabled
         self.enabled = config_data.setlist_logger.enabled
         self.create_setlist_directory()
         self.file_name = setlist_file_name()
@@ -44,7 +41,6 @@ class SetlistLogger:
         self.write_to_setlist_file(LOG_SEPARATOR)
 
         self.setlist_path = config_data.setlist_logger.setlist_path
-        # TODO
         self.log_file_name = "TODO.txt"
         self.setlist = []
         self.last_song = None
@@ -62,7 +58,6 @@ class SetlistLogger:
 
     def write_to_setlist_file(self, string):
         try:
-            # TODO maybe we should save the file to this Class and then just append. What if crash or exit?
             with open(self.file_name, 'a', encoding="utf-8") as file:
                 file.write(string + '\n')
         except OSError:

@@ -73,7 +73,6 @@ def update_config():
         check_enabled_module_dependencies()
 
 
-# TODO move to debug Class?
 def get_debug_message():
     modules_str = "--- Enabled modules ---" + os.linesep
     if sniffer.enabled:
