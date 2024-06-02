@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 
 from definitions import PATTERN_CDLC_FILE_EXT, PATTERN_CDLC_INFO_FILE_EXT, \
     EXT_PSARC_INFO_JSON
+from utils import string_utils
 from utils.exceptions import BadDirectoryError
 
 DEFAULT_NOT_PARSED_FILE_AGE_SECONDS = 15
@@ -141,8 +142,9 @@ def create_directory(directory_to_create):
 
 
 def create_directory_logged(directory_to_create):
-    log.warning("Creating directory '%s' if not exists!", directory_to_create)
-    create_directory(directory_to_create)
+    if string_utils.is_not_blank(directory_to_create):
+        log.warning("Creating directory '%s' if not exists!", directory_to_create)
+        create_directory(directory_to_create)
 
 
 def replace_dlc_and_cdlc(file_name):
