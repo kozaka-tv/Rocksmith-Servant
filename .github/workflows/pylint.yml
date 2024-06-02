@@ -21,5 +21,6 @@ jobs:
           pip install pylint
       - name: Analysing the code with pylint
         run: |
+          # TODO remove --disable=fixme while resolving issue #217
           pylint $(git ls-files '*.py') --disable=missing-docstring --disable=too-few-public-methods --disable=fixme \
           --ignore-paths='^new_stuffs_to_try_out/.*$'
