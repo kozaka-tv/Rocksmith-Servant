@@ -4,27 +4,30 @@ import pathlib
 
 from yaml import safe_load
 
-LOG_DIR = 'log'
-
-
-def create_log_dir():
-    pathlib.Path(os.path.join(LOG_DIR)).mkdir(parents=True, exist_ok=True)
+LOG_DIR_PATH = pathlib.Path(os.path.join('log'))
 
 
 def config():
-    """
-    Configure `logging` from a YAML file. You might adjust this function to
-    provide the configuration path as an argument.
-    """
-
     create_log_dir()
 
-    path = pathlib.Path(__file__).with_suffix(".yaml")
-    logging.config.dictConfig(safe_load(path.read_text(encoding="UTF-8")))
+    logging.config.dictConfig(safe_load(get_log_config()))
+
+
+def create_log_dir():
+    LOG_DIR_PATH.mkdir(parents=True, exist_ok=True)
+
+
+def get_log_config():
+    return get_log_config_path().read_text(encoding="UTF-8")
+
+
+def get_log_config_path():
+    return pathlib.Path(__file__).with_suffix(".yaml")
 
 
 if __name__ == "__main__":
-    # In case you want to do a test run.
+    """ In case you want to do a manual try out, run this! """
+
     config()
 
     root = logging.getLogger()

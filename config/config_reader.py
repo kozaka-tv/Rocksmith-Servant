@@ -4,7 +4,7 @@ import os
 import sys
 
 from config.config_ini_template import serialized
-from utils import file_utils
+from utils import file_utils, string_utils
 from utils.string_utils import strtobool
 
 ERROR_MSG = 'Error retrieving value from %s for section [%s] with key [%s].'
