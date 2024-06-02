@@ -1,11 +1,10 @@
 import argparse
-import os
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Servant script for managing Rocksmith sessions.')
-    parser.add_argument('-c', '--config', default='config' + os.sep + 'config.ini',
-                        help='Path of the configuration file like: config' + os.sep + 'my_config.ini')
+    parser.add_argument('-c', '--config', default='config.ini',
+                        help='Path of the configuration file like: my_config.ini')
     parser.add_argument('-db', '--database', default='servant.db',
                         help='Path of the database file like: my_database.db')
 
