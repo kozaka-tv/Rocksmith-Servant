@@ -10,8 +10,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
-
+  pytest:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
