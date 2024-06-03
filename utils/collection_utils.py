@@ -22,7 +22,7 @@ def repr_in_multi_line(collection):
     if len(collection) == 0:
         return ''
 
-    if type(collection) is dict:
+    if isinstance(collection, dict):
         return os.linesep + os.linesep.join(f"{k}: ({v})" for k, v in collection.items())
 
-    return os.linesep + os.linesep.join(collection)
+    return os.linesep + os.linesep.join(map(str, collection))
