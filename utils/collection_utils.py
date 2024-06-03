@@ -12,8 +12,7 @@ def is_not_empty(collection):
 def set_of_the_tuples_from_the_first_position(tuples):
     if tuples is None:
         return None
-
-    return set([item[0] for item in tuples])
+    return {item[0] for item in tuples}
 
 
 def repr_in_multi_line(collection):

@@ -31,7 +31,8 @@ class DBManager:
     def __create_table(self, sql_file_name):
         cursor = self.db.cursor()
         sql_file = os.path.join(self.dirname, sql_file_name)
-        read_sql_file = open(sql_file, encoding="utf-8").read()
+        with open(sql_file, encoding="utf-8") as file:
+            read_sql_file = file.read()
         cursor.executescript(read_sql_file)
         self.db.commit()
 

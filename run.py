@@ -89,9 +89,9 @@ def get_debug_message():
 
     modules_str += "---------------" + os.linesep
 
-    sniffer_str = "Song: {sniffer.artistName} - {sniffer.songName} " \
-                  "({sniffer.albumYear}, {sniffer.albumName}), " \
-                  "duration:{sniffer.songLength}s " \
+    sniffer_str = "Song: {sniffer.artist_name} - {sniffer.song_name} " \
+                  "({sniffer.album_year}, {sniffer.album_name}), " \
+                  "duration:{sniffer.song_length}s " \
                   "".format(sniffer=sniffer) + os.linesep
 
     setlist = f"Setlist: {str(setlist_logger.setlist)}" + os.linesep
@@ -105,7 +105,7 @@ def in_game():
 
 def put_the_song_into_the_setlist():
     if setlist_logger.enabled and in_game():
-        setlist_logger.log_a_song(sniffer.artistName + " - " + sniffer.songName)
+        setlist_logger.log_a_song(sniffer.artist_name + " - " + sniffer.song_name)
 
 
 def update_game_information():

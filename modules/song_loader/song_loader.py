@@ -67,7 +67,7 @@ class SongLoader:
             log.error("Directory %s could not be created!", bde.filename)
             log.error("Please fix the configuration!")
             log.error("---------------------------------------")
-            raise BadDirectoryError
+            raise BadDirectoryError from bde
 
     def run(self):
         if self.enabled:
@@ -218,7 +218,7 @@ class SongLoader:
 
                 songs.update({song_data.song_filename: song_data})
                 if log.isEnabledFor(logging.DEBUG) and len(songs) % 100 == 0:
-                    log.info(f"Loaded {len(songs)} songs...")
+                    log.info("Loaded %s songs...", len(songs))
 
         songs_to_update.update(songs)
 

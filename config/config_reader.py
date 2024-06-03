@@ -123,10 +123,10 @@ class ConfigReader:
         """
         config = configparser.ConfigParser()
 
-        for section in serialized:
-            config[section] = {}
-            for key in serialized[section]:
-                config[section][key] = str(serialized[section][key])
+        for instrument, section in serialized.items():
+            config[instrument] = {}
+            for key, value in section.items():
+                config[instrument][key] = str(value)
 
         return config
 
@@ -149,7 +149,7 @@ class ConfigReader:
             if cast == list:
                 return [v.strip() for v in self.content[section][key].split(";")]
             if cast == set:
-                return set([v.strip() for v in self.content[section][key].split(";")])
+                return {v.strip() for v in self.content[section][key].split(";")}
 
             # Cast to bool
             if cast == bool:
@@ -170,8 +170,8 @@ class ConfigReader:
                 new_key = str(serialized[section][key])
             else:
                 new_key = serialized[section][key]
-        except KeyError:
-            raise ConfigTemplateError(section, key)
+        except KeyError as e:
+            raise ConfigTemplateError(section, key) from e
 
         # Replace and save the config value with a default value according to type
         self.content[section][key] = new_key
