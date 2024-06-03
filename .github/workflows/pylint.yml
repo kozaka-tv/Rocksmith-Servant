@@ -22,5 +22,4 @@ jobs:
       - name: Analysing the code with pylint
         run: |
           pylint $(git ls-files '*.py') \
-            --disable=too-few-public-methods \
-            --ignore-paths='^new_stuffs_to_try_out/.*$'
+            --disable=too-few-public-methods
