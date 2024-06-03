@@ -14,6 +14,18 @@ RSPL_POSITION = 4
 
 TAGS = {'tag1', 'tag2'}
 
+REP_WITH_TAG_1_TAG_2 = '<SongData: song_filename=my_super_song.psarc, artist=My Artist, title=My ' \
+                       'Title, artist_title=My Artist - My Title, rspl_request_id=1, cdlc_id=3, ' \
+                       "rspl_song_id=666, rspl_official=True, rspl_position=4, tags={'tag1', " \
+                       "'tag2'}>"
+
+REP_WITH_TAG_2_TAG_1 = '<SongData: song_filename=my_super_song.psarc, artist=My Artist, title=My ' \
+                       'Title, artist_title=My Artist - My Title, rspl_request_id=1, cdlc_id=3, ' \
+                       "rspl_song_id=666, rspl_official=True, rspl_position=4, tags={'tag2', " \
+                       "'tag1'}>"
+
+EXPECTED_REPS = (REP_WITH_TAG_1_TAG_2, REP_WITH_TAG_2_TAG_1)
+
 
 def test_song_data__when_no_input_in_constructor__then_everything_is_empty():
     song_data = SongData()
@@ -115,7 +127,7 @@ def test_tags__when_tags_is_set__then_return_tags():
     assert song_data.tags == TAGS
 
 
-def test__ref__():
+def test__rep__():
     song_data = SongData()
 
     song_data.song_filename = SONG_FILENAME
@@ -134,11 +146,4 @@ def test__ref__():
 
     actual = str(song_data)
 
-    assert (actual == ('<SongData: song_filename=my_super_song.psarc, artist=My Artist, title=My '
-                       'Title, artist_title=My Artist - My Title, rspl_request_id=1, cdlc_id=3, '
-                       "rspl_song_id=666, rspl_official=True, rspl_position=4, tags={'tag2', "
-                       "'tag1'}>")
-            or actual == ('<SongData: song_filename=my_super_song.psarc, artist=My Artist, title=My '
-                          'Title, artist_title=My Artist - My Title, rspl_request_id=1, cdlc_id=3, '
-                          "rspl_song_id=666, rspl_official=True, rspl_position=4, tags={'tag1', "
-                          "'tag2'}>"))
+    assert actual in EXPECTED_REPS

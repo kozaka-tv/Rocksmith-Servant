@@ -12,6 +12,7 @@ from Crypto.Cipher import AES
 from definitions import PSARC_INFO_FILE_CACHE_DIR, EXT_PSARC_INFO_JSON
 from modules.song_loader.song_data import SongData
 from utils import file_utils
+from utils.exceptions import ExtractError
 
 log = logging.getLogger()
 
@@ -59,7 +60,7 @@ def __create_song_data(entry, psarc, song_data_input: SongData):
             song_data_input.title = __get_song_name(attributes, song_data_dict)
             return
 
-    raise Exception("Could not extract useful attribute information from: %s", song_data_dict)
+    raise ExtractError(f"Could not extract useful attribute information from: {song_data_dict}")
 
 
 def __get_song_data_dict(entry, psarc):

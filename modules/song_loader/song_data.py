@@ -1,3 +1,4 @@
+from definitions import KEY_VALUES_OF_AN_OFFICIAL_CDLC
 from utils import string_utils
 
 
@@ -22,7 +23,7 @@ class SongData:
 
     @property
     def is_official(self):
-        return 3 == self.rspl_official or 4 == self.rspl_official
+        return self.rspl_official in KEY_VALUES_OF_AN_OFFICIAL_CDLC
 
     def __repr__(self):
         rep = '<SongData: '

@@ -3,6 +3,7 @@ import os
 
 from deepdiff import DeepDiff
 
+from definitions import KEY_VALUES_OF_AN_OFFICIAL_CDLC
 from utils import collection_utils
 from utils.exceptions import ConfigError
 
@@ -51,7 +52,7 @@ def check_dir(dir_to_check, error_msg):
 
 
 def is_official(rspl_official):
-    return 3 == rspl_official or 4 == rspl_official
+    return rspl_official in KEY_VALUES_OF_AN_OFFICIAL_CDLC
 
 
 def log_new_songs_found(new_songs):
