@@ -25,7 +25,7 @@ ATTR_ARTIST_NAME = 'ArtistName'
 ATTR_SONG_NAME = 'SongName'
 
 
-def extract_psarc(filename_to_extract, song_data_input, write_to_file=False):
+def extract(filename_to_extract, song_data_input, write_to_file=False):
     log.debug('Extracting %s', filename_to_extract)
 
     if log.isEnabledFor(logging.DEBUG) or write_to_file:
@@ -35,7 +35,7 @@ def extract_psarc(filename_to_extract, song_data_input, write_to_file=False):
         entry = __get_psarc_info(psarc)
         if entry is None:
             log.error('Could not extract any song information from the psarc file: %s', filename_to_extract)
-            return None
+            return
 
         if log.isEnabledFor(logging.DEBUG) or write_to_file:
             __write_info_file(entry, filename_to_extract, psarc)
@@ -45,53 +45,42 @@ def extract_psarc(filename_to_extract, song_data_input, write_to_file=False):
 
 
 def __create_song_data(entry, psarc, song_data_input: SongData):
-    song_data_dict = get_song_data_dict(entry, psarc)
+    song_data_dict = __get_song_data_dict(entry, psarc)
 
     iterator = iter(song_data_dict['Entries'])
 
     while key := next(iterator):
         log.debug("Extracting attribute from the entry: %s", key)
 
-        value_ = song_data_dict['Entries'][key]
-        attributes = value_['Attributes']
-        artist_name = get_artist_name(attributes, key, song_data_dict)
+        attributes = song_data_dict['Entries'][key]['Attributes']
+        artist_name = __get_artist_name(attributes, key, song_data_dict)
         if artist_name is not None:
             song_data_input.artist = artist_name
-            song_data_input.title = get_song_name(attributes, song_data_dict)
+            song_data_input.title = __get_song_name(attributes, song_data_dict)
             return
 
     raise Exception("Could not extract useful attribute information from: %s", song_data_dict)
 
 
-def get_song_data_dict(entry, psarc):
+def __get_song_data_dict(entry, psarc):
     data = __read_entry_data(psarc, entry).decode('utf-8').replace('\\r\\n', '')
     return json.loads(data)
 
 
-def get_attributes(song_data_dict):
-    iterator = iter(song_data_dict['Entries'])
-
-    while key := next(iterator):
-        attributes = song_data_dict['Entries'][key]['Attributes']
-        name = get_artist_name(attributes, key, song_data_dict)
-        if name is not None:
-            return attributes
-
-    log.warning("Could not extract useful attribute information from: %s", song_data_dict)
-
-
-def get_artist_name(attributes_, key, song_data_dict):
+def __get_artist_name(attributes_, key, song_data_dict):
     try:
         return attributes_[ATTR_ARTIST_NAME]
     except KeyError:
         log.debug("Could not extract attribute %s from the entry: %s - %s", ATTR_ARTIST_NAME, key, song_data_dict)
+        return None
 
 
-def get_song_name(attributes_, song_data_dict):
+def __get_song_name(attributes_, song_data_dict):
     try:
         return attributes_[ATTR_SONG_NAME]
     except KeyError:
         log.error("Could not extract attribute %s from this entry: %s", ATTR_SONG_NAME, song_data_dict)
+        return None
 
 
 def __pad(data, blocksize=16):

@@ -246,7 +246,7 @@ class SongLoader:
         song_data.song_filename = cdlc_file_name
         file_path_to_extract = os.path.join(directory, cdlc_file_name)
 
-        psarc_reader.extract_psarc(file_path_to_extract, song_data)
+        psarc_reader.extract(file_path_to_extract, song_data)
 
         return song_data
 
