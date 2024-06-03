@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 import threading
 from time import sleep
 
@@ -24,7 +25,7 @@ try:
     config_file_path, db_file_path = parse_args()
 except ValueError as e:
     print(f"Error: {e}")
-    exit(1)
+    sys.exit(1)
 
 config.log_config.config()
 log = logging.getLogger()
@@ -48,7 +49,7 @@ try:
     config_data = ConfigData(conf)
 except ConfigError as e:
     log.error(e)
-    exit()
+    sys.exit()
 
 # Initializing modules and utils
 sniffer = Rocksniffer(config_data)
@@ -93,7 +94,7 @@ def get_debug_message():
                   "duration:{sniffer.songLength}s " \
                   "".format(sniffer=sniffer) + os.linesep
 
-    setlist = "Setlist: {0}".format(str(setlist_logger.setlist)) + os.linesep
+    setlist = f"Setlist: {str(setlist_logger.setlist)}" + os.linesep
 
     return os.linesep + modules_str + sniffer_str + setlist
 
@@ -143,6 +144,7 @@ def manage_songs(db_file):
             log.error(ex)
 
         # Catch all unchecked Exceptions, but keep app alive.
+        # pylint: disable=broad-exception-caught
         except Exception as ex:
             log.exception(ex)
 
@@ -155,6 +157,7 @@ def update_game_info_and_setlist():
             sleep(HEARTBEAT_UPDATE_GAME_INFO_AND_SETLIST)
 
         # Catch all unchecked Exceptions, but keep app alive.
+        # pylint: disable=broad-exception-caught
         except Exception as ex:
             log.exception(ex)
 
@@ -176,5 +179,6 @@ while True:
         update_config()
 
     # Catch all unchecked Exceptions, but keep app alive.
+    # pylint: disable=broad-exception-caught
     except Exception as e:
         log.exception(e)
