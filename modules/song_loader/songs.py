@@ -1,6 +1,9 @@
+import dataclasses
+
 from modules.song_loader.song_data import SongData
 
 
+@dataclasses.dataclass
 class Songs:
     def __init__(self):
         self.songs_in_archive = dict[str, SongData]()

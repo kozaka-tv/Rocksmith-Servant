@@ -15,11 +15,11 @@ class Rocksniffer:
 
         self.memory = None
 
-        self.artistName = None
-        self.songName = None
-        self.albumName = None
-        self.songLength = None
-        self.albumYear = None
+        self.artist_name = None
+        self.song_name = None
+        self.album_name = None
+        self.song_length = None
+        self.album_year = None
 
         self.samples = [0, 0, 0]
 
@@ -37,8 +37,8 @@ class Rocksniffer:
             if self.memory["success"]:
                 self.take_sample()
                 self.get_song_details()
-        except Exception:
-            raise RocksnifferConnectionError(self.host, self.port)
+        except Exception as e:
+            raise RocksnifferConnectionError(self.host, self.port) from e
 
     def get_sniffer_data(self):
         request = f"http://{self.host}:{self.port}/"
@@ -47,11 +47,11 @@ class Rocksniffer:
         return result
 
     def get_song_details(self):
-        self.artistName = self.memory['songDetails']['artistName']
-        self.songName = self.memory['songDetails']['songName']
-        self.albumName = self.memory['songDetails']['albumName']
-        self.songLength = self.memory['songDetails']['songLength']
-        self.albumYear = self.memory['songDetails']['albumYear']
+        self.artist_name = self.memory['songDetails']['artistName']
+        self.song_name = self.memory['songDetails']['songName']
+        self.album_name = self.memory['songDetails']['albumName']
+        self.song_length = self.memory['songDetails']['songLength']
+        self.album_year = self.memory['songDetails']['albumYear']
 
     def take_sample(self):
         """

@@ -2,6 +2,8 @@ import requests
 
 from utils.exceptions import RSPLPlaylistIsNotEnabledError
 
+REQUEST_TIMEOUT = 15
+
 RS_PLAYLIST_HOME = "https://rsplaylist.com/ajax/"
 URL_PLAYLIST = RS_PLAYLIST_HOME + "playlist.php?channel=%s"
 URL_REQUESTS = RS_PLAYLIST_HOME + "requests.php?channel=%s"
@@ -14,27 +16,27 @@ URL_SETTINGS = RS_PLAYLIST_HOME + "form-settings.php?channel=%s"
 
 
 def get_playlist(twitch_channel, phpsessid):
-    return requests.get(URL_PLAYLIST % twitch_channel, cookies={'PHPSESSID': phpsessid}).json()
+    return requests.get(URL_PLAYLIST % twitch_channel, cookies={'PHPSESSID': phpsessid}, timeout=REQUEST_TIMEOUT).json()
 
 
 def get_viewers(twitch_channel, phpsessid):
-    return requests.get(URL_VIEWERS % twitch_channel, cookies={'PHPSESSID': phpsessid}).json()
+    return requests.get(URL_VIEWERS % twitch_channel, cookies={'PHPSESSID': phpsessid}, timeout=REQUEST_TIMEOUT).json()
 
 
 def get_settings(twitch_channel, phpsessid):
-    return requests.get(URL_SETTINGS % twitch_channel, cookies={'PHPSESSID': phpsessid}).json()
+    return requests.get(URL_SETTINGS % twitch_channel, cookies={'PHPSESSID': phpsessid}, timeout=REQUEST_TIMEOUT).json()
 
 
 def __set_tag(twitch_channel, phpsessid, rspl_request_id, tag_id):
     url = URL_TAG_SET % (twitch_channel, rspl_request_id, tag_id)
     cookies = {'PHPSESSID': phpsessid}
-    requests.put(url, cookies=cookies).json()
+    requests.put(url, cookies=cookies, timeout=REQUEST_TIMEOUT).json()
 
 
 def __unset_tag(twitch_channel, phpsessid, rspl_request_id, tag_id):
     url = URL_TAG_UNSET % (twitch_channel, rspl_request_id, tag_id)
     cookies = {'PHPSESSID': phpsessid}
-    requests.put(url, cookies=cookies).json()
+    requests.put(url, cookies=cookies, timeout=REQUEST_TIMEOUT).json()
 
 
 def set_tag_loaded(twitch_channel, phpsessid, rspl_request_id, rspl_tags):
@@ -57,5 +59,5 @@ def user_is_not_logged_in(playlist):
                     return True
                 return False
         return None
-    except KeyError:
-        raise RSPLPlaylistIsNotEnabledError
+    except KeyError as exc:
+        raise RSPLPlaylistIsNotEnabledError from exc

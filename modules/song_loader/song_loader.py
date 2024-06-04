@@ -67,7 +67,7 @@ class SongLoader:
             log.error("Directory %s could not be created!", bde.filename)
             log.error("Please fix the configuration!")
             log.error("---------------------------------------")
-            raise BadDirectoryError
+            raise BadDirectoryError from bde
 
     def run(self):
         if self.enabled:
@@ -94,19 +94,19 @@ class SongLoader:
             else:
                 log.debug("Waiting for heartbeat ... waited: %s seconds", time_float_to_string(time_waited))
 
-    def __update_songs_from_download_dir(self):
-        cdlc_files = file_utils.get_files_from_directories(self.download_dirs)
-        for source_dir in self.download_dirs:
-            self.__store_and_return_all_the_new_song_datas(source_dir, self.songs.songs_in_tmp)
+    # def __update_songs_from_download_dir(self):
+    #     cdlc_files = file_utils.get_files_from_directories(self.download_dirs)
+    #     for source_dir in self.download_dirs:
+    #         self.__store_and_return_all_the_new_song_datas(source_dir, self.songs.songs_in_tmp)
 
     def __update_songs_from_rs_dir(self):
         self.__store_and_return_all_the_new_song_datas(self.rocksmith_cdlc_dir, self.songs.songs_in_rs)
 
-    def __update_songs_from_import_dir(self):
-        self.__store_and_return_all_the_new_song_datas(self.destination_dir, self.songs.songs_in_import)
+    # def __update_songs_from_import_dir(self):
+    #     self.__store_and_return_all_the_new_song_datas(self.destination_dir, self.songs.songs_in_import)
 
-    def __update_songs_from_tmp_dir(self):
-        self.__store_and_return_all_the_new_song_datas(self.destination_dir, self.songs.songs_in_tmp)
+    # def __update_songs_from_tmp_dir(self):
+    #     self.__store_and_return_all_the_new_song_datas(self.destination_dir, self.songs.songs_in_tmp)
 
     def playlist_has_been_changed(self):
         new_playlist = get_playlist(self.twitch_channel, self.phpsessid)
@@ -202,6 +202,7 @@ class SongLoader:
         filenames = file_utils.get_file_names_from(directory)
 
         songs_removed = self.__remove_missing_songs_from(songs_to_update, filenames)
+        log.debug('songs_removed:%s', repr_in_multi_line(songs_removed))
 
         new_songs = filenames.difference(songs_to_update)
         log_new_songs_found(new_songs)
@@ -218,7 +219,7 @@ class SongLoader:
 
                 songs.update({song_data.song_filename: song_data})
                 if log.isEnabledFor(logging.DEBUG) and len(songs) % 100 == 0:
-                    log.info(f"Loaded {len(songs)} songs...")
+                    log.info("Loaded %s songs...", len(songs))
 
         songs_to_update.update(songs)
 
@@ -236,7 +237,6 @@ class SongLoader:
             for missing_song in missing:
                 pop = songs_to_update.pop(missing_song, None)
                 removed[pop.song_filename] = pop
-                pass
 
         return removed
 
@@ -246,7 +246,7 @@ class SongLoader:
         song_data.song_filename = cdlc_file_name
         file_path_to_extract = os.path.join(directory, cdlc_file_name)
 
-        psarc_reader.extract_psarc(file_path_to_extract, song_data)
+        psarc_reader.extract(file_path_to_extract, song_data)
 
         return song_data
 

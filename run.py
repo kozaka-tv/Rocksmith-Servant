@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 import threading
 from time import sleep
 
@@ -24,7 +25,7 @@ try:
     config_file_path, db_file_path = parse_args()
 except ValueError as e:
     print(f"Error: {e}")
-    exit(1)
+    sys.exit(1)
 
 config.log_config.config()
 log = logging.getLogger()
@@ -48,7 +49,7 @@ try:
     config_data = ConfigData(conf)
 except ConfigError as e:
     log.error(e)
-    exit()
+    sys.exit()
 
 # Initializing modules and utils
 sniffer = Rocksniffer(config_data)
@@ -88,12 +89,12 @@ def get_debug_message():
 
     modules_str += "---------------" + os.linesep
 
-    sniffer_str = "Song: {sniffer.artistName} - {sniffer.songName} " \
-                  "({sniffer.albumYear}, {sniffer.albumName}), " \
-                  "duration:{sniffer.songLength}s " \
+    sniffer_str = "Song: {sniffer.artist_name} - {sniffer.song_name} " \
+                  "({sniffer.album_year}, {sniffer.album_name}), " \
+                  "duration:{sniffer.song_length}s " \
                   "".format(sniffer=sniffer) + os.linesep
 
-    setlist = "Setlist: {0}".format(str(setlist_logger.setlist)) + os.linesep
+    setlist = f"Setlist: {str(setlist_logger.setlist)}" + os.linesep
 
     return os.linesep + modules_str + sniffer_str + setlist
 
@@ -104,7 +105,7 @@ def in_game():
 
 def put_the_song_into_the_setlist():
     if setlist_logger.enabled and in_game():
-        setlist_logger.log_a_song(sniffer.artistName + " - " + sniffer.songName)
+        setlist_logger.log_a_song(sniffer.artist_name + " - " + sniffer.song_name)
 
 
 def update_game_information():
@@ -143,6 +144,7 @@ def manage_songs(db_file):
             log.error(ex)
 
         # Catch all unchecked Exceptions, but keep app alive.
+        # pylint: disable=broad-exception-caught
         except Exception as ex:
             log.exception(ex)
 
@@ -155,6 +157,7 @@ def update_game_info_and_setlist():
             sleep(HEARTBEAT_UPDATE_GAME_INFO_AND_SETLIST)
 
         # Catch all unchecked Exceptions, but keep app alive.
+        # pylint: disable=broad-exception-caught
         except Exception as ex:
             log.exception(ex)
 
@@ -176,5 +179,6 @@ while True:
         update_config()
 
     # Catch all unchecked Exceptions, but keep app alive.
+    # pylint: disable=broad-exception-caught
     except Exception as e:
         log.exception(e)

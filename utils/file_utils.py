@@ -33,7 +33,7 @@ def get_files_from_directories(directories):
         if os.path.isdir(directory):
             get_files(cdlc_files, directory)
         else:
-            error_msg = "Bad directory! Directory {} is not exists or could not be reached.".format(directory)
+            error_msg = f'Bad directory! Directory {directory} is not exists or could not be reached.'
             log.error(error_msg)
             raise BadDirectoryError(error_msg, directory)
 
@@ -41,7 +41,7 @@ def get_files_from_directories(directories):
 
 
 def get_files(cdlc_files, directory, older=False, file_age_seconds=DEFAULT_NOT_PARSED_FILE_AGE_SECONDS):
-    for root, dir_names, filenames in os.walk(directory):
+    for root, _, filenames in os.walk(directory):
         for filename in fnmatch.filter(filenames, PATTERN_CDLC_FILE_EXT):
             file = os.path.join(root, filename)
             if older:
@@ -58,7 +58,7 @@ def get_file_names_from(directory, extension=PATTERN_CDLC_FILE_EXT) -> set:
     cdlc_files = set()
 
     log.debug("----- Files ------------------------------------------")
-    for root, dir_names, filenames in os.walk(directory):
+    for _, _, filenames in os.walk(directory):
         for filename in fnmatch.filter(filenames, extension):
             if is_info_file_ext_to_remove:
                 cdlc_files.add(filename_without_info_json_ext(filename))
@@ -103,7 +103,7 @@ def last_modification_time(path):
 
 def move_file(file, destination):
     if log.isEnabledFor(logging.DEBUG):
-        log.debug(f"Moving file {file} to {destination} if exists!")
+        log.debug("Moving file %s to %s if exists!", file, destination)
 
     if os.path.exists(file):
         destination_file = os.path.join(destination, os.path.basename(file))
@@ -121,7 +121,7 @@ def delete_file(directory, file):
     if os.path.exists(directory):
         file_path = os.path.join(directory, os.path.basename(file))
         if os.path.isfile(file_path) and os.path.exists(file_path):
-            log.debug(f"Deleting file {file} from {directory} if exists!")
+            log.debug('Deleting file %s from %s if exists!', file, directory)
             os.remove(file_path)
         return True
     return False

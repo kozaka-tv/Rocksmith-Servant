@@ -1,3 +1,4 @@
+import dataclasses
 import os
 
 from utils import rs_playlist, string_utils
@@ -40,6 +41,7 @@ ERR_MSG_RSPL_TAG = "Missing or undefined tag value of the tag '{}' in the config
                    "BAD: {}={}"
 
 
+@dataclasses.dataclass
 class ConfigData:
     def __init__(self, conf):
         self.sniffer = ConfRockSniffer(conf)
@@ -49,6 +51,7 @@ class ConfigData:
         self.scene_switcher = ConfSceneSwitcher(conf)
 
 
+@dataclasses.dataclass
 class ConfRockSniffer:
     def __init__(self, conf):
         self.enabled = conf.get_bool(SECTION_ROCK_SNIFFER, KEY_ENABLED)
@@ -56,12 +59,14 @@ class ConfRockSniffer:
         self.port = conf.get(SECTION_ROCK_SNIFFER, "port")
 
 
+@dataclasses.dataclass
 class ConfSetlistLogger:
     def __init__(self, conf):
         self.enabled = conf.get_bool(SECTION_SETLIST_LOGGER, KEY_ENABLED)
         self.setlist_path = conf.get(SECTION_SETLIST_LOGGER, "setlist_path")
 
 
+@dataclasses.dataclass
 class ConfFileManager:
     def __init__(self, conf):
         self.enabled = conf.get_bool(SECTION_FILE_MANAGER, KEY_ENABLED)
@@ -70,6 +75,7 @@ class ConfFileManager:
         self.using_cfsm = conf.get(SECTION_FILE_MANAGER, "using_cfsm")
 
 
+@dataclasses.dataclass
 class ConfSongLoader:
     def __init__(self, conf):
         self.enabled = conf.get_bool(SECTION_SONG_LOADER, KEY_ENABLED)
@@ -83,6 +89,7 @@ class ConfSongLoader:
             self.allow_load_when_in_game = conf.get_bool(SECTION_SONG_LOADER, "allow_load_when_in_game")
 
 
+@dataclasses.dataclass
 class RSPLTags:
     def __init__(self, conf):
         self.tag_to_download = get_tag_validated(conf, TAG_TO_DOWNLOAD)
@@ -94,6 +101,7 @@ class RSPLTags:
         self.tag_vip_viewer_request = get_tag(conf, TAG_VIP_VIEWER_REQ)
 
 
+@dataclasses.dataclass
 class ConfSceneSwitcher:
     def __init__(self, conf):
         self.enabled = conf.get_bool(SECTION_SCENE_SWITCHER, KEY_ENABLED)

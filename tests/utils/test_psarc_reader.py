@@ -4,7 +4,7 @@ import pytest
 
 from modules.song_loader.song_data import SongData
 from tests.base_test import CDLC_DIR
-from utils.psarc_reader import extract_psarc
+from utils.psarc_reader import extract
 
 # If you want to keep the info.json files, set this to True
 KEEP_INFO_FILES = False
@@ -24,7 +24,7 @@ KEEP_INFO_FILES = False
 def test_artist(test_input, expected):
     song_data = SongData()
 
-    extract_psarc(test_input, song_data, KEEP_INFO_FILES)
+    extract(test_input, song_data, KEEP_INFO_FILES)
 
     assert song_data.artist == expected
 
@@ -43,6 +43,6 @@ def test_artist(test_input, expected):
 def test_title(test_input, expected):
     song_data = SongData()
 
-    extract_psarc(test_input, song_data, KEEP_INFO_FILES)
+    extract(test_input, song_data, KEEP_INFO_FILES)
 
     assert song_data.title == expected

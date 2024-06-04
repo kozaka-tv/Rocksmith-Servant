@@ -26,8 +26,6 @@ def get_log_config_path():
 
 
 if __name__ == "__main__":
-    """ In case you want to do a manual try out, run this! """
-
     config()
 
     root = logging.getLogger()

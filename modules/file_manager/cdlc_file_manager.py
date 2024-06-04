@@ -95,7 +95,7 @@ class FileManager:
             log.error("Please fix the configuration!")
             log.error("---------------------------------------")
             self.download_dirs.discard(bde.directory)
-            return
+            return []
 
         if len(cdlc_files) > 0:
             log.info('Found %s new CDLC file under source dirs.', len(cdlc_files))

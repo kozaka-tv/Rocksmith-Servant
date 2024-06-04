@@ -42,4 +42,4 @@ def strtobool(value: str) -> bool:
 def time_float_to_string(time: float):
     if time is None:
         return None
-    return "%.2f" % round(time, 2)
+    return f"{round(time, 2):.2f}"
