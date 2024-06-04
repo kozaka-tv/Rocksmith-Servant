@@ -9,10 +9,10 @@ def is_not_empty(collection):
     return bool(collection)
 
 
-def set_of_the_tuples_from_the_first_position(tuples):
-    if tuples is None:
-        return None
-    return {item[0] for item in tuples}
+def get_tuples_from_the_first_position_of(list_of_tuples: list[tuple]) -> set:
+    if list_of_tuples is None:
+        return set()
+    return {item[0] for item in list_of_tuples}
 
 
 def repr_in_multi_line(collection):

@@ -4,7 +4,7 @@ import sqlite3
 
 from modules.song_loader.song_data import SongData
 from utils import string_utils
-from utils.collection_utils import set_of_the_tuples_from_the_first_position
+from utils.collection_utils import get_tuples_from_the_first_position_of
 from utils.string_utils import remove_special_chars
 
 log = logging.getLogger()
@@ -44,7 +44,7 @@ class DBManager:
         cur = self.db.cursor()
         songs = cur.execute("SELECT distinct colFileName FROM songs where colArtist like ? and colTitle like ?",
                             ("%" + artist + "%", "%" + title + "%")).fetchall()
-        return set_of_the_tuples_from_the_first_position(songs)
+        return get_tuples_from_the_first_position_of(songs)
 
     def search_song_by_artist_and_title(self, artist, title):
         songs_from_db_without_special_chars = self.__get_songs_from_db(remove_special_chars(artist),
@@ -87,8 +87,8 @@ class DBManager:
 
     def all_song_filenames(self):
         cur = self.db.cursor()
-        all_elements_tuple = cur.execute("SELECT distinct colFileName FROM songs").fetchall()
-        return set_of_the_tuples_from_the_first_position(all_elements_tuple)
+        all_songs = cur.execute("SELECT distinct colFileName FROM songs").fetchall()
+        return get_tuples_from_the_first_position_of(all_songs)
 
     def delete_song_by_filename(self, to_delete):
         cur = self.db.cursor()
