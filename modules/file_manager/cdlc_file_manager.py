@@ -3,9 +3,8 @@ import logging
 import math
 
 from definitions import TMP_DIR
-from utils import file_utils
+from utils import file_utils, collection_utils
 from utils.collection_utils import repr_in_multi_line, is_not_empty
-from utils.exceptions import BadDirectoryError
 
 HEARTBEAT = 1
 HEARTBEAT_NOT_PARSED = 5
@@ -22,7 +21,7 @@ class FileManager:
         if self.enabled:
             self.last_run = datetime.datetime.now()
             self.last_run_not_parsed = self.last_run
-            self.download_dirs = config_data.file_manager.download_dirs
+            self.download_dirs: set = config_data.file_manager.download_dirs
             self.destination_dir = config_data.file_manager.destination_dir
             self.using_cfsm = config_data.file_manager.using_cfsm
 
@@ -83,23 +82,22 @@ class FileManager:
 
         return cdlc_files
 
-    def __scan_cdlc_files_in_download_dirs(self):
+    def __scan_cdlc_files_in_download_dirs(self) -> set:
 
-        try:
-            cdlc_files = file_utils.get_files_from_directories(self.download_dirs)
-        except BadDirectoryError as bde:
+        cdlc_files, bad_dirs = file_utils.get_files_from_directories(self.download_dirs)
+
+        if collection_utils.is_not_empty(bad_dirs):
             log.error("---------------------------------------")
-            log.error("Bad definition of the section FileManager of key download_dirs!")
-            log.error("Directory %s is bad or could not be reached, therefore it will be not checked anymore.",
-                      format(bde.directory))
-            log.error("Please fix the configuration!")
+            log.error('Bad definition or could not reach some directories defined in the config '
+                      'under the section FileManager with the key download_dirs')
+            log.error('Bad directories will be excluded from next search: %s', repr_in_multi_line(bad_dirs))
             log.error("---------------------------------------")
-            self.download_dirs.discard(bde.directory)
-            return []
+            for bad_dir in bad_dirs:
+                self.download_dirs.discard(bad_dir)
 
         if len(cdlc_files) > 0:
-            log.info('Found %s new CDLC file under source dirs.', len(cdlc_files))
-            log.debug(cdlc_files)
+            log.warning('Found %s new CDLC file under source dirs. Files:%s',
+                        len(cdlc_files), repr_in_multi_line(cdlc_files))
 
         return cdlc_files
 
