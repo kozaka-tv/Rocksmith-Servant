@@ -1,13 +1,15 @@
+""" Utility for mostly CDLC file handlings """
+
 import fnmatch
 import logging
 import os
 import pathlib
 import shutil
 from datetime import datetime, timedelta
+from typing import Tuple
 
 from definitions import PATTERN_CDLC_FILE_EXT, PATTERN_CDLC_INFO_FILE_EXT, \
     EXT_PSARC_INFO_JSON
-from utils.exceptions import BadDirectoryError
 from utils.string_utils import is_not_blank
 
 DEFAULT_NOT_PARSED_FILE_AGE_SECONDS = 15
@@ -16,39 +18,42 @@ log = logging.getLogger()
 
 
 def get_files_from_directory(directory):
-    cdlc_files = []
-    get_files(cdlc_files, directory)
+    cdlc_files = set()
+    __add_files_from_dir(cdlc_files, directory)
     return cdlc_files
 
 
 def get_not_parsed_files_from_directory(directory):
-    cdlc_files = []
-    get_files(cdlc_files, directory, True, DEFAULT_NOT_PARSED_FILE_AGE_SECONDS)
+    cdlc_files = set()
+    __add_files_from_dir(cdlc_files, directory, True, DEFAULT_NOT_PARSED_FILE_AGE_SECONDS)
     return cdlc_files
 
 
-def get_files_from_directories(directories):
-    cdlc_files = []
-    for directory in directories:
-        if os.path.isdir(directory):
-            get_files(cdlc_files, directory)
-        else:
-            error_msg = f'Bad directory! Directory {directory} is not exists or could not be reached.'
-            log.error(error_msg)
-            raise BadDirectoryError(error_msg, directory)
+def get_files_from_directories(directories: set) -> Tuple[set, set]:
+    cdlc_files = set()
+    bad_dirs = set()
 
-    return cdlc_files
+    if directories:
+        for directory in directories:
+            if os.path.isdir(directory):
+                __add_files_from_dir(cdlc_files, directory)
+            else:
+                log.debug('Bad directory! The directory what does not exists or could not be reached: %s', directory)
+                bad_dirs.add(directory)
+
+    return cdlc_files, bad_dirs
 
 
-def get_files(cdlc_files, directory, older=False, file_age_seconds=DEFAULT_NOT_PARSED_FILE_AGE_SECONDS):
+def __add_files_from_dir(cdlc_files: set, directory: str, older=False,
+                         file_age_seconds=DEFAULT_NOT_PARSED_FILE_AGE_SECONDS):
     for root, _, filenames in os.walk(directory):
         for filename in fnmatch.filter(filenames, PATTERN_CDLC_FILE_EXT):
             file = os.path.join(root, filename)
             if older:
                 if is_file_old(file, file_age_seconds):
-                    cdlc_files.append(file)
+                    cdlc_files.add(file)
             else:
-                cdlc_files.append(file)
+                cdlc_files.add(file)
 
 
 def get_file_names_from(directory, extension=PATTERN_CDLC_FILE_EXT) -> set:

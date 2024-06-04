@@ -96,7 +96,7 @@ def test_set_of_the_tuples_from_the_first_position__with_2_tuples_and_int_in_the
     "test_input, expected",
     [
         (None, 'None'),
-        (set(), ''),
+        ({}, ''),
         ({}, ''),
 
         (['line1'], NL + 'line1'),
