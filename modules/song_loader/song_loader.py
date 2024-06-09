@@ -2,17 +2,20 @@ import logging
 import os
 from time import time
 
+from dacite import from_dict
+
 from config.config_data import ConfigData
 from definitions import PSARC_INFO_FILE_CACHE_DIR, TMP_DIR
 from modules.database.db_manager import DBManager
+from modules.song_loader.rs_playlist_data import RsPlaylist
 from modules.song_loader.song_data import SongData
 from modules.song_loader.song_loader_helper import playlist_does_not_changed, check_cdlc_archive_dir, \
     check_rocksmith_cdlc_dir, update_tags_in_song_data, is_official, log_new_songs_found
-from utils import file_utils, rs_playlist, psarc_reader
+from utils import file_utils, psarc_reader
 from utils.collection_utils import is_not_empty, is_empty, repr_in_multi_line
 from utils.exceptions import BadDirectoryError
 from utils.exceptions import RSPLNotLoggedInError
-from utils.rs_playlist import get_playlist, user_is_not_logged_in
+from utils.rs_playlist_util import get_playlist, user_is_not_logged_in, set_tag_to_download, set_tag_loaded
 from utils.string_utils import time_float_to_string
 
 HEARTBEAT = 5
@@ -26,9 +29,12 @@ class SongLoader:
         if self.enabled:
             self.twitch_channel = config_data.song_loader.twitch_channel
             self.phpsessid = config_data.song_loader.phpsessid
+
             self.rsplaylist = None
+            self.rsplaylist_json = None
             self.rsplaylist_updated = True
             self.rspl_tags = config_data.song_loader.rspl_tags
+
             self.cdlc_archive_dir = check_cdlc_archive_dir(config_data.song_loader.cdlc_archive_dir)
             self.destination_dir = config_data.song_loader.destination_dir
             self.download_dirs = config_data.file_manager.download_dirs
@@ -80,7 +86,7 @@ class SongLoader:
 
                 self.__update_songs_from_rs_dir()
 
-                if self.playlist_has_been_changed():
+                if self.__playlist_has_been_changed():
                     log.info("Playlist has been changed, update songs!")
 
                     self.__find_existing_song_filenames_from_db_according_to_the_requests()
@@ -108,24 +114,28 @@ class SongLoader:
     # def __update_songs_from_tmp_dir(self):
     #     self.__store_and_return_all_the_new_song_datas(self.destination_dir, self.songs.songs_in_tmp)
 
-    def playlist_has_been_changed(self):
+    def __playlist_has_been_changed(self):
         new_playlist = get_playlist(self.twitch_channel, self.phpsessid)
 
         self.__stop_if_user_is_not_logged_in_on_rspl_page(new_playlist)
 
-        if self.rsplaylist is None:
-            self.rsplaylist = new_playlist
+        if self.rsplaylist_json is None:
+            self.__update_playlist_with(new_playlist)
             log.info("Initial load of the playlist is done...")
             return True
 
-        if playlist_does_not_changed(self.rsplaylist, new_playlist):
+        if playlist_does_not_changed(self.rsplaylist_json, new_playlist):
             return False
 
         log.info("Playlist has been changed, lets update!")
 
-        self.rsplaylist = new_playlist
+        self.__update_playlist_with(new_playlist)
 
         return True
+
+    def __update_playlist_with(self, new_playlist):
+        self.rsplaylist_json = new_playlist
+        self.rsplaylist = from_dict(data_class=RsPlaylist, data=new_playlist)
 
     def __stop_if_user_is_not_logged_in_on_rspl_page(self, new_playlist):
         not_logged_in = user_is_not_logged_in(new_playlist)
@@ -134,7 +144,7 @@ class SongLoader:
             log.debug("Playlist is empty! Can not tell, that the user is logged in or not!")
 
         elif not_logged_in:
-            self.rsplaylist = None
+            self.rsplaylist_json = None
             self.last_run = time()
             log.error("User is not logged in! Please log in on RSPL!")
             raise RSPLNotLoggedInError
@@ -273,10 +283,10 @@ class SongLoader:
                     self.songs.moved_from_archive.update(
                         {filename: self.songs.songs_from_archive_has_to_be_moved.pop(filename)})
                     actually_loaded_songs.add(filename)
-                    rs_playlist.set_tag_loaded(self.twitch_channel,
-                                               self.phpsessid,
-                                               song_data.rspl_request_id,
-                                               self.rspl_tags)
+                    set_tag_loaded(self.twitch_channel,
+                                   self.phpsessid,
+                                   song_data.rspl_request_id,
+                                   self.rspl_tags)
                 else:
                     log.error("Could not move file! Song exists in DB, but there is no file in archive: %s",
                               song_to_move)
@@ -284,10 +294,10 @@ class SongLoader:
                         {filename: self.songs.songs_from_archive_has_to_be_moved.pop(filename)})
 
                     if self.__has_no_tag_to_download(song_data):
-                        rs_playlist.set_tag_to_download(self.twitch_channel,
-                                                        self.phpsessid,
-                                                        song_data.rspl_request_id,
-                                                        self.rspl_tags)
+                        set_tag_to_download(self.twitch_channel,
+                                            self.phpsessid,
+                                            song_data.rspl_request_id,
+                                            self.rspl_tags)
 
         if is_not_empty(self.songs.moved_from_archive):
             log.warning("---- Files newly moved and will be parsed: %s", str(actually_loaded_songs))
@@ -303,45 +313,45 @@ class SongLoader:
     def __has_no_tag_to_download(self, song_data):
         return self.rspl_tags.tag_to_download not in song_data.tags
 
-    def __do_not_has_the_tag_to_download(self, sr):
-        return self.rspl_tags.tag_to_download not in sr["tags"]
+    def __do_not_has_the_tag_to_download(self, playlist_item):
+        return self.rspl_tags.tag_to_download not in playlist_item.tags
 
     def __find_existing_song_filenames_from_db_according_to_the_requests(self):
-        for sr in self.rsplaylist["playlist"]:
-            rspl_request_id = sr['id']
-            for dlc_set in sr["dlc_set"]:
-                rspl_song_id = dlc_set['id']
-                cdlc_id = dlc_set["cdlc_id"]
-                artist = dlc_set["artist"]
-                title = dlc_set["title"]
-                official = dlc_set["official"]
-                rspl_position = str(sr["position"])
+        playlist = self.rsplaylist.playlist
+        for playlist_item in playlist:
+            for dlc_set_item in playlist_item.dlc_set:
+                cdlc_id = dlc_set_item.cdlc_id
+                artist = dlc_set_item.artist
+                title = dlc_set_item.title
 
+                official = dlc_set_item.official
                 if is_official(official):
                     log.info("Skipping ODLC request with cdlc_id=%s - %s - %s", cdlc_id, artist, title)
                     continue
 
                 songs_in_the_db = self.db_manager.search_song_by_artist_and_title(artist, title)
 
+                rspl_position = str(playlist_item.position)
+
                 if is_empty(songs_in_the_db):
-                    if self.__do_not_has_the_tag_to_download(sr):
+                    if self.__do_not_has_the_tag_to_download(playlist_item):
                         log.warning("User must download the song: rspl_position=%s cdlc_id=%s - %s - %s",
                                     rspl_position, cdlc_id, artist, title)
-                        rs_playlist.set_tag_to_download(self.twitch_channel,
-                                                        self.phpsessid,
-                                                        rspl_request_id,
-                                                        self.rspl_tags)
+                        set_tag_to_download(self.twitch_channel,
+                                            self.phpsessid,
+                                            playlist_item.id,
+                                            self.rspl_tags)
 
                         log.info("Tag is set! rspl_position=%s cdlc_id=%s - %s - %s",
                                  rspl_position, cdlc_id, artist, title)
                     continue
 
                 for song_filename in songs_in_the_db:
-                    song_data = SongData(rspl_request_id, cdlc_id, rspl_song_id, artist, title, song_filename)
+                    song_data = SongData(playlist_item.id, cdlc_id, dlc_set_item.id, artist, title, song_filename)
                     song_data.rspl_official = official
                     song_data.rspl_position = rspl_position
 
-                    update_tags_in_song_data(song_data, sr)
+                    update_tags_in_song_data(song_data, playlist_item)
 
                     song_data.rspl_official = official
                     song_data.rspl_position = rspl_position
@@ -364,10 +374,10 @@ class SongLoader:
             if filename in filenames_from_rs_dir:
                 log.debug("Already loaded song: %s", song_data)
                 if self.__has_no_tag_loaded(song_data):
-                    rs_playlist.set_tag_loaded(self.twitch_channel,
-                                               self.phpsessid,
-                                               song_data.rspl_request_id,
-                                               self.rspl_tags)
+                    set_tag_loaded(self.twitch_channel,
+                                   self.phpsessid,
+                                   song_data.rspl_request_id,
+                                   self.rspl_tags)
 
             elif filename in difference:
                 self.songs.songs_from_archive_has_to_be_moved.update({filename: song_data})
@@ -377,8 +387,8 @@ class SongLoader:
                      repr_in_multi_line(self.songs.songs_from_archive_has_to_be_moved))
 
     def __set_tag_loaded(self, song_data):
-        rs_playlist.set_tag_loaded(self.twitch_channel,
-                                   self.phpsessid,
-                                   song_data.rspl_request_id,
-                                   self.rspl_tags)
+        set_tag_loaded(self.twitch_channel,
+                       self.phpsessid,
+                       song_data.rspl_request_id,
+                       self.rspl_tags)
         song_data.tags.add(self.rspl_tags.tag_loaded)

@@ -30,9 +30,9 @@ def playlist_does_not_changed(old_playlist, new_playlist):
     return False
 
 
-def update_tags_in_song_data(song_data, sr):
+def update_tags_in_song_data(song_data, playlist_item):
     song_data.tags.clear()
-    for tag in sr['tags']:
+    for tag in playlist_item.tags:
         song_data.tags.add(tag)
 
 
