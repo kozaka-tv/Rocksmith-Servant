@@ -2,6 +2,9 @@ from dataclasses import dataclass
 from typing import List, Dict, Optional
 
 
+# pylint: disable=too-many-instance-attributes
+# The structure of this data class is defined in RSPL, so we have to disable the pylint check.
+
 @dataclass
 class Viewer:
     username: str
