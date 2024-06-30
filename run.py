@@ -39,6 +39,14 @@ HEARTBEAT_MANAGE_SONGS = 1
 HEARTBEAT_UPDATE_GAME_INFO_AND_SETLIST = 0.1
 
 
+def check_modules_enabled(config_data):
+    # Search in all attributes that has "enabled" attribute
+    modules_enabled = [getattr(getattr(config_data, attr), 'enabled', False) for attr in dir(config_data) if
+                       not attr.startswith('__')]
+    if not any(modules_enabled):
+        log.error("!!! No modules are enabled !!!")
+
+
 def check_enabled_module_dependencies():
     if song_loader.enabled and not file_manager.enabled:
         raise ConfigError("Please enable FileManager if you wanna use the SongLoader!")
@@ -50,6 +58,8 @@ try:
 except ConfigError as e:
     log.error(e)
     sys.exit()
+
+check_modules_enabled(config_data)
 
 # Initializing modules and utils
 sniffer = Rocksniffer(config_data)
