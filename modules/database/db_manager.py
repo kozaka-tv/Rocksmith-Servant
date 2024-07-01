@@ -23,7 +23,6 @@ class DBManager:
     def __init_db(self):
         try:
             self.__create_table("create_table_songs.sql")
-            self.__create_table("create_table_songs_enhanced.sql")
         except Exception as e:
             log.error("%s Database init error: %s", type(e), e)
             raise e
@@ -42,7 +41,7 @@ class DBManager:
 
     def __get_songs_from_db(self, artist, title):
         cur = self.db.cursor()
-        songs = cur.execute("SELECT distinct colFileName FROM songs where colArtist like ? and colTitle like ?",
+        songs = cur.execute("SELECT distinct fileName FROM songs where artist like ? and title like ?",
                             ("%" + artist + "%", "%" + title + "%")).fetchall()
         return get_tuples_from_the_first_position_of(songs)
 
@@ -53,7 +52,7 @@ class DBManager:
 
     def search_song_by_filename(self, filename: str) -> Optional[SongData]:
         cur = self.db.cursor()
-        song = cur.execute("SELECT colFileName, colArtist, colTitle FROM songs where songs.colFileName = ?",
+        song = cur.execute("SELECT fileName, artist, title FROM songs where songs.fileName = ?",
                            ("" + filename,)).fetchone()
 
         if song is None:
@@ -63,7 +62,7 @@ class DBManager:
 
     def is_song_by_filename_exists(self, filename):
         cur = self.db.cursor()
-        execute = cur.execute("select count(*) from songs where colFilename = ?", ("" + filename,))
+        execute = cur.execute("select count(*) from songs where filename = ?", ("" + filename,))
         fetchone = execute.fetchone()[0]
         return fetchone != 0
 
@@ -71,11 +70,11 @@ class DBManager:
         cur = self.db.cursor()
         sql = (
                 ("insert into songs ("
-                 "colArtist, "
-                 "colTitle, "
+                 "artist, "
+                 "title, "
                  "artistNormalized, "
                  "titleNormalized, "
-                 "colFileName"
+                 "fileName"
                  ") " +
                  "values ('")
                 + escape_single_quote(song_data.artist_title.artist) + "', '"
@@ -90,11 +89,11 @@ class DBManager:
 
     def all_song_filenames(self):
         cur = self.db.cursor()
-        all_songs = cur.execute("SELECT distinct colFileName FROM songs").fetchall()
+        all_songs = cur.execute("SELECT distinct fileName FROM songs").fetchall()
         return get_tuples_from_the_first_position_of(all_songs)
 
     def delete_song_by_filename(self, to_delete):
         cur = self.db.cursor()
-        sql = f"delete FROM songs WHERE songs.colFileName in ({','.join(['?'] * len(to_delete))})"
+        sql = f"delete FROM songs WHERE songs.fileName in ({','.join(['?'] * len(to_delete))})"
         cur.execute(sql, tuple(to_delete))
         self.db.commit()

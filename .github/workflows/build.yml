@@ -39,7 +39,6 @@ jobs:
           pyinstaller -y --onefile --hidden-import=yaml --hidden-import=yaml.loader --hidden-import=colorlog `
           --paths=.\.venv\Lib\site-packages\ --add-data "config/log_config.yaml;config" `
           --add-data "modules/database/create_table_songs.sql;modules/database" `
-          --add-data "modules/database/create_table_songs_enhanced.sql;modules/database" `
           --distpath . run.py
 
       - name: Upload Artifacts
