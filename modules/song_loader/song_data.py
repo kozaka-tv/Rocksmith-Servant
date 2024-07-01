@@ -1,25 +1,43 @@
+from dataclasses import dataclass, field
+from typing import Optional
+
 from definitions import KEY_VALUES_OF_AN_OFFICIAL_CDLC
-from utils import string_utils
+from utils.string_utils import normalize
 
 
-class SongData:
+@dataclass(slots=True)
+class ArtistTitle:
+    artist: str
+    title: str
 
-    def __init__(self, rspl_request_id=None, cdlc_id=None, rspl_song_id=None, artist=None, title=None,
-                 song_filename=None):
+    def artist_normalized(self) -> str:
+        return normalize(self.artist)
 
-        self.song_filename = song_filename
+    def title_normalized(self) -> str:
+        return normalize(self.title)
 
-        self.artist = artist
-        self.title = title
-        self.artist_title = string_utils.create_artist_minus_title(artist, title)
+    def __repr__(self):
+        rep = '<ArtistTitle: '
+        rep += f"artist={self.artist}, "
+        rep += f"title={self.title}"
+        rep += ">"
 
-        self.rspl_request_id = rspl_request_id  # id of the request on RSPL
-        self.cdlc_id = cdlc_id
-        self.rspl_song_id = rspl_song_id  # id of the request on RSPL
-        self.rspl_official = None
-        self.rspl_position = None
+        return rep
 
-        self.tags = set()
+
+@dataclass(slots=True)
+class SongData(object):
+    song_filename: Optional[str] = None
+
+    artist_title: Optional[ArtistTitle] = None
+
+    rspl_request_id: Optional[int] = None  # id of the request on RSPL
+    cdlc_id: Optional[int] = None
+    rspl_song_id: Optional[int] = None  # id of the request on RSPL
+    rspl_official: Optional[str] = None
+    rspl_position: Optional[str] = None
+
+    tags: set[str] = field(default_factory=set)
 
     @property
     def is_official(self):
@@ -31,10 +49,6 @@ class SongData:
         if self.song_filename:
             rep += f"song_filename={self.song_filename}, "
 
-        if self.artist:
-            rep += f"artist={self.artist}, "
-        if self.title:
-            rep += f"title={self.title}, "
         if self.artist_title:
             rep += f"artist_title={self.artist_title}, "
 

@@ -131,7 +131,6 @@ dmypy.json
 /.idea/
 *.iml
 *.bak
-*.ini
 /log_*.txt
 /log/
 **/log/
@@ -141,3 +140,6 @@ dmypy.json
 /cdlc_archive/
 *.db
 /cache/
+
+*.ini
+!pytest.ini

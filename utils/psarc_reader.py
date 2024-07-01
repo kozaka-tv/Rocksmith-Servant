@@ -10,7 +10,7 @@ import zlib
 from Crypto.Cipher import AES
 
 from definitions import PSARC_INFO_FILE_CACHE_DIR, EXT_PSARC_INFO_JSON
-from modules.song_loader.song_data import SongData
+from modules.song_loader.song_data import ArtistTitle, SongData
 from utils import file_utils
 from utils.exceptions import ExtractError
 
@@ -26,7 +26,7 @@ ATTR_ARTIST_NAME = 'ArtistName'
 ATTR_SONG_NAME = 'SongName'
 
 
-def extract(filename_to_extract, song_data_input, write_to_file=False):
+def extract(filename_to_extract, song_data: SongData, write_to_file=False):
     log.debug('Extracting %s', filename_to_extract)
 
     if log.isEnabledFor(logging.DEBUG) or write_to_file:
@@ -41,11 +41,11 @@ def extract(filename_to_extract, song_data_input, write_to_file=False):
         if log.isEnabledFor(logging.DEBUG) or write_to_file:
             __write_info_file(entry, filename_to_extract, psarc)
 
-        __create_song_data(entry, psarc, song_data_input)
-        log.debug("Song data with the extracted information: %s", song_data_input)
+        __add_artist_and_title_to_song_data(entry, psarc, song_data)
+        log.debug("Song data with the extracted information: %s", song_data)
 
 
-def __create_song_data(entry, psarc, song_data_input: SongData):
+def __add_artist_and_title_to_song_data(entry, psarc, song_data: SongData):
     song_data_dict = __get_song_data_dict(entry, psarc)
 
     iterator = iter(song_data_dict['Entries'])
@@ -56,8 +56,7 @@ def __create_song_data(entry, psarc, song_data_input: SongData):
         attributes = song_data_dict['Entries'][key]['Attributes']
         artist_name = __get_artist_name(attributes, key, song_data_dict)
         if artist_name is not None:
-            song_data_input.artist = artist_name
-            song_data_input.title = __get_song_name(attributes, song_data_dict)
+            song_data.artist_title = ArtistTitle(artist_name, __get_song_name(attributes, song_data_dict))
             return
 
     raise ExtractError(f"Could not extract useful attribute information from: {song_data_dict}")
