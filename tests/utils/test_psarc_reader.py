@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from modules.song_loader.song_data import SongData
+from modules.song_loader.song_data import SongData, ArtistTitle
 from tests.base_test import TEST_CDLC_DIR
 from utils.psarc_reader import extract
 
@@ -26,7 +26,7 @@ def test_artist(test_input, expected):
 
     extract(test_input, song_data, KEEP_INFO_FILES)
 
-    assert song_data.artist == expected
+    assert song_data.artist_title.artist == expected
 
 
 @pytest.mark.parametrize(
@@ -45,4 +45,4 @@ def test_title(test_input, expected):
 
     extract(test_input, song_data, KEEP_INFO_FILES)
 
-    assert song_data.title == expected
+    assert song_data.artist_title.title == expected
