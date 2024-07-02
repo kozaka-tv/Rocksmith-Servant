@@ -10,24 +10,26 @@ from utils import string_utils
         ("", ""),
         (" ", ""),
 
-        ("Metallica - Cyanide", "Metallica Cyanide"),
-        ("Creeping Death", "Creeping Death"),
+        ("Metallica - Cyanide", "metallica cyanide"),
+        ("Creeping Death", "creeping death"),
 
-        ("Depresszió - Itt Az Én Időm", "Depresszio Itt Az En Idom"),
-        ("Alvin és a Mókusok - Kurva Élet", "Alvin es a Mokusok Kurva Elet"),
-        ("Ill Niño - If You Still Hate Me", "Ill Nino If You Still Hate Me"),
-        ("Daði Freyr - Think About Things", "Da i Freyr Think About Things"),
-        ("L'Impératrice - L'Impératrice", "L Imperatrice L Imperatrice"),
-        ("L'Impératrice - Fou", "L Imperatrice Fou"),
-        ("Nirvana/Sungha Jung - Come As You Are", "Nirvana Sungha Jung Come As You Are"),
-        ("The Dillinger Escape Plan - 43% Burnt (Ramen's Ver)", "The Dillinger Escape Plan 43 Burnt Ramen s Ver"),
+        ("Depresszió - Itt Az Én Időm", "depresszio itt az en idom"),
+        ("Alvin és a Mókusok - Kurva Élet", "alvin es a mokusok kurva elet"),
+        ("Ill Niño - If You Still Hate Me", "ill nino if you still hate me"),
+        ("Daði Freyr - Think About Things", "da i freyr think about things"),
+        ("L'Impératrice - L'Impératrice", "l imperatrice l imperatrice"),
+        ("L'Impératrice - Fou", "l imperatrice fou"),
+        ("Nirvana/Sungha Jung - Come As You Are", "nirvana sungha jung come as you are"),
+        ("The Dillinger Escape Plan - 43% Burnt (Ramen's Ver)", "the dillinger escape plan 43 burnt ramen s ver"),
 
-        ("Guns N' Roses - Don`t Cry (Tonight)", "Guns N Roses Don t Cry Tonight"),
-        ("Swallow The Sun - Swallow (Horror pt.1)", "Swallow The Sun Swallow Horror pt 1"),
+        ("Guns N' Roses - Don`t Cry (Tonight)", "guns n roses don t cry tonight"),
+        ("Swallow The Sun - Swallow (Horror pt.1)", "swallow the sun swallow horror pt 1"),
+
+        ("Молчат Дома / Molchat Doma - Танцевать / Tancevat", "molchat doma tancevat"),
     ]
 )
-def test_remove_special_chars(test_input, expected):
-    actual = string_utils.remove_special_chars(test_input)
+def test_normalize(test_input, expected):
+    actual = string_utils.normalize(test_input)
 
     assert actual == expected
 
