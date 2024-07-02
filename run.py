@@ -6,6 +6,7 @@ from time import sleep
 
 import config.log_config
 from config.config_data import ConfigData
+from config.config_helper import check_enabled_module_dependencies, check_modules_enabled
 from config.config_reader import ConfigReader
 from modules.database.db_manager import DBManager
 from modules.file_manager.cdlc_file_manager import FileManager
@@ -38,20 +39,6 @@ HEARTBEAT = 1
 HEARTBEAT_MANAGE_SONGS = 1
 HEARTBEAT_UPDATE_GAME_INFO_AND_SETLIST = 0.1
 
-
-def check_modules_enabled(config_data):
-    # Search in all attributes that has "enabled" attribute
-    modules_enabled = [getattr(getattr(config_data, attr), 'enabled', False) for attr in dir(config_data) if
-                       not attr.startswith('__')]
-    if not any(modules_enabled):
-        log.error("!!! No modules are enabled !!!")
-
-
-def check_enabled_module_dependencies():
-    if song_loader.enabled and not file_manager.enabled:
-        raise ConfigError("Please enable FileManager if you wanna use the SongLoader!")
-
-
 conf = ConfigReader(config_file_path)
 try:
     config_data = ConfigData(conf)
@@ -68,7 +55,9 @@ file_manager = FileManager(config_data)
 songs = Songs()
 song_loader = SongLoader(config_data, songs)
 scene_switcher = SceneSwitcher(config_data)
-check_enabled_module_dependencies()
+
+# TODO move this into check_modules_enabled
+check_enabled_module_dependencies(song_loader, file_manager)
 
 
 def update_config():
@@ -81,7 +70,8 @@ def update_config():
         scene_switcher.update_config(config_data_updated)
         file_manager.update_config(config_data_updated)
 
-        check_enabled_module_dependencies()
+        # TODO call check_modules_enabled(config_data_updated)
+        check_enabled_module_dependencies(song_loader, file_manager)
 
 
 def get_debug_message():
