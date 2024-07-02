@@ -1,8 +1,9 @@
 import dataclasses
 import os
 
-from utils import rs_playlist, string_utils
+from utils import string_utils
 from utils.exceptions import ConfigError
+from utils.rs_playlist_util import get_viewers
 
 SECTION_ROCK_SNIFFER = "RockSniffer"
 SECTION_SETLIST_LOGGER = "SetlistLogger"
@@ -115,7 +116,7 @@ def validate_and_get_phpsessid(conf, twitch_channel):
     phpsessid_set = conf.get_set(SECTION_SONG_LOADER, "phpsessid")
 
     for phpsessid in phpsessid_set:
-        viewers = rs_playlist.get_viewers(twitch_channel, phpsessid)
+        viewers = get_viewers(twitch_channel, phpsessid)
         if viewers.get("result") != "Error":
             return phpsessid
 
