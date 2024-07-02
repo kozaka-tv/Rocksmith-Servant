@@ -17,3 +17,5 @@ pylint==3.2.3
 
 fuzzywuzzy~=0.18.0
 watchdog==4.0.1
+
+fastapi==0.111.0
