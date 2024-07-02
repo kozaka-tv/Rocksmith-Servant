@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Optional
 
-from definitions import KEY_VALUES_OF_AN_OFFICIAL_CDLC
+from common.definitions import KEY_VALUES_OF_AN_OFFICIAL_CDLC
 from utils.string_utils import normalize
 
 

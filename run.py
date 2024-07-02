@@ -1,12 +1,19 @@
+import asyncio
 import logging
 import os
 import sys
 import threading
+from contextlib import asynccontextmanager
 from time import sleep
 
+import uvicorn
+from fastapi import FastAPI
+
 import config.log_config
+from common.enums import Tags
 from config.config_data import ConfigData
 from config.config_reader import ConfigReader
+from modules.api import users_api_example
 from modules.database.db_manager import DBManager
 from modules.file_manager.cdlc_file_manager import FileManager
 from modules.scene_switcher.scene_switcher import SceneSwitcher
@@ -162,23 +169,71 @@ def update_game_info_and_setlist():
             log.exception(ex)
 
 
-manage_songs_thread = threading.Thread(target=manage_songs, args=(db_file_path,))
-manage_songs_thread.daemon = True
-manage_songs_thread.start()
+async def run_servant():
+    manage_songs_thread = threading.Thread(target=manage_songs, args=(db_file_path,))
+    manage_songs_thread.daemon = True
+    manage_songs_thread.start()
 
-update_game_info_and_setlist_thread = threading.Thread(target=update_game_info_and_setlist)
-update_game_info_and_setlist_thread.daemon = True
-update_game_info_and_setlist_thread.start()
+    update_game_info_and_setlist_thread = threading.Thread(target=update_game_info_and_setlist)
+    update_game_info_and_setlist_thread.daemon = True
+    update_game_info_and_setlist_thread.start()
 
-while True:
+    while True:
 
-    try:
-        # Sleep a bit to avoid too fast processing
-        sleep(HEARTBEAT)
+        try:
+            # Sleep a bit to avoid too fast processing
+            await asyncio.sleep(HEARTBEAT)
 
-        update_config()
+            update_config()
 
-    # Catch all unchecked Exceptions, but keep app alive.
-    # pylint: disable=broad-exception-caught
-    except Exception as e:
-        log.exception(e)
+        # Catch all unchecked Exceptions, but keep app alive.
+        # pylint: disable=broad-exception-caught
+        except Exception as e:
+            log.exception(e)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    asyncio.create_task(run_servant())
+    yield
+    # Add any logs or commands before shutting down.
+    print('It is shutting down...')
+
+
+tags_metadata = [
+    {"name": Tags.USERS, "description": "Some user endpoint examples...fake as f"},
+    {"name": Tags.GETTERS, "description": "One other way around"},
+    {"name": "post methods", "description": "Keep doing this"},
+    {"name": "delete methods", "description": "KILL 'EM ALL"},
+    {"name": "put methods", "description": "Boring"},
+]
+
+app = FastAPI(lifespan=lifespan, openapi_tags=tags_metadata)
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=["*"],
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
+app.include_router(users_api_example.router)
+
+
+@app.get("/", tags=[Tags.GETTERS])
+async def root():
+    return {"message": "Hello World"}
+
+
+@app.get("/hello/{name}", tags=[Tags.GETTERS])
+async def say_hello(name: str):
+    return {"message": f"Hello {name}"}
+
+
+if __name__ == "__main__":
+    uvicorn.run(
+        "run:app",
+        host="127.0.0.1",
+        port=8000,
+        log_level="debug",
+        reload=True,
+    )

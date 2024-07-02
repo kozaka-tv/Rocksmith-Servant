@@ -5,7 +5,7 @@ from time import time
 from dacite import from_dict
 
 from config.config_data import ConfigData
-from definitions import PSARC_INFO_FILE_CACHE_DIR, TMP_DIR
+from common.definitions import PSARC_INFO_FILE_CACHE_DIR, TMP_DIR
 from modules.database.db_manager import DBManager
 from modules.song_loader.rs_playlist_data import RsPlaylist
 from modules.song_loader.song_data import SongData, ArtistTitle

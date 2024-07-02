@@ -8,7 +8,7 @@ import shutil
 from datetime import datetime, timedelta
 from typing import Tuple
 
-from definitions import PATTERN_CDLC_FILE_EXT, PATTERN_CDLC_INFO_FILE_EXT, \
+from common.definitions import PATTERN_CDLC_FILE_EXT, PATTERN_CDLC_INFO_FILE_EXT, \
     EXT_PSARC_INFO_JSON
 from utils.string_utils import is_not_blank
 
