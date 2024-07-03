@@ -4,14 +4,14 @@ from contextlib import asynccontextmanager
 import uvicorn
 from fastapi import FastAPI
 
-from modules.servant import servant
 from common.enums import Tags
 from modules.api import users_api_example
+from modules.servant.servant import Servant
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    asyncio.create_task(servant.run())
+    asyncio.create_task(Servant().run())
     yield
     # Add any logs or commands before shutting down.
     print('It is shutting down...')
