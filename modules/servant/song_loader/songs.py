@@ -1,6 +1,6 @@
 import dataclasses
 
-from modules.song_loader.song_data import SongData
+from modules.servant.song_loader.song_data import SongData
 
 
 @dataclasses.dataclass

@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from modules.song_loader.song_data import SongData, ArtistTitle
+from modules.servant.song_loader.song_data import SongData
 from tests.base_test import TEST_CDLC_DIR
 from utils.psarc_reader import extract
 

@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 import uvicorn
 from fastapi import FastAPI
 
-import servant
+from modules.servant import servant
 from common.enums import Tags
 from modules.api import users_api_example
 

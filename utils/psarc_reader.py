@@ -10,7 +10,7 @@ import zlib
 from Crypto.Cipher import AES
 
 from common.definitions import PSARC_INFO_FILE_CACHE_DIR, EXT_PSARC_INFO_JSON
-from modules.song_loader.song_data import ArtistTitle, SongData
+from modules.servant.song_loader.song_data import ArtistTitle, SongData
 from utils import file_utils
 from utils.exceptions import ExtractError
 

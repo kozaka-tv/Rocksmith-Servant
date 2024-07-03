@@ -8,12 +8,12 @@ from time import sleep
 import config.log_config
 from config.config_data import ConfigData
 from config.config_reader import ConfigReader
-from modules.database.db_manager import DBManager
-from modules.file_manager.cdlc_file_manager import FileManager
-from modules.scene_switcher.scene_switcher import SceneSwitcher
-from modules.setlist.setlist_logger import SetlistLogger
-from modules.song_loader.song_loader import SongLoader
-from modules.song_loader.songs import Songs
+from modules.servant.database.db_manager import DBManager
+from modules.servant.file_manager.cdlc_file_manager import FileManager
+from modules.servant.scene_switcher.scene_switcher import SceneSwitcher
+from modules.servant.setlist.setlist_logger import SetlistLogger
+from modules.servant.song_loader.song_loader import SongLoader
+from modules.servant.song_loader.songs import Songs
 from utils.cmd_line_parser import parse_args
 from utils.exceptions import RocksnifferConnectionError, ConfigError, RSPLNotLoggedInError, \
     RSPLPlaylistIsNotEnabledError

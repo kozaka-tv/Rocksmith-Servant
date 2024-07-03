@@ -1,4 +1,4 @@
-from modules.song_loader.song_data import SongData, ArtistTitle
+from modules.servant.song_loader.song_data import SongData, ArtistTitle
 
 SONG_FILENAME = "my_super_song.psarc"
 
