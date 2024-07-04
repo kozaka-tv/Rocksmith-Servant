@@ -1,6 +1,6 @@
 from config.config_data import ConfigData
-from modules.file_manager.cdlc_file_manager import FileManager
-from modules.song_loader.song_loader import SongLoader
+from modules.servant.file_manager.cdlc_file_manager import FileManager
+from modules.servant.song_loader.song_loader import SongLoader
 from utils.exceptions import ConfigError
 
 
