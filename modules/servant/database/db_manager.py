@@ -3,7 +3,7 @@ import os
 import sqlite3
 from typing import Optional
 
-from modules.song_loader.song_data import SongData, ArtistTitle
+from modules.servant.song_loader.song_data import SongData, ArtistTitle
 from utils.collection_utils import get_tuples_from_the_first_position_of
 from utils.string_utils import normalize, escape_single_quote
 

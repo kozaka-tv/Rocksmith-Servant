@@ -2,7 +2,7 @@ import datetime
 import logging
 import math
 
-from definitions import TMP_DIR
+from common.definitions import TMP_DIR
 from utils import file_utils, collection_utils
 from utils.collection_utils import repr_in_multi_line, is_not_empty
 
