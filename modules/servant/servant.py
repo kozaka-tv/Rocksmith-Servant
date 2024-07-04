@@ -7,6 +7,7 @@ from time import sleep
 
 import config.log_config
 from config.config_data import ConfigData
+from config.config_helper import check_modules_enabled
 from config.config_reader import ConfigReader
 from modules.servant.database.db_manager import DBManager
 from modules.servant.file_manager.cdlc_file_manager import FileManager
@@ -59,11 +60,7 @@ class Servant:
         self.song_loader = SongLoader(config_data, self.songs)
         self.scene_switcher = SceneSwitcher(config_data)
 
-        self.check_enabled_module_dependencies()
-
-    def check_enabled_module_dependencies(self):
-        if self.song_loader.enabled and not self.file_manager.enabled:
-            raise ConfigError("Please enable FileManager if you wanna use the SongLoader!")
+        check_modules_enabled(config_data)
 
     def update_config(self):
         if self.conf.reload_if_changed():
@@ -75,7 +72,7 @@ class Servant:
             self.scene_switcher.update_config(config_data_updated)
             self.file_manager.update_config(config_data_updated)
 
-            self.check_enabled_module_dependencies()
+            check_modules_enabled(config_data_updated)
 
     def get_debug_message(self):
         modules_str = "--- Enabled modules ---" + os.linesep
