@@ -5,11 +5,11 @@ from time import time
 from dacite import from_dict
 
 from config.config_data import ConfigData
-from definitions import PSARC_INFO_FILE_CACHE_DIR, TMP_DIR
-from modules.database.db_manager import DBManager
-from modules.song_loader.rs_playlist_data import RsPlaylist
-from modules.song_loader.song_data import SongData
-from modules.song_loader.song_loader_helper import playlist_does_not_changed, check_cdlc_archive_dir, \
+from common.definitions import PSARC_INFO_FILE_CACHE_DIR, TMP_DIR
+from modules.servant.database.db_manager import DBManager
+from modules.servant.song_loader.rs_playlist_data import RsPlaylist
+from modules.servant.song_loader.song_data import SongData, ArtistTitle
+from modules.servant.song_loader.song_loader_helper import playlist_does_not_changed, check_cdlc_archive_dir, \
     check_rocksmith_cdlc_dir, update_tags_in_song_data, is_official, log_new_songs_found
 from utils import file_utils, psarc_reader
 from utils.collection_utils import is_not_empty, is_empty, repr_in_multi_line
@@ -252,8 +252,8 @@ class SongLoader:
 
     @staticmethod
     def __extract_song_information(directory, cdlc_file_name: str):
-        song_data = SongData()
-        song_data.song_filename = cdlc_file_name
+        song_data = SongData(song_filename=cdlc_file_name)
+
         file_path_to_extract = os.path.join(directory, cdlc_file_name)
 
         psarc_reader.extract(file_path_to_extract, song_data)
@@ -347,14 +347,15 @@ class SongLoader:
                     continue
 
                 for song_filename in songs_in_the_db:
-                    song_data = SongData(playlist_item.id, cdlc_id, dlc_set_item.id, artist, title, song_filename)
-                    song_data.rspl_official = official
-                    song_data.rspl_position = rspl_position
+                    song_data = SongData(song_filename=song_filename,
+                                         artist_title=ArtistTitle(artist, title),
+                                         rspl_request_id=playlist_item.id,
+                                         cdlc_id=cdlc_id,
+                                         rspl_song_id=dlc_set_item.id,
+                                         rspl_official=official,
+                                         rspl_position=rspl_position)
 
                     update_tags_in_song_data(song_data, playlist_item)
-
-                    song_data.rspl_official = official
-                    song_data.rspl_position = rspl_position
 
                     self.songs.requested_songs_found_in_db.update({song_data.song_filename: song_data})
 

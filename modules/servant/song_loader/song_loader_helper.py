@@ -3,7 +3,7 @@ import os
 
 from deepdiff import DeepDiff
 
-from definitions import KEY_VALUES_OF_AN_OFFICIAL_CDLC
+from common.definitions import KEY_VALUES_OF_AN_OFFICIAL_CDLC
 from utils import collection_utils
 from utils.exceptions import ConfigError
 

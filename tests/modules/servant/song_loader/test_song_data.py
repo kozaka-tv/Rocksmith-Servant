@@ -1,10 +1,16 @@
-from modules.song_loader.song_data import SongData
+from modules.servant.song_loader.song_data import SongData, ArtistTitle
 
 SONG_FILENAME = "my_super_song.psarc"
 
 ARTIST = "My Artist"
 TITLE = "My Title"
-ARTIST_TITLE = 'My Artist - My Title'
+ARTIST_WITH_SPECIALS = "My Artist/Second"
+TITLE_WITH_SPECIALS = "My Title (Kozaka feat fun'z and hoses version!)"
+
+EXPECTED_ARTIST_NORM = "my artist"
+EXPECTED_TITLE_NORM = "my title"
+EXPECTED_ARTIST_WITH_SPECIALS_NORM = "my artist second"
+EXPECTED_TITLE_WITH_SPECIALS_NORM = "my title kozaka feat fun z and hoses version"
 
 RSPL_REQUEST_ID = 1
 CDLC_ID = 3
@@ -14,17 +20,33 @@ RSPL_POSITION = 4
 
 TAGS = {'tag1', 'tag2'}
 
-REP_WITH_TAG_1_TAG_2 = '<SongData: song_filename=my_super_song.psarc, artist=My Artist, title=My ' \
-                       'Title, artist_title=My Artist - My Title, rspl_request_id=1, cdlc_id=3, ' \
-                       "rspl_song_id=666, rspl_official=True, rspl_position=4, tags={'tag1', " \
-                       "'tag2'}>"
+REP_WITH_TAG_1_TAG_2 = ('<SongData: song_filename=my_super_song.psarc, artist_title=<ArtistTitle: '
+                        'artist=My Artist, title=My Title>, rspl_request_id=1, cdlc_id=3, '
+                        "rspl_song_id=666, rspl_official=True, rspl_position=4, tags={'tag1', "
+                        "'tag2'}>")
 
-REP_WITH_TAG_2_TAG_1 = '<SongData: song_filename=my_super_song.psarc, artist=My Artist, title=My ' \
-                       'Title, artist_title=My Artist - My Title, rspl_request_id=1, cdlc_id=3, ' \
-                       "rspl_song_id=666, rspl_official=True, rspl_position=4, tags={'tag2', " \
-                       "'tag1'}>"
+REP_WITH_TAG_2_TAG_1 = ('<SongData: song_filename=my_super_song.psarc, artist_title=<ArtistTitle: '
+                        'artist=My Artist, title=My Title>, rspl_request_id=1, cdlc_id=3, '
+                        "rspl_song_id=666, rspl_official=True, rspl_position=4, tags={'tag2', "
+                        "'tag1'}>")
 
 EXPECTED_REPS = (REP_WITH_TAG_1_TAG_2, REP_WITH_TAG_2_TAG_1)
+
+
+def test_artist_title__when_without_special_chars__then_artist_title_is_set():
+    artist_title = ArtistTitle(artist=ARTIST, title=TITLE)
+    assert artist_title.artist == ARTIST
+    assert artist_title.title == TITLE
+    assert artist_title.artist_normalized() == EXPECTED_ARTIST_NORM
+    assert artist_title.title_normalized() == EXPECTED_TITLE_NORM
+
+
+def test_artist_title__when_with_special_chars__then_artist_title_is_set():
+    artist_title = ArtistTitle(artist=ARTIST_WITH_SPECIALS, title=TITLE_WITH_SPECIALS)
+    assert artist_title.artist == ARTIST_WITH_SPECIALS
+    assert artist_title.title == TITLE_WITH_SPECIALS
+    assert artist_title.artist_normalized() == EXPECTED_ARTIST_WITH_SPECIALS_NORM
+    assert artist_title.title_normalized() == EXPECTED_TITLE_WITH_SPECIALS_NORM
 
 
 def test_song_data__when_no_input_in_constructor__then_everything_is_empty():
@@ -34,8 +56,6 @@ def test_song_data__when_no_input_in_constructor__then_everything_is_empty():
 
     assert song_data.song_filename is None
 
-    assert song_data.artist is None
-    assert song_data.title is None
     assert song_data.artist_title is None
 
     assert song_data.rspl_request_id is None
@@ -47,34 +67,9 @@ def test_song_data__when_no_input_in_constructor__then_everything_is_empty():
     assert len(song_data.tags) == 0
 
 
-def test_song_data__when_song_filename_is_given__then_song_filename_is_set():
+def test_artist_title__when_song_filename_is_given__then_song_filename_is_set():
     song_data = SongData(song_filename=SONG_FILENAME)
     assert song_data.song_filename == SONG_FILENAME
-
-
-def test_song_data__when_artist_is_given__then_artist_is_set():
-    song_data = SongData(artist=ARTIST)
-    assert song_data.artist == ARTIST
-
-
-def test_song_data__when_title_is_given__then_title_is_set():
-    song_data = SongData(title=TITLE)
-    assert song_data.title == TITLE
-
-
-def test_song_data__when_only_artist_is_given__then_artist_and_title_is_none():
-    song_data = SongData(artist=ARTIST)
-    assert song_data.artist_title is None
-
-
-def test_song_data__when_only_title_is_given__then_artist_and_title_is_none():
-    song_data = SongData(title=TITLE)
-    assert song_data.artist_title is None
-
-
-def test_song_data__when_artist_and_title_is_given__then_artist_and_title_is_set():
-    song_data = SongData(artist="My Artist", title="My Title")
-    assert song_data.artist_title == ARTIST_TITLE
 
 
 def test_song_data__when_rspl_request_id_is_given__then_rspl_request_id_is_set():
@@ -132,9 +127,7 @@ def test__rep__():
 
     song_data.song_filename = SONG_FILENAME
 
-    song_data.artist = ARTIST
-    song_data.title = TITLE
-    song_data.artist_title = ARTIST + " - " + TITLE
+    song_data.artist_title = ArtistTitle(ARTIST, TITLE)
 
     song_data.rspl_request_id = RSPL_REQUEST_ID
     song_data.cdlc_id = CDLC_ID
