@@ -7,7 +7,7 @@ from time import sleep
 
 import config.log_config
 from config.config_data import ConfigData
-from config.config_helper import check_modules_enabled
+from config.config_data_helper import check_modules_enabled
 from config.config_reader import ConfigReader
 from modules.servant.database.db_manager import DBManager
 from modules.servant.file_manager.cdlc_file_manager import FileManager
