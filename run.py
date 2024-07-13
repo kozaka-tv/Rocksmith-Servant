@@ -10,11 +10,12 @@ from modules.servant.servant import Servant
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def start_servant_app(fast_api: FastAPI):
+    # noinspection PyAsyncCall
     asyncio.create_task(Servant().run())
+
     yield
-    # Add any logs or commands before shutting down.
-    print('It is shutting down...')
+    print('Shutting app server down...')
 
 
 tags_metadata = [
@@ -25,7 +26,7 @@ tags_metadata = [
     {"name": "put methods", "description": "Boring"},
 ]
 
-app = FastAPI(lifespan=lifespan, openapi_tags=tags_metadata)
+app = FastAPI(lifespan=start_servant_app, openapi_tags=tags_metadata)
 # app.add_middleware(
 #     CORSMiddleware,
 #     allow_origins=["*"],
