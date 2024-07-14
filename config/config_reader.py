@@ -18,11 +18,11 @@ class ConfigTemplateError(Exception):
 
 
 class ConfigReader:
-    def __init__(self, config_file):
-        self.config_file = config_file
-        self.config_dirname = os.path.dirname(config_file)
-        self.config_filename = os.path.basename(config_file)
-        self.config_abspath = os.path.abspath(config_file)
+    def __init__(self, config_file_path):
+        self.config_file_path = config_file_path
+        self.config_dirname = os.path.dirname(config_file_path)
+        self.config_filename = os.path.basename(config_file_path)
+        self.config_abspath = os.path.abspath(config_file_path)
 
         file_utils.create_directory_logged(self.config_dirname)
         log.warning('Loading config from %s ...', self.config_abspath)
@@ -37,7 +37,7 @@ class ConfigReader:
 
     def __if_needed_create_config_from_template_and_then_stop(self):
         if self.__last_modification_time == 0:
-            self.save()
+            self.__save()
             log.error(
                 'Because this is the first run, and no configuration file was found, '
                 'I just created the %s configuration file for you!', self.config_abspath)
@@ -54,11 +54,11 @@ class ConfigReader:
         :return: Config Object
         """
         config = self.__get_default_config_ini()
-        config.read(self.config_file, encoding="UTF-8")
+        config.read(self.config_file_path, encoding="UTF-8")
         self.last_modified = self.__last_modification_time
 
         if self.last_modified != 0:
-            log.warning('%s has been loaded!', self.config_file)
+            log.warning('%s has been loaded!', self.config_file_path)
 
         return config
 
@@ -89,18 +89,7 @@ class ConfigReader:
         if self.get_bool(feature_name, 'enabled'):
             log.warning(feature_name)
 
-    def __config_changed_and_reloaded(self):
-        """
-        Reload only if the config file has been changed
-        :return: True if config file has been changed and reloaded, otherwise False
-        """
-        if self.last_modified != self.__last_modification_time:
-            self.content = self.__load_content_from_config()
-            return True
-
-        return False
-
-    def save(self):
+    def __save(self):
         """
         Write the config to the specified path
         """
@@ -179,7 +168,7 @@ class ConfigReader:
 
         # Replace and save the config value with a default value according to type
         self.content[section][key] = new_key
-        self.save()
+        self.__save()
 
         log.warning("Bad value has been replaced with the default: %s", new_key)
 
@@ -188,10 +177,10 @@ class ConfigReader:
         if cast == bool:
             log.warning("For this type of key, please use either False, No, 0 or True, Yes, 1")
 
-    def reload_if_changed(self):
-        if self.__config_changed_and_reloaded():
-            log.warning("Configuration has been reloaded!")
-            self.__log_config()
-            return True
-
-        return False
+    # def reload_if_changed(self):
+    #     if self.__config_changed_and_reloaded():
+    #         log.warning("Configuration has been reloaded!")
+    #         self.__log_config()
+    #         return True
+    #
+    #     return False
