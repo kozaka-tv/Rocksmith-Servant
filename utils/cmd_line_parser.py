@@ -4,7 +4,7 @@ DEFAULT_CONFIG_INI = 'config.ini'
 DEFAULT_SERVANT_DB = 'servant.db'
 
 
-def parse_args():
+def parse_args() -> [str, str]:
     parser = argparse.ArgumentParser(description='Servant script for managing Rocksmith sessions.')
     parser.add_argument('-c', '--config', default=DEFAULT_CONFIG_INI,
                         help='Path of the configuration file like: my_config.ini')
