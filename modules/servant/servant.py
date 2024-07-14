@@ -16,7 +16,7 @@ from modules.servant.song_loader.song_loader import SongLoader
 from modules.servant.song_loader.songs import Songs
 from utils.cmd_line_parser import parse_args
 from utils.exceptions import RocksnifferConnectionError, RSPLNotLoggedInError, \
-    RSPLPlaylistIsNotEnabledError
+    RSPLPlaylistIsNotEnabledError, ConfigError
 from utils.project_dir_setter import set_project_directory
 from utils.rocksniffer import Rocksniffer
 
@@ -54,7 +54,11 @@ class Servant:
         self.song_loader = SongLoader(config_data, self.songs)
         self.scene_switcher = SceneSwitcher(config_data)
 
-        check_modules_enabled(config_data)
+        try:
+            check_modules_enabled(config_data)
+        except ConfigError as e:
+            print(f"Incorrect configuration! Error: {e}")
+            sys.exit(1)
 
     def get_debug_message(self):
         modules_str = "--- Enabled modules ---" + os.linesep
