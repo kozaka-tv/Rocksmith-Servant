@@ -6,8 +6,8 @@ import threading
 from time import sleep
 
 import config.log_config
-from config.config_data import ConfigData
-from config.config_reader import ConfigReader
+from config import config_controller
+from config.config_data_helper import check_modules_enabled
 from modules.servant.database.db_manager import DBManager
 from modules.servant.file_manager.cdlc_file_manager import FileManager
 from modules.servant.scene_switcher.scene_switcher import SceneSwitcher
@@ -15,8 +15,8 @@ from modules.servant.setlist.setlist_logger import SetlistLogger
 from modules.servant.song_loader.song_loader import SongLoader
 from modules.servant.song_loader.songs import Songs
 from utils.cmd_line_parser import parse_args
-from utils.exceptions import RocksnifferConnectionError, ConfigError, RSPLNotLoggedInError, \
-    RSPLPlaylistIsNotEnabledError
+from utils.exceptions import RocksnifferConnectionError, RSPLNotLoggedInError, \
+    RSPLPlaylistIsNotEnabledError, ConfigError
 from utils.project_dir_setter import set_project_directory
 from utils.rocksniffer import Rocksniffer
 
@@ -39,17 +39,12 @@ class Servant:
         try:
             self.config_file_path, self.db_file_path = parse_args()
         except ValueError as e:
-            print(f"Error: {e}")
+            print(f"Incorrect command line parameter! Error: {e}")
             sys.exit(1)
 
         config.log_config.config()
 
-        self.conf = ConfigReader(self.config_file_path)
-        try:
-            config_data = ConfigData(self.conf)
-        except ConfigError as e:
-            log.error(e)
-            sys.exit()
+        config_data = config_controller.load_config(self.config_file_path)
 
         # Initializing modules and utils
         self.sniffer = Rocksniffer(config_data)
@@ -59,23 +54,11 @@ class Servant:
         self.song_loader = SongLoader(config_data, self.songs)
         self.scene_switcher = SceneSwitcher(config_data)
 
-        self.check_enabled_module_dependencies()
-
-    def check_enabled_module_dependencies(self):
-        if self.song_loader.enabled and not self.file_manager.enabled:
-            raise ConfigError("Please enable FileManager if you wanna use the SongLoader!")
-
-    def update_config(self):
-        if self.conf.reload_if_changed():
-            config_data_updated = ConfigData(self.conf)
-
-            self.sniffer.update_config(config_data_updated)
-            self.setlist_logger.update_config(config_data_updated)
-            self.song_loader.update_config(config_data_updated)
-            self.scene_switcher.update_config(config_data_updated)
-            self.file_manager.update_config(config_data_updated)
-
-            self.check_enabled_module_dependencies()
+        try:
+            check_modules_enabled(config_data)
+        except ConfigError as e:
+            print(f"Incorrect configuration! Error: {e}")
+            sys.exit(1)
 
     def get_debug_message(self):
         modules_str = "--- Enabled modules ---" + os.linesep
@@ -168,14 +151,4 @@ class Servant:
         update_game_info_and_setlist_thread.start()
 
         while True:
-
-            try:
-                # Sleep a bit to avoid too fast processing
-                await asyncio.sleep(HEARTBEAT)
-
-                self.update_config()
-
-            # Catch all unchecked Exceptions, but keep app alive.
-            # pylint: disable=broad-exception-caught
-            except Exception as e:
-                log.exception(e)
+            await asyncio.sleep(5)

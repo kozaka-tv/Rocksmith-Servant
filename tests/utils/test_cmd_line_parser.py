@@ -49,11 +49,13 @@ def test_custom_config_and_database():
 
 @patch('sys.argv', ['run.py', '-c', 'custom_config.txt'])
 def test_invalid_config_extension():
-    with pytest.raises(ValueError, match="The configuration file must have a '.ini' extension."):
+    with pytest.raises(ValueError,
+                       match="The configuration file must end with an '.ini' extension! config: custom_config.txt"):
         parse_args()
 
 
 @patch('sys.argv', ['run.py', '-db', 'custom_servant.txt'])
 def test_invalid_database_extension():
-    with pytest.raises(ValueError, match="The database file must have a '.db' extension."):
+    with pytest.raises(ValueError,
+                       match="The database file must end with an '.db' extension! database: custom_servant.txt"):
         parse_args()
