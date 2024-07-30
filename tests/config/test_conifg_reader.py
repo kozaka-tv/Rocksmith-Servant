@@ -1,8 +1,10 @@
 import os
-import pytest
 from unittest.mock import patch, PropertyMock
+
+import pytest
+
 from config.config_reader import ConfigReader
-from config.config_ini_template import serialized as original_serialized
+
 
 # Fixtures
 @pytest.fixture
@@ -77,13 +79,22 @@ def config_reader(config_file_path, mock_serialized):
     return ConfigReader(config_file_path)
 
 
-# Tests
-
-# Initialization and Loading Tests
 def test_initialization(mock_file_utils, mock_logging, config_file_path):
-    reader = ConfigReader(config_file_path)
-    mock_file_utils.assert_called_once_with(os.path.dirname(config_file_path))
-    mock_logging.warning.assert_any_call('Loading config from %s ...', os.path.abspath(config_file_path))
+    expected_dirname = os.path.dirname(config_file_path)
+    expected_basename = os.path.basename(config_file_path)
+    expected_abspath = os.path.abspath(config_file_path)
+
+    actual = ConfigReader(config_file_path)
+
+    assert actual.config_file_path == config_file_path
+    assert actual.config_dirname == expected_dirname
+    assert actual.config_filename == expected_basename
+    assert actual.config_abspath == expected_abspath
+
+    mock_file_utils.assert_called_once_with(expected_dirname)
+    mock_logging.warning.assert_any_call('Loading config from %s ...', expected_abspath)
+
+    assert actual.last_modified is not None
 
 
 def test_load_content_from_config(mock_serialized, config_reader):
@@ -102,7 +113,8 @@ def test_if_needed_create_config_from_template_and_then_stop(mock_logging, confi
 
     config_reader = ConfigReader(empty_config_file_path)
 
-    with patch('config.config_reader.ConfigReader._ConfigReader__last_modification_time', new_callable=PropertyMock) as mock_last_modification_time:
+    with patch('config.config_reader.ConfigReader._ConfigReader__last_modification_time',
+               new_callable=PropertyMock) as mock_last_modification_time:
         mock_last_modification_time.return_value = 0
         with patch('sys.exit') as mock_exit, patch('builtins.input', return_value=''):
             print(f"Running __if_needed_create_config_from_template_and_then_stop for {empty_config_file_path}")
@@ -113,6 +125,7 @@ def test_if_needed_create_config_from_template_and_then_stop(mock_logging, confi
             mock_logging.error.assert_called_once_with(
                 'Because this is the first run, and no configuration file was found, '
                 'I just created the %s configuration file for you!', config_reader.config_abspath)
+
 
 # Configuration Values Tests
 def test_get_int_value(config_reader):
@@ -189,7 +202,7 @@ def test_retain_good_value(mock_serialized, config_reader):
     assert config_reader.content.get('RockSniffer', 'port') == initial_value
 
 
-#def test_log_bad_value_message(mock_logging, config_reader):
+# def test_log_bad_value_message(mock_logging, config_reader):
 #    # Directly setting a bad value in the config to trigger the error
 #    config_reader.content.set('RockSniffer', 'enabled', 'not_a_bool')
 #    try:
@@ -274,4 +287,3 @@ def test_create_directory(mock_file_utils, config_file_path):
 def test_config_file_path(config_file_path):
     reader = ConfigReader(config_file_path)
     assert reader.config_abspath == os.path.abspath(config_file_path)
-
