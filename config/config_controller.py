@@ -91,9 +91,9 @@ def __create_conf_file_manager(conf):
 
 
 def __create_rspl_tags(conf):
-    tag_to_download = __get_tag_validated(conf, TAG_TO_DOWNLOAD)
+    tag_to_download = __get_tag(conf, TAG_TO_DOWNLOAD) # TODO temporary get it without validation. Validate in tag manager #49
     tag_downloaded = __get_tag(conf, TAG_DOWNLOADED)
-    tag_loaded = __get_tag_validated(conf, TAG_LOADED)
+    tag_loaded = __get_tag(conf, TAG_LOADED) # TODO temporary get it without validation. Validate in tag manager #49
 
     tag_new_viewer_request = __get_tag(conf, TAG_NEW_VIEWER_REQ)
     tag_raider_request = __get_tag(conf, TAG_RAIDER_REQ)
