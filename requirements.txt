@@ -11,10 +11,10 @@ ordered-set
 zstandard==0.22.0
 pycryptodome==3.20.0
 
-fastapi==0.111.0
+fastapi~=0.115.6
 dacite~=1.8.1
 uvicorn~=0.30.1
-starlette~=0.41.0
+starlette~=0.41.3
 
 pytest==8.2.2
 pylint==3.2.3
