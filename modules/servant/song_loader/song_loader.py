@@ -1,11 +1,12 @@
 import logging
 import os
+import pprint
 from time import time
 
 from dacite import from_dict
 
-from config.config_data import ConfigData
 from common.definitions import PSARC_INFO_FILE_CACHE_DIR, TMP_DIR
+from config.config_data import ConfigData
 from modules.servant.database.db_manager import DBManager
 from modules.servant.song_loader.rs_playlist_data import RsPlaylist
 from modules.servant.song_loader.song_data import SongData, ArtistTitle
@@ -122,6 +123,7 @@ class SongLoader:
         if self.rsplaylist_json is None:
             self.__update_playlist_with(new_playlist)
             log.info("Initial load of the playlist is done...")
+            self.__log_available_rspl_tags()
             return True
 
         if playlist_does_not_changed(self.rsplaylist_json, new_playlist):
@@ -132,6 +134,11 @@ class SongLoader:
         self.__update_playlist_with(new_playlist)
 
         return True
+
+    def __log_available_rspl_tags(self):
+        tags = self.rsplaylist.channel_tags
+        user_tags = {value.name: key for key, value in tags.items() if value.user}
+        log.warning("Tags set in RSPlaylist:\n%s", pprint.pformat(user_tags))
 
     def __update_playlist_with(self, new_playlist):
         self.rsplaylist_json = new_playlist
