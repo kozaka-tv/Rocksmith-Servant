@@ -34,7 +34,7 @@ class SongLoader:
             self.rsplaylist = None
             self.rsplaylist_json = None
             self.rsplaylist_updated = True
-            self.rspl_tags = config_data.song_loader.rspl_tags
+            self.rspl_tags = config_data.song_loader.rspl_tags # TODO itt nem kéne, hogy a tag manager-t izzítsuk és tölsük be? Vagy csak none?
 
             self.cdlc_archive_dir = check_cdlc_archive_dir(config_data.song_loader.cdlc_archive_dir)
             self.destination_dir = config_data.song_loader.destination_dir

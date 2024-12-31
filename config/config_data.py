@@ -23,7 +23,7 @@ class ConfFileManager:
 
 
 @dataclass
-class RSPLTags:
+class RSPLTagNames:
     tag_to_download: str
     tag_downloaded: str
     tag_loaded: str
@@ -37,7 +37,7 @@ class ConfSongLoader:
     enabled: bool
     twitch_channel: str
     phpsessid: str
-    rspl_tags: RSPLTags
+    rspl_tags: RSPLTagNames
     cdlc_archive_dir: str
     destination_dir: str
     rocksmith_cdlc_dir: str

@@ -2,7 +2,7 @@ import os
 import sys
 
 from config.config_data import ConfigData, ConfRockSniffer, ConfSetlistLogger, ConfSceneSwitcher, ConfSongLoader, \
-    ConfFileManager, RSPLTags
+    ConfFileManager, RSPLTagNames
 from config.config_reader import log, ConfigReader
 from utils import string_utils
 from utils.exceptions import ConfigError
@@ -90,20 +90,27 @@ def __create_conf_file_manager(conf):
     return ConfFileManager(enabled, destination_dir, using_cfsm, download_dirs)
 
 
-def __create_rspl_tags(conf):
-    tag_to_download = __get_tag(conf, TAG_TO_DOWNLOAD) # TODO temporary get it without validation. Validate in tag manager #49
-    tag_downloaded = __get_tag(conf, TAG_DOWNLOADED)
-    tag_loaded = __get_tag(conf, TAG_LOADED) # TODO temporary get it without validation. Validate in tag manager #49
+# Define constants for tag names
+TAG_NAMES = [
+    TAG_TO_DOWNLOAD,
+    TAG_DOWNLOADED,
+    TAG_LOADED,
+    TAG_NEW_VIEWER_REQ,
+    TAG_RAIDER_REQ,
+    TAG_VIP_VIEWER_REQ
+]
 
-    tag_new_viewer_request = __get_tag(conf, TAG_NEW_VIEWER_REQ)
-    tag_raider_request = __get_tag(conf, TAG_RAIDER_REQ)
-    tag_vip_viewer_request = __get_tag(conf, TAG_VIP_VIEWER_REQ)
-    return RSPLTags(tag_to_download,
-                    tag_downloaded,
-                    tag_loaded,
-                    tag_new_viewer_request,
-                    tag_raider_request,
-                    tag_vip_viewer_request)
+
+def __create_rspl_tags(conf):
+    tags = __fetch_tags(conf, TAG_NAMES)
+    return RSPLTagNames(*tags)
+
+
+def __fetch_tags(conf, tag_names):
+    """
+    Fetch multiple tags based on the provided tag names.
+    """
+    return [__get_tag(conf, tag_name) for tag_name in tag_names]
 
 
 def __create_conf_song_loader(conf):
