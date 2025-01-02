@@ -16,7 +16,8 @@ from utils import file_utils, psarc_reader
 from utils.collection_utils import is_not_empty, is_empty, repr_in_multi_line
 from utils.exceptions import BadDirectoryError
 from utils.exceptions import RSPLNotLoggedInError
-from utils.rs_playlist_util import get_playlist, user_is_not_logged_in, set_tag_to_download, set_tag_loaded
+from utils.rs_playlist_util import get_playlist, user_is_not_logged_in, set_tag_to_download, set_tag_loaded, \
+    unset_user_tags
 from utils.string_utils import time_float_to_string
 
 HEARTBEAT = 5
@@ -34,7 +35,8 @@ class SongLoader:
             self.rsplaylist = None
             self.rsplaylist_json = None
             self.rsplaylist_updated = True
-            self.rspl_tags = config_data.song_loader.rspl_tags # TODO itt nem kéne, hogy a tag manager-t izzítsuk és tölsük be? Vagy csak none?
+            # TODO itt nem kéne, hogy a tag manager-t izzítsuk és töltsük be? Vagy csak none?
+            self.rspl_tags = config_data.song_loader.rspl_tags
 
             self.cdlc_archive_dir = check_cdlc_archive_dir(config_data.song_loader.cdlc_archive_dir)
             self.destination_dir = config_data.song_loader.destination_dir
@@ -334,6 +336,11 @@ class SongLoader:
                 official = dlc_set_item.official
                 if is_official(official):
                     log.info("Skipping ODLC request with cdlc_id=%s - %s - %s", cdlc_id, artist, title)
+                    unset_user_tags(self.twitch_channel,
+                                    self.phpsessid,
+                                    playlist_item.id,
+                                    self.rspl_tags,
+                                    playlist_item.tags)
                     continue
 
                 songs_in_the_db = self.db_manager.search_song_by_artist_and_title(artist, title)

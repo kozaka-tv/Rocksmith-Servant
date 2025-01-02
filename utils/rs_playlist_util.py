@@ -39,6 +39,18 @@ def __unset_tag(twitch_channel, phpsessid, rspl_request_id, tag_id):
     requests.put(url, cookies=cookies, timeout=REQUEST_TIMEOUT).json()
 
 
+def __is_tag_relevant(tag, rspl_tags):
+    """Check if the tag is one of the relevant tags to be unset."""
+    return tag in (rspl_tags.tag_loaded, rspl_tags.tag_to_download)
+
+
+def unset_user_tags(twitch_channel, phpsessid, rspl_request_id, rspl_tags, rspl_item_tags):
+    """Unset relevant user tags for a specific request."""
+    for tag in rspl_item_tags:
+        if __is_tag_relevant(tag, rspl_tags):
+            __unset_tag(twitch_channel, phpsessid, rspl_request_id, tag)
+
+
 def set_tag_loaded(twitch_channel, phpsessid, rspl_request_id, rspl_tags):
     __unset_tag(twitch_channel, phpsessid, rspl_request_id, rspl_tags.tag_to_download)
     __set_tag(twitch_channel, phpsessid, rspl_request_id, rspl_tags.tag_loaded)
