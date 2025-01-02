@@ -5,69 +5,73 @@ from utils.exceptions import RSPLPlaylistIsNotEnabledError
 REQUEST_TIMEOUT = 15
 
 RS_PLAYLIST_HOME = "https://rsplaylist.com/ajax/"
-URL_PLAYLIST = RS_PLAYLIST_HOME + "playlist.php?channel=%s"
-URL_REQUESTS = RS_PLAYLIST_HOME + "requests.php?channel=%s"
-URL_TAG_SET = URL_REQUESTS + "&action=set-tag&id=%s&tag=%s&value=true"
-URL_TAG_UNSET = URL_REQUESTS + "&action=set-tag&id=%s&tag=%s&value=false"
-# https://rsplaylist.com/ajax/viewers.php?user_name=&pageIndex=3&channel=kozaka
-URL_VIEWERS = RS_PLAYLIST_HOME + "viewers.php?user_name=&pageIndex=0&channel=%s"
-# https://rsplaylist.com/ajax/form-settings.php?channel=Kozaka
-URL_SETTINGS = RS_PLAYLIST_HOME + "form-settings.php?channel=%s"
+URLS = {
+    "playlist": RS_PLAYLIST_HOME + "playlist.php?channel={channel}",
+    "viewers": RS_PLAYLIST_HOME + "viewers.php?user_name=&pageIndex=0&channel={channel}",
+    "settings": RS_PLAYLIST_HOME + "form-settings.php?channel={channel}",
+    "tag_set": RS_PLAYLIST_HOME + "requests.php?channel={channel}&action=set-tag&id={id}&tag={tag}&value=true",
+    "tag_unset": RS_PLAYLIST_HOME + "requests.php?channel={channel}&action=set-tag&id={id}&tag={tag}&value=false",
+}
 
 
-def get_playlist(twitch_channel, phpsessid):
-    return requests.get(URL_PLAYLIST % twitch_channel, cookies={'PHPSESSID': phpsessid}, timeout=REQUEST_TIMEOUT).json()
+def make_request(method, url, cookies, timeout=REQUEST_TIMEOUT):
+    """
+    Helper function for making HTTP requests.
+    :param method: HTTP method ('GET', 'PUT', etc.)
+    :param url: The URL to request.
+    :param cookies: Dictionary of cookies for the request.
+    :param timeout: Timeout for the request.
+    :return: JSON response.
+    """
+    response = requests.request(method, url, cookies=cookies, timeout=timeout)
+    return response.json()
 
 
-def get_viewers(twitch_channel, phpsessid):
-    return requests.get(URL_VIEWERS % twitch_channel, cookies={'PHPSESSID': phpsessid}, timeout=REQUEST_TIMEOUT).json()
+def get_playlist(channel, php_session_id):
+    return make_request("GET", URLS["playlist"].format(channel=channel), cookies={'PHPSESSID': php_session_id})
 
 
-def get_settings(twitch_channel, phpsessid):
-    return requests.get(URL_SETTINGS % twitch_channel, cookies={'PHPSESSID': phpsessid}, timeout=REQUEST_TIMEOUT).json()
+def get_viewers(channel, php_session_id):
+    return make_request("GET", URLS["viewers"].format(channel=channel), cookies={'PHPSESSID': php_session_id})
 
 
-def __set_tag(twitch_channel, phpsessid, rspl_request_id, tag_id):
-    url = URL_TAG_SET % (twitch_channel, rspl_request_id, tag_id)
-    cookies = {'PHPSESSID': phpsessid}
-    requests.put(url, cookies=cookies, timeout=REQUEST_TIMEOUT).json()
+def get_settings(channel, php_session_id):
+    return make_request("GET", URLS["settings"].format(channel=channel), cookies={'PHPSESSID': php_session_id})
 
 
-def __unset_tag(twitch_channel, phpsessid, rspl_request_id, tag_id):
-    url = URL_TAG_UNSET % (twitch_channel, rspl_request_id, tag_id)
-    cookies = {'PHPSESSID': phpsessid}
-    requests.put(url, cookies=cookies, timeout=REQUEST_TIMEOUT).json()
+def __set_tag(channel, php_session_id, request_id, tag_id):
+    url = URLS["tag_set"].format(channel=channel, id=request_id, tag=tag_id)
+    make_request("PUT", url, cookies={'PHPSESSID': php_session_id})
 
 
-def __is_loaded_or_to_download(tag, rspl_tags):
-    return tag in (rspl_tags.tag_loaded, rspl_tags.tag_to_download)
+def __unset_tag(channel, php_session_id, request_id, tag_id):
+    url = URLS["tag_unset"].format(channel=channel, id=request_id, tag=tag_id)
+    make_request("PUT", url, cookies={'PHPSESSID': php_session_id})
 
 
-def unset_user_tags(twitch_channel, phpsessid, rspl_request_id, rspl_tags, rspl_item_tags):
-    for tag in rspl_item_tags:
-        if __is_loaded_or_to_download(tag, rspl_tags):
-            __unset_tag(twitch_channel, phpsessid, rspl_request_id, tag)
+def unset_user_tags(channel, php_session_id, request_id, tags, item_tags):
+    for tag in item_tags:
+        if tag in (tags.tag_loaded, tags.tag_to_download):  # Simplified condition
+            __unset_tag(channel, php_session_id, request_id, tag)
 
 
-def set_tag_loaded(twitch_channel, phpsessid, rspl_request_id, rspl_tags):
-    __unset_tag(twitch_channel, phpsessid, rspl_request_id, rspl_tags.tag_to_download)
-    __set_tag(twitch_channel, phpsessid, rspl_request_id, rspl_tags.tag_loaded)
+def set_tag_loaded(channel, php_session_id, request_id, tags):
+    unset_user_tags(channel, php_session_id, request_id, tags, [tags.tag_to_download])
+    __set_tag(channel, php_session_id, request_id, tags.tag_loaded)
 
 
-def set_tag_to_download(twitch_channel, phpsessid, rspl_request_id, rspl_tags):
-    __unset_tag(twitch_channel, phpsessid, rspl_request_id, rspl_tags.tag_loaded)
-    __set_tag(twitch_channel, phpsessid, rspl_request_id, rspl_tags.tag_to_download)
+def set_tag_to_download(channel, php_session_id, request_id, tags):
+    unset_user_tags(channel, php_session_id, request_id, tags, [tags.tag_loaded])
+    __set_tag(channel, php_session_id, request_id, tags.tag_to_download)
 
 
 def user_is_not_logged_in(playlist):
     try:
-        for sr in playlist["playlist"]:
-            for cdlc in sr["dlc_set"]:
-                try:
-                    cdlc['id']
-                except TypeError:
-                    return True
-                return False
-        return None
+        # Streamlined the nested checks for readability
+        return any(
+            "id" not in cdlc
+            for sr in playlist.get("playlist", [])
+            for cdlc in sr.get("dlc_set", [])
+        )
     except KeyError as exc:
         raise RSPLPlaylistIsNotEnabledError from exc
