@@ -1,6 +1,5 @@
 import logging
 import os
-import pprint
 from time import time
 
 from dacite import from_dict
@@ -12,6 +11,7 @@ from modules.servant.song_loader.rs_playlist_data import RsPlaylist
 from modules.servant.song_loader.song_data import SongData, ArtistTitle
 from modules.servant.song_loader.song_loader_helper import playlist_does_not_changed, check_cdlc_archive_dir, \
     check_rocksmith_cdlc_dir, update_tags_in_song_data, is_official, log_new_songs_found
+from modules.servant.tag_manager import tag_utils
 from utils import file_utils, psarc_reader
 from utils.collection_utils import is_collection_not_empty, is_collection_empty, repr_in_multi_line
 from utils.exceptions import BadDirectoryError
@@ -125,7 +125,7 @@ class SongLoader:
         if self.rsplaylist_json is None:
             self.__update_playlist_with(new_playlist)
             log.info("Initial load of the playlist is done...")
-            self.__log_available_rspl_tags()
+            tag_utils.log_available_rspl_tags(self.rsplaylist.channel_tags)
             return True
 
         if playlist_does_not_changed(self.rsplaylist_json, new_playlist):
@@ -136,22 +136,6 @@ class SongLoader:
         self.__update_playlist_with(new_playlist)
 
         return True
-
-    def __log_available_rspl_tags(self):
-
-        def _filter_tags(tags_to_filter, is_user):
-            return {value.name: key for key, value in tags_to_filter.items() if value.user == is_user}
-
-        def _log_tags(tags_to_log, log_function, prefix_message):
-            formatted_tags = pprint.pformat(tags_to_log)
-            log_function(f"{prefix_message}:\n{formatted_tags}")
-
-        tags = self.rsplaylist.channel_tags
-        user_tags = _filter_tags(tags, is_user=True)
-        system_tags = _filter_tags(tags, is_user=False)
-
-        _log_tags(user_tags, log.warning, "Tags set by the user in RSPlaylist")
-        _log_tags(system_tags, log.info, "System tags set in RSPlaylist")
 
     def __update_playlist_with(self, new_playlist):
         self.rsplaylist_json = new_playlist
