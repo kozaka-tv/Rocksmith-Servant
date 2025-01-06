@@ -1,4 +1,4 @@
-colorama~=0.4.5
+colorama==0.4.5
 setuptools==70.0.0
 requests==2.32.3
 munch==4.0.0
@@ -7,18 +7,18 @@ colorlog==6.8.2
 pyyaml==6.0.1
 wheel==0.43.0
 twine==5.1.0
-ordered-set
+ordered-set==4.1.0
 zstandard==0.22.0
 pycryptodome==3.20.0
 
-fastapi~=0.115.6
-dacite~=1.8.1
-uvicorn~=0.30.1
-starlette~=0.41.3
-httpx~=0.28.1
+fastapi==0.115.6
+dacite==1.8.1
+uvicorn==0.30.1
+starlette==0.41.3
+httpx==0.28.1
 
-pytest==8.2.2
-pylint==3.2.3
+pytest==8.3.4
+pylint==3.3.3
 
-fuzzywuzzy~=0.18.0
+fuzzywuzzy==0.18.0
 watchdog==4.0.1

@@ -14,6 +14,7 @@ from modules.servant.scene_switcher.scene_switcher import SceneSwitcher
 from modules.servant.setlist.setlist_logger import SetlistLogger
 from modules.servant.song_loader.song_loader import SongLoader
 from modules.servant.song_loader.songs import Songs
+from modules.servant.tag_manager.tag_manager import TagManager
 from utils.cmd_line_parser import parse_args
 from utils.exceptions import RocksnifferConnectionError, RSPLNotLoggedInError, \
     RSPLPlaylistIsNotEnabledError, ConfigError
@@ -52,6 +53,7 @@ class Servant:
         self.file_manager = FileManager(config_data)
         self.songs = Songs()
         self.song_loader = SongLoader(config_data, self.songs)
+        self.tag_manager = TagManager(config_data, self.song_loader)
         self.scene_switcher = SceneSwitcher(config_data)
 
         try:

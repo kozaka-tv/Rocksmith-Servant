@@ -44,28 +44,19 @@ class SongData(object):
         return self.rspl_official in KEY_VALUES_OF_AN_OFFICIAL_CDLC
 
     def __repr__(self):
-        rep = '<SongData: '
+        def format_attribute(name, value):
+            return f"{name}={value}" if value else None
 
-        if self.song_filename:
-            rep += f"song_filename={self.song_filename}, "
+        attributes = [
+            format_attribute("song_filename", self.song_filename),
+            format_attribute("artist_title", self.artist_title),
+            format_attribute("rspl_request_id", self.rspl_request_id),
+            format_attribute("cdlc_id", self.cdlc_id),
+            format_attribute("rspl_song_id", self.rspl_song_id),
+            format_attribute("rspl_official", self.rspl_official),
+            format_attribute("rspl_position", self.rspl_position),
+            format_attribute("tags", self.tags)
+        ]
 
-        if self.artist_title:
-            rep += f"artist_title={self.artist_title}, "
-
-        if self.rspl_request_id:
-            rep += f"rspl_request_id={self.rspl_request_id}, "
-        if self.cdlc_id:
-            rep += f"cdlc_id={self.cdlc_id}, "
-        if self.rspl_song_id:
-            rep += f"rspl_song_id={self.rspl_song_id}, "
-        if self.rspl_official:
-            rep += f"rspl_official={self.rspl_official}, "
-        if self.rspl_position:
-            rep += f"rspl_position={self.rspl_position}, "
-
-        if self.tags:
-            rep += f"tags={self.tags}"
-
-        rep += ">"
-
-        return rep
+        attributes_str = ", ".join(attr for attr in attributes if attr)
+        return f"<SongData: {attributes_str}>"
