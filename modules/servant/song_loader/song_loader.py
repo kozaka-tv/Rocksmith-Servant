@@ -13,7 +13,7 @@ from modules.servant.song_loader.song_data import SongData, ArtistTitle
 from modules.servant.song_loader.song_loader_helper import playlist_does_not_changed, check_cdlc_archive_dir, \
     check_rocksmith_cdlc_dir, update_tags_in_song_data, is_official, log_new_songs_found
 from utils import file_utils, psarc_reader
-from utils.collection_utils import is_not_empty, is_empty, repr_in_multi_line
+from utils.collection_utils import is_collection_not_empty, is_collection_empty, repr_in_multi_line
 from utils.exceptions import BadDirectoryError
 from utils.exceptions import RSPLNotLoggedInError
 from utils.rs_playlist_util import get_playlist, user_is_not_logged_in, set_tag_to_download, set_tag_loaded, \
@@ -191,13 +191,13 @@ class SongLoader:
     def __clean_up_archive_dir_for_duplicates(self, filenames_from_rs_dir, filenames_from_archive_dir):
         log.info('Cleaning up archive dir for duplicates')
         duplicates = set(filenames_from_rs_dir).intersection(filenames_from_archive_dir)
-        if is_not_empty(duplicates):
+        if is_collection_not_empty(duplicates):
             self.__remove_duplicates(duplicates, filenames_from_archive_dir)
 
     def __clean_up_songs_in_db(self, filenames_in_rs_and_archive_dir, filenames_in_db):
         log.info('Cleaning up songs in DB')
         to_delete = filenames_in_db.difference(filenames_in_rs_and_archive_dir)
-        if is_not_empty(to_delete):
+        if is_collection_not_empty(to_delete):
             log.info("Count of songs to be deleted: %s", len(to_delete))
             self.db_manager.delete_song_by_filename(to_delete)
 
@@ -270,7 +270,7 @@ class SongLoader:
         return song_data
 
     def __move_requested_cdlc_files_from_archive_to_rs(self):
-        if is_empty(self.songs.songs_from_archive_has_to_be_moved):
+        if is_collection_empty(self.songs.songs_from_archive_has_to_be_moved):
             log.debug("---- No file found to move from archive to RS directory.")
             return
 
@@ -308,9 +308,9 @@ class SongLoader:
                                             song_data.rspl_request_id,
                                             self.rspl_tags)
 
-        if is_not_empty(self.songs.moved_from_archive):
+        if is_collection_not_empty(self.songs.moved_from_archive):
             log.warning("---- Files newly moved and will be parsed: %s", str(actually_loaded_songs))
-        if is_not_empty(self.songs.missing_from_archive):
+        if is_collection_not_empty(self.songs.missing_from_archive):
             log.error("---- Missing files but found in Database: %s", str(self.songs.missing_from_archive))
 
     def __song_already_moved_from_archive(self, filename):
@@ -347,7 +347,7 @@ class SongLoader:
 
                 rspl_position = str(playlist_item.position)
 
-                if is_empty(songs_in_the_db):
+                if is_collection_empty(songs_in_the_db):
                     if self.__do_not_has_the_tag_to_download(playlist_item):
                         log.warning("User must download the song: rspl_position=%s cdlc_id=%s - %s - %s",
                                     rspl_position, cdlc_id, artist, title)
@@ -375,7 +375,7 @@ class SongLoader:
 
                     log.info("Request found in DB: %s", song_data)
 
-        if is_not_empty(self.songs.requested_songs_found_in_db):
+        if is_collection_not_empty(self.songs.requested_songs_found_in_db):
             log.info("Existing songs found: %s", repr_in_multi_line(self.songs.requested_songs_found_in_db))
 
     def __calculate_songs_need_to_be_moved_from_archive_to_under_rs(self):
@@ -397,7 +397,7 @@ class SongLoader:
             elif filename in difference:
                 self.songs.songs_from_archive_has_to_be_moved.update({filename: song_data})
 
-        if is_not_empty(self.songs.songs_from_archive_has_to_be_moved):
+        if is_collection_not_empty(self.songs.songs_from_archive_has_to_be_moved):
             log.info("Songs from archive has to be moved according to the requests: %s",
                      repr_in_multi_line(self.songs.songs_from_archive_has_to_be_moved))
 

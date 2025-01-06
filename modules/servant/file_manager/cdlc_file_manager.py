@@ -4,7 +4,7 @@ import math
 
 from common.definitions import TMP_DIR
 from utils import file_utils, collection_utils
-from utils.collection_utils import repr_in_multi_line, is_not_empty
+from utils.collection_utils import repr_in_multi_line, is_collection_not_empty
 
 HEARTBEAT = 1
 HEARTBEAT_NOT_PARSED = 5
@@ -63,7 +63,7 @@ class FileManager:
     def __move_not_parsed_files_to_tmp(self):
         non_parsed_files = self.__scan_cdlc_files_in_destination_dir()
 
-        if is_not_empty(non_parsed_files):
+        if is_collection_not_empty(non_parsed_files):
             log.warning(
                 "Found %s file(s) in %s dir which one(s) were not yet parsed so I moving them to %s now! Files: %s"
                 , len(non_parsed_files), self.destination_dir, TMP_DIR, repr_in_multi_line(non_parsed_files))
@@ -86,7 +86,7 @@ class FileManager:
 
         cdlc_files, bad_dirs = file_utils.get_files_from_directories(self.download_dirs)
 
-        if collection_utils.is_not_empty(bad_dirs):
+        if collection_utils.is_collection_not_empty(bad_dirs):
             log.error("---------------------------------------")
             log.error('Bad definition or could not reach some directories defined in the config '
                       'under the section FileManager with the key download_dirs')
