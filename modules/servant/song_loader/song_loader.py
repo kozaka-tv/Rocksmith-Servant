@@ -138,9 +138,20 @@ class SongLoader:
         return True
 
     def __log_available_rspl_tags(self):
+
+        def _filter_tags(tags_to_filter, is_user):
+            return {value.name: key for key, value in tags_to_filter.items() if value.user == is_user}
+
+        def _log_tags(tags_to_log, log_function, prefix_message):
+            formatted_tags = pprint.pformat(tags_to_log)
+            log_function(f"{prefix_message}:\n{formatted_tags}")
+
         tags = self.rsplaylist.channel_tags
-        user_tags = {value.name: key for key, value in tags.items() if value.user}
-        log.warning("Tags set in RSPlaylist:\n%s", pprint.pformat(user_tags))
+        user_tags = _filter_tags(tags, is_user=True)
+        system_tags = _filter_tags(tags, is_user=False)
+
+        _log_tags(user_tags, log.warning, "Tags set by the user in RSPlaylist")
+        _log_tags(system_tags, log.info, "System tags set in RSPlaylist")
 
     def __update_playlist_with(self, new_playlist):
         self.rsplaylist_json = new_playlist
