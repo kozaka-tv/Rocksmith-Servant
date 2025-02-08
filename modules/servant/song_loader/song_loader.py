@@ -35,7 +35,7 @@ class SongLoader:
             self.rsplaylist = None
             self.rsplaylist_json = None
             self.rsplaylist_updated = True
-            # TODO itt nem kéne, hogy a tag manager-t izzítsuk és töltsük be? Vagy csak none?
+            # TODO Shouldn't we activate the tag manager here and load it? Or just set it to none?
             self.rspl_tags = config_data.song_loader.rspl_tags
 
             self.cdlc_archive_dir = check_cdlc_archive_dir(config_data.song_loader.cdlc_archive_dir)
@@ -125,7 +125,7 @@ class SongLoader:
         if self.rsplaylist_json is None:
             self.__update_playlist_with(new_playlist)
             log.info("Initial load of the playlist is done...")
-            tag_utils.log_available_rspl_tags(self.rsplaylist.channel_tags)
+            tag_utils.validate_and_log_rspl_tags(self.rsplaylist.channel_tags, self.rspl_tags)
             return True
 
         if playlist_does_not_changed(self.rsplaylist_json, new_playlist):

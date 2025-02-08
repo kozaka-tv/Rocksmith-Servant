@@ -34,41 +34,80 @@ RSPL_PLAYLIST_NOT_ENABLED_ERROR = (
 
 
 # Base exception class for custom errors
-class CustomError(Exception):
+class CheckedException(Exception):
     def __init__(self, error_msg, **kwargs):
         super().__init__(error_msg.format(**kwargs))
         self.details = kwargs
 
 
 # Custom exception classes
-class ConfigError(CustomError):
-    pass
+class ConfigError(CheckedException):
+    def __init__(self, error_msg, **kwargs):
+        super().__init__(error_msg.format(**kwargs))
+        self.details = kwargs
 
 
-class SongLoaderError(CustomError):
-    pass
+class TagConfigError(Exception):
+    """
+    Custom exception to handle errors related to missing or misconfigured RSPlaylist tags.
+    This exception only displays the error message without a traceback.
+    """
+
+    def __init__(self, tag_name: str, tag: str, required_tags: dict, user_tags: dict):
+        """
+        Initializes the TagConfigError.
+
+        :param tag_name: Name of the tag (e.g., 'tag_to_download', 'tag_downloaded').
+        :param tag: The missing tag value (what's expected but not present).
+        :param required_tags: Dictionary of all required tags with their names.
+        :param user_tags: Dictionary of the user-provided tags.
+        """
+        self.tag_name = tag_name
+        self.tag = tag
+        self.required_tags = required_tags
+        self.user_tags = user_tags
+        # Set a detailed error message
+        self.message = (
+                NL +
+                "--- Bad configuration of the tags!" + NL +
+                "--------------------------------------------------" + NL +
+                "Please check tag definitions in config:" + NL +
+                f"Missing or misconfigured required tag: '{tag_name}' with value set in config: '{tag}'" + NL +
+                f"Required tags: {required_tags}" + NL +
+                f"Tags set in RSPlaylist: {user_tags}" + NL +
+                "Please correct the required tags in config according to your tags set in RSPlaylist!" + NL +
+                "--------------------------------------------------"
+        )
+        super().__init__(self.message)
 
 
-class RocksnifferConnectionError(CustomError):
+class SongLoaderError(CheckedException):
+    def __init__(self, error_msg, **kwargs):
+        super().__init__(error_msg.format(**kwargs))
+
+
+class RocksnifferConnectionError(CheckedException):
     def __init__(self, host, port):
         super().__init__(SNIFFER_ERROR_TEMPLATE, host=host, port=port)
 
 
-class RSPLNotLoggedInError(CustomError):
+class RSPLNotLoggedInError(CheckedException):
     def __init__(self):
         super().__init__(RSPL_LOGIN_ERROR)
 
 
-class RSPLPlaylistIsNotEnabledError(CustomError):
+class RSPLPlaylistIsNotEnabledError(CheckedException):
     def __init__(self):
         super().__init__(RSPL_PLAYLIST_NOT_ENABLED_ERROR)
 
 
-class BadDirectoryError(CustomError):
+class BadDirectoryError(CheckedException):
     def __init__(self, error_msg, directory):
         super().__init__(error_msg)
         self.directory = directory
 
 
-class ExtractError(CustomError):
-    pass
+class PsarcReaderExtractError(CheckedException):
+    def __init__(self, error_msg, **kwargs):
+        super().__init__(error_msg.format(**kwargs))
+        self.details = kwargs
