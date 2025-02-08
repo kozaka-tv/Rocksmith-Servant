@@ -34,7 +34,7 @@ def __validate_required_user_tags(rspl_tags, user_tags: Dict[str, str]) -> None:
     user_tags_set = set(user_tags.values())
     required_tags = {
         rspl_tags.tag_to_download: "tag_to_download",
-        rspl_tags.tag_loaded: "tag_loaded"
+        rspl_tags.tag_loaded: "tag_loaded",
     }
 
     for tag, tag_name in required_tags.items():

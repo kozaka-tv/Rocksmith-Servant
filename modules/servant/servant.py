@@ -35,12 +35,14 @@ class Servant:
         log.warning("----- SERVANT IS STARTING ----------------------------------------------")
         log.warning("------------------------------------------------------------------------")
 
+        self.fatal_error_event = threading.Event()  # Shared Event to signal fatal errors
+
         set_project_directory()
 
         try:
             self.config_file_path, self.db_file_path = parse_args()
         except ValueError as e:
-            print(f"Incorrect command line parameter! Error: {e}")
+            log.error("Incorrect command line parameter! Error: %s", e)
             sys.exit(1)
 
         config.log_config.config()
@@ -59,7 +61,7 @@ class Servant:
         try:
             check_modules_enabled(config_data)
         except ConfigError as e:
-            print(f"Incorrect configuration! Error: {e}")
+            log.error("Incorrect configuration! Error: %s", e)
             sys.exit(1)
 
     def get_debug_message(self):
@@ -115,23 +117,25 @@ class Servant:
     def manage_songs(self, db_file):
         self.song_loader.set_db_manager(DBManager(db_file))  # because of Threading, we must set DB here
 
-        while True:
-            try:
-                self.file_manager.run()
-                self.song_loader.run()
-                sleep(HEARTBEAT_MANAGE_SONGS)
+        try:
+            while not self.fatal_error_event.is_set():  # Check if a fatal error was set
+                try:
+                    self.file_manager.run()
+                    self.song_loader.run()
+                    sleep(HEARTBEAT_MANAGE_SONGS)
 
-            # Catch and log all known exceptions, but keep app alive.
-            except (RSPLNotLoggedInError, RSPLPlaylistIsNotEnabledError) as ex:
-                log.error(ex)
+                # Catch and log all known exceptions, but keep app alive.
+                except (RSPLNotLoggedInError, RSPLPlaylistIsNotEnabledError) as ex:
+                    log.error(ex)
 
-            # Catch all unchecked Exceptions, but keep app alive.
-            # pylint: disable=broad-exception-caught
-            except Exception as ex:
-                log.exception(ex)
+        # pylint: disable=broad-exception-caught
+        except Exception as e:
+            log.error("Exception in manage_songs: %s", e)
+            self.fatal_error_event.set()  # Signal a fatal error to stop the program
+            sys.exit(1)  # Exit the application with an error code
 
     def update_game_info_and_setlist(self):
-        while True:
+        while not self.fatal_error_event.is_set():  # Periodically check if stop is requested
             try:
                 self.update_game_information()
                 self.put_the_song_into_the_setlist()
@@ -152,5 +156,17 @@ class Servant:
         update_game_info_and_setlist_thread.daemon = True
         update_game_info_and_setlist_thread.start()
 
-        while True:
-            await asyncio.sleep(5)
+        # Main thread logic
+        try:
+            while not self.fatal_error_event.is_set():
+                log.debug("...still alive!")
+                await asyncio.sleep(5)
+        except KeyboardInterrupt:
+            log.warning("Shutting down due to user interrupt...")
+            self.fatal_error_event.set()  # Signal all threads to stop
+            sys.exit(0)
+
+        log.debug("Thread manage_songs_thread alive: %s", manage_songs_thread.is_alive())
+        log.debug("Thread update_game_info_and_setlist alive: %s", update_game_info_and_setlist_thread.is_alive())
+
+        log.warning("Bye! See you soon! And the rock should be with you...")
