@@ -21,7 +21,7 @@ log = logging.getLogger()
 
 
 def playlist_does_not_changed(old_playlist, new_playlist):
-    diff = DeepDiff(old_playlist, new_playlist, exclude_regex_paths="\\['inactive_time'\\]")
+    diff = DeepDiff(old_playlist, new_playlist, exclude_regex_paths="\\['inactive_time'\\]|\\['tags'\\]")
     if str(diff) == "{}":
         log.debug("Playlist does not changed!")
         return True
