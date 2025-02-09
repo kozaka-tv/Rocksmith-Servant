@@ -17,7 +17,7 @@ from modules.servant.song_loader.songs import Songs
 from modules.servant.tag_manager.tag_manager import TagManager
 from utils.cmd_line_parser import parse_args
 from utils.exceptions import RocksnifferConnectionError, RSPLNotLoggedInError, \
-    RSPLPlaylistIsNotEnabledError, ConfigError
+    RSPLPlaylistIsNotEnabledError, ConfigError, SongLoaderError
 from utils.project_dir_setter import set_project_directory
 from utils.rocksniffer import Rocksniffer
 
@@ -132,7 +132,7 @@ class Servant:
         except Exception as e:
             log.error("Exception in manage_songs: %s", e)
             self.fatal_error_event.set()  # Signal a fatal error to stop the program
-            sys.exit(1)  # Exit the application with an error code
+            raise SongLoaderError("A fatal error occurred in the manage_songs method.") from e
 
     def update_game_info_and_setlist(self):
         while not self.fatal_error_event.is_set():  # Periodically check if stop is requested

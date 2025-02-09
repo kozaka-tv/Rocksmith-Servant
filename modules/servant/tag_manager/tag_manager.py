@@ -20,8 +20,6 @@ class TagManager:
         self.user_tags = self.__fetch_user_tags(rsplaylist)
         self.server_tags = self.__fetch_server_tags(rsplaylist)
 
-        pass
-
     @staticmethod
     def get_rsplaylist(config_data):
         loader = config_data.song_loader

@@ -56,12 +56,10 @@ def unset_user_tags(channel, php_session_id, request_id, tags, item_tags):
 
 
 def set_tag_loaded(channel, php_session_id, request_id, tags):
-    unset_user_tags(channel, php_session_id, request_id, tags, [tags.tag_to_download])
     __set_tag(channel, php_session_id, request_id, tags.tag_loaded)
 
 
 def set_tag_to_download(channel, php_session_id, request_id, tags):
-    unset_user_tags(channel, php_session_id, request_id, tags, [tags.tag_loaded])
     __set_tag(channel, php_session_id, request_id, tags.tag_to_download)
 
 

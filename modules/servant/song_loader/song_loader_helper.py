@@ -20,7 +20,19 @@ ERR_MSG_ROCKSMITH_CDLC_DIR = "Please set your Rocksmith CDLC directory!" + NL + 
 log = logging.getLogger()
 
 
-def playlist_does_not_changed(old_playlist, new_playlist):
+def playlist_does_not_changed(rsplaylist_request_strings: set[str], new_rsplaylist_request_strings: set[str]) -> bool:
+    if rsplaylist_request_strings == new_rsplaylist_request_strings:
+        log.info("Playlist does not changed!")
+        return True
+
+    removed = rsplaylist_request_strings - new_rsplaylist_request_strings
+    added = new_rsplaylist_request_strings - rsplaylist_request_strings
+    log.warning("Playlist has been changed! Removed: %s, Added: %s", removed, added)
+
+    return rsplaylist_request_strings == new_rsplaylist_request_strings
+
+
+def rsplaylist_does_not_changed(old_playlist, new_playlist):
     diff = DeepDiff(old_playlist, new_playlist, exclude_regex_paths="\\['inactive_time'\\]|\\['tags'\\]")
     if str(diff) == "{}":
         log.debug("Playlist does not changed!")

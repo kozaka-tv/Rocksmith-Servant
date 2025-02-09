@@ -9,15 +9,17 @@ from config.config_data import ConfigData
 from modules.servant.database.db_manager import DBManager
 from modules.servant.song_loader.rs_playlist_data import RsPlaylist
 from modules.servant.song_loader.song_data import SongData, ArtistTitle
-from modules.servant.song_loader.song_loader_helper import playlist_does_not_changed, check_cdlc_archive_dir, \
-    check_rocksmith_cdlc_dir, update_tags_in_song_data, is_official, log_new_songs_found
+from modules.servant.song_loader.song_loader_helper import check_cdlc_archive_dir, \
+    check_rocksmith_cdlc_dir, update_tags_in_song_data, is_official, log_new_songs_found, playlist_does_not_changed
 from modules.servant.tag_manager import tag_utils
 from utils import file_utils, psarc_reader
 from utils.collection_utils import is_collection_not_empty, is_collection_empty, repr_in_multi_line
 from utils.exceptions import BadDirectoryError
 from utils.exceptions import RSPLNotLoggedInError
-from utils.rs_playlist_util import get_playlist, user_is_not_logged_in, set_tag_to_download, set_tag_loaded, \
-    unset_user_tags
+from utils.rs_playlist_util import (get_playlist,
+                                    user_is_not_logged_in,
+                                    set_tag_to_download,
+                                    unset_user_tags, set_tag_loaded)
 from utils.string_utils import time_float_to_string
 
 HEARTBEAT = 5
@@ -37,6 +39,8 @@ class SongLoader:
             self.rsplaylist_updated = True
             # TODO Shouldn't we activate the tag manager here and load it? Or just set it to none?
             self.rspl_tags = config_data.song_loader.rspl_tags
+
+            self.rsplaylist_request_strings = set()
 
             self.cdlc_archive_dir = check_cdlc_archive_dir(config_data.song_loader.cdlc_archive_dir)
             self.destination_dir = config_data.song_loader.destination_dir
@@ -87,9 +91,9 @@ class SongLoader:
 
             if time_waited >= HEARTBEAT:
 
-                self.__update_songs_from_rs_dir()
+                updated_songs_count = self.__update_songs_from_rs_dir()
 
-                if self.__playlist_has_been_changed():
+                if self.__update_playlist_and_get_playlist_has_been_changed() or updated_songs_count > 0:
                     log.info("Playlist has been changed, update songs!")
 
                     self.__find_existing_song_filenames_from_db_according_to_the_requests()
@@ -108,8 +112,12 @@ class SongLoader:
     #     for source_dir in self.download_dirs:
     #         self.__store_and_return_all_the_new_song_datas(source_dir, self.songs.songs_in_tmp)
 
-    def __update_songs_from_rs_dir(self):
-        self.__store_and_return_all_the_new_song_datas(self.rocksmith_cdlc_dir, self.songs.songs_in_rs)
+    def __update_songs_from_rs_dir(self) -> int:
+        updated_songs_count = self.__store_and_return_all_the_new_song_datas(
+            self.rocksmith_cdlc_dir, self.songs.songs_in_rs)
+        if updated_songs_count > 0:
+            log.debug("Count of songs updated from RS dir: %s", updated_songs_count)
+        return updated_songs_count
 
     # def __update_songs_from_import_dir(self):
     #     self.__store_and_return_all_the_new_song_datas(self.destination_dir, self.songs.songs_in_import)
@@ -117,27 +125,33 @@ class SongLoader:
     # def __update_songs_from_tmp_dir(self):
     #     self.__store_and_return_all_the_new_song_datas(self.destination_dir, self.songs.songs_in_tmp)
 
-    def __playlist_has_been_changed(self):
+    def __update_playlist_and_get_playlist_has_been_changed(self):
+        is_initial_load = self.rsplaylist_json is None
         new_playlist = get_playlist(self.twitch_channel, self.phpsessid)
 
+        self.__update_rsplaylist_with(new_playlist)
         self.__stop_if_user_is_not_logged_in_on_rspl_page(new_playlist)
 
-        if self.rsplaylist_json is None:
-            self.__update_playlist_with(new_playlist)
-            log.info("Initial load of the playlist is done...")
-            tag_utils.validate_and_log_rspl_tags(self.rsplaylist.channel_tags, self.rspl_tags)
+        if is_initial_load:
+            self.__handle_initial_playlist_load()
             return True
 
-        if playlist_does_not_changed(self.rsplaylist_json, new_playlist):
+        new_rsplaylist_request_strings = self.__extract_request_strings()
+        if playlist_does_not_changed(self.rsplaylist_request_strings, new_rsplaylist_request_strings):
             return False
 
         log.info("Playlist has been changed, lets update!")
-
-        self.__update_playlist_with(new_playlist)
-
+        self.rsplaylist_request_strings = self.__extract_request_strings()
         return True
 
-    def __update_playlist_with(self, new_playlist):
+    def __extract_request_strings(self):
+        return {item.string for item in self.rsplaylist.playlist}
+
+    def __handle_initial_playlist_load(self):
+        log.info("Initial load of the playlist is done...")
+        tag_utils.validate_and_log_rspl_tags(self.rsplaylist.channel_tags, self.rspl_tags)
+
+    def __update_rsplaylist_with(self, new_playlist):
         self.rsplaylist_json = new_playlist
         self.rsplaylist = from_dict(data_class=RsPlaylist, data=new_playlist)
 
@@ -210,7 +224,7 @@ class SongLoader:
     def __store_and_return_all_the_new_song_datas(self, directory, songs_to_update: dict):
         log.info('Loading songs from directory: %s', directory)
 
-        counter_new_songs = 0
+        new_songs_count = 0
         songs = {}
 
         filenames = file_utils.get_file_names_from(directory)
@@ -228,7 +242,7 @@ class SongLoader:
                 if song_data is None:
                     song_data = self.__extract_song_information(directory, filename)
                     self.db_manager.insert_song(song_data)
-                    counter_new_songs += 1
+                    new_songs_count += 1
                     log.info('New song added to DB: %s', song_data)
 
                 songs.update({song_data.song_filename: song_data})
@@ -237,7 +251,12 @@ class SongLoader:
 
         songs_to_update.update(songs)
 
-        log.info("---- Loaded %s songs, and from this, %s new song(s) stored in DB", len(songs), counter_new_songs)
+        if new_songs_count > 0:
+            log.info("---- Loaded %s songs, and from this, %s new song(s) stored in DB", len(songs), new_songs_count)
+            return new_songs_count
+
+        log.debug("---- No new songs were loaded!")
+        return 0
 
     @staticmethod
     def __remove_missing_songs_from(songs_to_update: dict[str, SongData](), filenames):
@@ -317,44 +336,42 @@ class SongLoader:
     def __has_no_tag_to_download(self, song_data):
         return self.rspl_tags.tag_to_download not in song_data.tags
 
-    def __do_not_has_the_tag_to_download(self, playlist_item):
-        return self.rspl_tags.tag_to_download not in playlist_item.tags
+    @staticmethod
+    def __no_file_found_in_db_for_this_song(songs_in_the_db):
+        return is_collection_empty(songs_in_the_db)
 
     def __find_existing_song_filenames_from_db_according_to_the_requests(self):
         playlist = self.rsplaylist.playlist
         for playlist_item in playlist:
+            dlc_items_count = len(playlist_item.dlc_set)
+            officials_count = 0
+            to_download_count = 0
+            loaded_count = 0
+            log.debug("Number of items in dlc_set for playlist_item position=%s id=%s dlc_items_count=%s",
+                      playlist_item.position, playlist_item.id, dlc_items_count)
+
             for dlc_set_item in playlist_item.dlc_set:
                 cdlc_id = dlc_set_item.cdlc_id
                 artist = dlc_set_item.artist
                 title = dlc_set_item.title
+                log.debug("Searching for --> cdlc_id=%s | %s - %s", cdlc_id, artist, title)
 
                 official = dlc_set_item.official
                 if is_official(official):
-                    log.info("Skipping ODLC request with cdlc_id=%s - %s - %s", cdlc_id, artist, title)
-                    unset_user_tags(self.twitch_channel,
-                                    self.phpsessid,
-                                    playlist_item.id,
-                                    self.rspl_tags,
-                                    playlist_item.tags)
+                    officials_count += 1
+                    log.debug("Skipping ODLC request with cdlc_id=%s - %s - %s", cdlc_id, artist, title)
                     continue
 
                 songs_in_the_db = self.db_manager.search_song_by_artist_and_title(artist, title)
 
                 rspl_position = str(playlist_item.position)
 
-                if is_collection_empty(songs_in_the_db):
-                    if self.__do_not_has_the_tag_to_download(playlist_item):
-                        log.warning("User must download the song: rspl_position=%s cdlc_id=%s - %s - %s",
-                                    rspl_position, cdlc_id, artist, title)
-                        set_tag_to_download(self.twitch_channel,
-                                            self.phpsessid,
-                                            playlist_item.id,
-                                            self.rspl_tags)
-
-                        log.info("Tag is set! rspl_position=%s cdlc_id=%s - %s - %s",
-                                 rspl_position, cdlc_id, artist, title)
+                if self.__no_file_found_in_db_for_this_song(songs_in_the_db):
+                    to_download_count += 1
+                    log.debug("This must be downloaded --> cdlc_id=%s - %s - %s", cdlc_id, artist, title)
                     continue
 
+                loaded_count += 1
                 for song_filename in songs_in_the_db:
                     song_data = SongData(song_filename=song_filename,
                                          artist_title=ArtistTitle(artist, title),
@@ -369,6 +386,31 @@ class SongLoader:
                     self.songs.requested_songs_found_in_db.update({song_data.song_filename: song_data})
 
                     log.info("Request found in DB: %s", song_data)
+
+            # if any tag has to set
+            if officials_count > 0 or to_download_count > 0 or loaded_count > 0:
+                log.debug(
+                    "Unset tags, as tags may be actualised! officials_count=%s to_download_count=%s loaded_count=%s ",
+                    officials_count, to_download_count, loaded_count)
+                unset_user_tags(self.twitch_channel,
+                                self.phpsessid,
+                                playlist_item.id,
+                                self.rspl_tags,
+                                playlist_item.tags)
+
+            if to_download_count > 0:
+                log.debug("To-download count: %s", to_download_count)
+                set_tag_to_download(self.twitch_channel,
+                                    self.phpsessid,
+                                    playlist_item.id,
+                                    self.rspl_tags)
+
+            if loaded_count > 0:
+                log.debug("Loaded count: %s", to_download_count)
+                set_tag_loaded(self.twitch_channel,
+                               self.phpsessid,
+                               playlist_item.id,
+                               self.rspl_tags)
 
         if is_collection_not_empty(self.songs.requested_songs_found_in_db):
             log.info("Existing songs found: %s", repr_in_multi_line(self.songs.requested_songs_found_in_db))
