@@ -67,33 +67,42 @@ for year in year_song_counts.keys():
     # Get the top 10 songs played in the year
     top_10_songs = sorted(year_song_counts[year].items(), key=lambda x: x[1], reverse=True)[:10]
 
+    # Determine the dynamic width for the count columns
+    max_count_top_10 = max([count for _, count in top_10_songs], default=1)
+    max_count_artist = max([count for _, count in year_artist_counts[year].items()], default=1)
+    max_count_song = max([count for _, count in year_song_counts[year].items()], default=1)
+
+    width_top_10 = len(str(max_count_top_10))
+    width_artist = len(str(max_count_artist))
+    width_song = len(str(max_count_song))
+
     # Write artist and song play counts for the current year
     with open(output_file, "w", encoding="utf-8") as f:
         # Write the Top 10 Songs section
         f.write(f"Year: {year}\n")
         f.write("Top 10 Songs Played:\n")
-        f.write("Count | Artist - Song\n")
-        f.write("------------------------\n")
+        f.write(f"{'Count'.ljust(width_top_10)} | Artist - Song\n")
+        f.write(f"{'-' * (width_top_10 + 20)}\n")
         for song, count in top_10_songs:
-            f.write(f"{count:3} | {song}\n")  # Use :3 to right-align numbers to 3 spaces
+            f.write(f"{str(count).rjust(width_top_10)} | {song}\n")  # Right-align based on width
         f.write("\n")  # Add a newline before the next section
 
         # Write artist stats
         f.write(f"Total songs played: {artist_total_songs}\n")
         f.write(f"Distinct artists appeared: {distinct_artist_count}\n")
-        f.write("Count | Artist\n")
-        f.write("------------------------\n")
+        f.write(f"{'Count'.ljust(width_artist)} | Artist\n")
+        f.write(f"{'-' * (width_artist + 20)}\n")
         for artist, count in sorted(year_artist_counts[year].items(), key=lambda x: x[1], reverse=True):
-            f.write(f"{count:3} | {artist}\n")  # Use :3 to right-align numbers to 3 spaces
+            f.write(f"{str(count).rjust(width_artist)} | {artist}\n")  # Right-align based on width
         f.write("\n")  # Add a newline before the next section
 
         # Write song stats
         f.write(f"Total songs played: {total_songs_played}\n")
         f.write(f"Distinct songs played: {distinct_songs_count}\n")
-        f.write("Count | Artist - Song\n")
-        f.write("------------------------\n")
+        f.write(f"{'Count'.ljust(width_song)} | Artist - Song\n")
+        f.write(f"{'-' * (width_song + 20)}\n")
         for song, count in sorted(year_song_counts[year].items(), key=lambda x: x[1], reverse=True):
-            f.write(f"{count:3} | {song}\n")  # Use :3 to right-align numbers to 3 spaces
+            f.write(f"{str(count).rjust(width_song)} | {song}\n")  # Right-align based on width
         f.write("\n")  # Add a newline at the end
 
 print(f"Song and artist play counts by year have been saved in the folder: {OUTPUT_DIR}")
