@@ -3,8 +3,8 @@ import re
 from collections import defaultdict
 
 # Path to the 'setlist' directory
-SETLIST_DIR = "./setlist/"
-OUTPUT_FILE = "song_count_by_year_and_title.txt"
+SETLIST_DIR = "../setlist/"
+OUTPUT_FILE = "../song_count_by_year_and_title.txt"
 
 # Dictionary to store song play counts by year
 # For each year, we will store a dictionary of songs and their counts.
