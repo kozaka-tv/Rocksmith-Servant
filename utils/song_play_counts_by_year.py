@@ -45,13 +45,21 @@ for year, songs in year_song_counts.items():
     # Set the output file name for the current year
     output_file = os.path.join(OUTPUT_DIR, f"song_count_{year}.txt")
 
+    # Calculate the total number of songs played in the year
+    total_songs_played = sum(songs.values())
+
+    # Calculate the number of distinct songs played
+    distinct_songs_count = len(songs)
+
     # Write song play counts for the current year
     with open(output_file, "w", encoding="utf-8") as f:
         f.write(f"Year: {year}\n")
-        f.write("Song\tCount\n")
+        f.write(f"Total songs played: {total_songs_played}\n")  # Add the total played songs
+        f.write(f"Distinct songs played: {distinct_songs_count}\n")  # Add the distinct song count
+        f.write("Count | Song\n")
         f.write("------------------------\n")
         for song, count in sorted(songs.items(), key=lambda x: x[1], reverse=True):  # Sort songs by count
-            f.write(f"{song}\t{count}\n")
+            f.write(f"{count:2} | {song}\n")  # Add leading space for numbers < 10
         f.write("\n")  # Add a newline at the end
 
 print(f"Song play counts by year have been saved in the folder: {OUTPUT_DIR}")
