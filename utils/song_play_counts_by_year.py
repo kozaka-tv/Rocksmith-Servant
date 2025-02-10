@@ -4,7 +4,10 @@ from collections import defaultdict
 
 # Path to the 'setlist' directory
 SETLIST_DIR = "../setlist/"
-OUTPUT_FILE = "../song_count_by_year_and_title.txt"
+OUTPUT_DIR = "../statistics/song_count_by_year"  # Directory to store the yearly output files
+
+# Create the output directory if it doesn't exist
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # Dictionary to store song play counts by year
 # For each year, we will store a dictionary of songs and their counts.
@@ -37,14 +40,18 @@ for filename in os.listdir(SETLIST_DIR):
                         # Increment the count for this song in the respective year
                         year_song_counts[year][song] += 1
 
-# Write summarized data to the output file
-with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-    for year, songs in sorted(year_song_counts.items()):  # Sort years
+# Write summarized data to separate files for each year
+for year, songs in year_song_counts.items():
+    # Set the output file name for the current year
+    output_file = os.path.join(OUTPUT_DIR, f"song_count_{year}.txt")
+
+    # Write song play counts for the current year
+    with open(output_file, "w", encoding="utf-8") as f:
         f.write(f"Year: {year}\n")
         f.write("Song\tCount\n")
         f.write("------------------------\n")
         for song, count in sorted(songs.items(), key=lambda x: x[1], reverse=True):  # Sort songs by count
             f.write(f"{song}\t{count}\n")
-        f.write("\n")  # Add a newline between years
+        f.write("\n")  # Add a newline at the end
 
-print(f"Song play counts by year have been saved to {OUTPUT_FILE}")
+print(f"Song play counts by year have been saved in the folder: {OUTPUT_DIR}")
