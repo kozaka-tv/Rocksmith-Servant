@@ -14,7 +14,7 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 year_song_counts = defaultdict(lambda: defaultdict(int))
 year_artist_counts = defaultdict(lambda: defaultdict(int))
 
-# Updated regular expression to extract the year from filenames
+# Regular expression to extract the year from filenames
 year_pattern = re.compile(r"setlist_(\d{4})-\d{2}-\d{2}")
 
 # Iterate over files in the 'setlist' directory
@@ -64,27 +64,36 @@ for year in year_song_counts.keys():
     artist_total_songs = sum(year_artist_counts[year].values())
     distinct_artist_count = len(year_artist_counts[year])
 
+    # Get the top 10 songs played in the year
+    top_10_songs = sorted(year_song_counts[year].items(), key=lambda x: x[1], reverse=True)[:10]
+
     # Write artist and song play counts for the current year
     with open(output_file, "w", encoding="utf-8") as f:
-        # Write artist stats first
+        # Write the Top 10 Songs section
         f.write(f"Year: {year}\n")
-        f.write(f"Total songs played: {artist_total_songs}\n")  # Renamed to "Total songs played"
-        f.write(f"Distinct artists appeared: {distinct_artist_count}\n")  # Retains distinct artists count
-        f.write("Count | Artist\n")
-        f.write("------------------------\n")
-        for artist, count in sorted(year_artist_counts[year].items(), key=lambda x: x[1],
-                                    reverse=True):  # Sort artists by count
-            f.write(f"{count:2} | {artist}\n")  # Add leading space for numbers < 10
-        f.write("\n")  # Add a newline at the end
-
-        # Write song stats second
-        f.write(f"Total songs played: {total_songs_played}\n")  # Add the total played songs
-        f.write(f"Distinct songs played: {distinct_songs_count}\n")  # Add the distinct song count
+        f.write("Top 10 Songs Played:\n")
         f.write("Count | Artist - Song\n")
         f.write("------------------------\n")
-        for song, count in sorted(year_song_counts[year].items(), key=lambda x: x[1],
-                                  reverse=True):  # Sort songs by count
-            f.write(f"{count:2} | {song}\n")  # Include artist and song in the same line
+        for song, count in top_10_songs:
+            f.write(f"{count:3} | {song}\n")  # Use :3 to right-align numbers to 3 spaces
+        f.write("\n")  # Add a newline before the next section
+
+        # Write artist stats
+        f.write(f"Total songs played: {artist_total_songs}\n")
+        f.write(f"Distinct artists appeared: {distinct_artist_count}\n")
+        f.write("Count | Artist\n")
+        f.write("------------------------\n")
+        for artist, count in sorted(year_artist_counts[year].items(), key=lambda x: x[1], reverse=True):
+            f.write(f"{count:3} | {artist}\n")  # Use :3 to right-align numbers to 3 spaces
+        f.write("\n")  # Add a newline before the next section
+
+        # Write song stats
+        f.write(f"Total songs played: {total_songs_played}\n")
+        f.write(f"Distinct songs played: {distinct_songs_count}\n")
+        f.write("Count | Artist - Song\n")
+        f.write("------------------------\n")
+        for song, count in sorted(year_song_counts[year].items(), key=lambda x: x[1], reverse=True):
+            f.write(f"{count:3} | {song}\n")  # Use :3 to right-align numbers to 3 spaces
         f.write("\n")  # Add a newline at the end
 
 print(f"Song and artist play counts by year have been saved in the folder: {OUTPUT_DIR}")
