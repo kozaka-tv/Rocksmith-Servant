@@ -1,9 +1,8 @@
 import sys
-from dataclasses import dataclass
-from typing import List
 
 import requests
 
+from modules.servant.song_loader.dataclasses.owned_dlcs import OwnedDLCs, OwnedDLC
 from utils.exceptions import RSPLPlaylistIsNotEnabledError
 
 REQUEST_TIMEOUT = 15
@@ -16,23 +15,6 @@ URLS = {
     "tag_set": RS_PLAYLIST_HOME + "requests.php?channel={channel}&action=set-tag&id={id}&tag={tag}&value=true",
     "tag_unset": RS_PLAYLIST_HOME + "requests.php?channel={channel}&action=set-tag&id={id}&tag={tag}&value=false",
 }
-
-
-# Define the data class for one ODLC
-@dataclass
-class OwnedDLC:
-    id: int
-    artist_name: str
-    title: str
-    owned: bool
-
-
-# Define the data class for all the ODLCs
-@dataclass
-class OwnedDLCs:
-    data: List[OwnedDLC]
-    total_count: int
-    owned_count: int
 
 
 def fetch_owned_dlc(channel: str, php_session_id: str) -> OwnedDLCs:
@@ -59,9 +41,14 @@ def fetch_owned_dlc(channel: str, php_session_id: str) -> OwnedDLCs:
         if not dlc_items:  # Stop if no more items are returned
             break
 
+        # Define the mapping from JSON keys to OwnedDLC fields
+        key_mapping = {
+            'id': 'rspl_owned_dlc_id',
+        }
+
         # Convert JSON objects into OwnedDLC data class instances
         for item in dlc_items:
-            results.append(OwnedDLC(**item))  # Assuming JSON keys match the OwnedDLC fields
+            results.append(OwnedDLC(**(map_rspl_item(item, key_mapping))))
             if item.get('owned'):
                 owned_count += 1
 
@@ -73,6 +60,15 @@ def fetch_owned_dlc(channel: str, php_session_id: str) -> OwnedDLCs:
         total_count=len(results),
         owned_count=owned_count
     )
+
+
+def map_rspl_item(item, key_mapping):
+    mapped_item = {
+        key_mapping.get(k, k): v
+        for k, v in item.items()
+        if k in key_mapping or k in OwnedDLC.__annotations__
+    }
+    return mapped_item
 
 
 def make_request(method, url, cookies, timeout=REQUEST_TIMEOUT):
@@ -159,11 +155,12 @@ if __name__ == "__main__":
             print(f"Found {owned_dlc_list.total_count} DLC items, "
                   f"from what {owned_dlc_list.owned_count} are owned:")
 
-            owned_dlcs = [dlc for dlc in owned_dlc_list.data if dlc.owned]
+            owned_dlcs = sorted([dlc for dlc in owned_dlc_list.data if dlc.owned],
+                                key=lambda x: (x.artist_name.lower(), x.title.lower()))
             if owned_dlcs:
                 print("\nOwned DLCs:")
-                for dlc in sorted(owned_dlcs, key=lambda x: (x.artist_name.lower(), x.title.lower())):
-                    print(f"{dlc.artist_name} - {dlc.title}")
+                for dlc in owned_dlcs:
+                    print(f"{dlc.rspl_owned_dlc_id} - {dlc.cdlc_id}: {dlc.artist_name} - {dlc.title}")
             else:
                 print("\nNo owned DLCs found.")
 
