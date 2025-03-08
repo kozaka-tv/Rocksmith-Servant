@@ -1,3 +1,7 @@
+import sys
+from dataclasses import dataclass
+from typing import List
+
 import requests
 
 from utils.exceptions import RSPLPlaylistIsNotEnabledError
@@ -12,6 +16,63 @@ URLS = {
     "tag_set": RS_PLAYLIST_HOME + "requests.php?channel={channel}&action=set-tag&id={id}&tag={tag}&value=true",
     "tag_unset": RS_PLAYLIST_HOME + "requests.php?channel={channel}&action=set-tag&id={id}&tag={tag}&value=false",
 }
+
+
+# Define the data class for one ODLC
+@dataclass
+class OwnedDLC:
+    id: int
+    artist_name: str
+    title: str
+    owned: bool
+
+
+# Define the data class for all the ODLCs
+@dataclass
+class OwnedDLCs:
+    data: List[OwnedDLC]
+    total_count: int
+    owned_count: int
+
+
+def fetch_owned_dlc(channel: str, php_session_id: str) -> OwnedDLCs:
+    """
+    Fetch owned DLC data from the RS Playlist API paginated endpoint.
+    :param channel: The channel name.
+    :param php_session_id: The PHP session ID for authentication.
+    :return: An OwnedDLCs object containing the list of DLCs, total count and owned count.
+    """
+    base_url = RS_PLAYLIST_HOME + "owneddlc.php?pageIndex={page}&pageSize=1&channel={channel}"
+    results = []
+    page_index = 0
+    owned_count = 0
+
+    while True:
+        # Format the URL with pageIndex and channel
+        url = base_url.format(page=page_index, channel=channel)
+
+        # Make the request
+        response = make_request("GET", url, cookies={'PHPSESSID': php_session_id})
+
+        # Parse the response data
+        dlc_items = response.get('data', [])
+        if not dlc_items:  # Stop if no more items are returned
+            break
+
+        # Convert JSON objects into OwnedDLC data class instances
+        for item in dlc_items:
+            results.append(OwnedDLC(**item))  # Assuming JSON keys match the OwnedDLC fields
+            if item.get('owned'):
+                owned_count += 1
+
+        # Increment the page index for the next request
+        page_index += 1
+
+    return OwnedDLCs(
+        data=results,
+        total_count=len(results),
+        owned_count=owned_count
+    )
 
 
 def make_request(method, url, cookies, timeout=REQUEST_TIMEOUT):
@@ -73,3 +134,38 @@ def user_is_not_logged_in(playlist):
         )
     except KeyError as exc:
         raise RSPLPlaylistIsNotEnabledError from exc
+
+
+if __name__ == "__main__":
+    # Main section, for testing the fetch_owned_dlc function.
+    # Ensure the script receives the correct number of arguments
+    if len(sys.argv) != 3:
+        print("Usage: python rs_playlist_util.py <channel_name> <php_session_id>")
+        sys.exit(1)
+
+    # Get the channel and PHP session ID from command-line arguments
+    channel_name = sys.argv[1]
+    php_session_id_arg = sys.argv[2]
+
+    try:
+        # Fetch the owned DLC data
+        print(f"Fetching owned DLC for channel '{channel_name}'...")
+        owned_dlc_list = fetch_owned_dlc(channel_name, php_session_id_arg)
+
+        # Output the result
+        if not owned_dlc_list:
+            print("No DLC items found.")
+        else:
+            print(f"Found {owned_dlc_list.total_count} DLC items, "
+                  f"from what {owned_dlc_list.owned_count} are owned:")
+
+            owned_dlcs = [dlc for dlc in owned_dlc_list.data if dlc.owned]
+            if owned_dlcs:
+                print("\nOwned DLCs:")
+                for dlc in sorted(owned_dlcs, key=lambda x: (x.artist_name.lower(), x.title.lower())):
+                    print(f"{dlc.artist_name} - {dlc.title}")
+            else:
+                print("\nNo owned DLCs found.")
+
+    except (requests.RequestException, ValueError, KeyError) as e:
+        print(f"An error occurred: {e}")
