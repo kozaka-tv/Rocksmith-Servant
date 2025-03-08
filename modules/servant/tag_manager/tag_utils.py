@@ -2,7 +2,7 @@ import logging
 import pprint
 from typing import Dict
 
-from modules.servant.song_loader.rs_playlist_data import ChannelTag
+from modules.servant.song_loader.dataclasses.rs_playlist_data import ChannelTag
 from utils.exceptions import TagConfigError
 
 log = logging.getLogger()

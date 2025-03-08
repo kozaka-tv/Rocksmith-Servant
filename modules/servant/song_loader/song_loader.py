@@ -7,8 +7,9 @@ from dacite import from_dict
 from common.definitions import PSARC_INFO_FILE_CACHE_DIR, TMP_DIR
 from config.config_data import ConfigData
 from modules.servant.database.db_manager import DBManager
-from modules.servant.song_loader.rs_playlist_data import RsPlaylist
-from modules.servant.song_loader.song_data import SongData, ArtistTitle
+from modules.servant.song_loader.dataclasses.artist_title import ArtistTitle
+from modules.servant.song_loader.dataclasses.rs_playlist_data import RsPlaylist
+from modules.servant.song_loader.dataclasses.song_data import SongData
 from modules.servant.song_loader.song_loader_helper import check_cdlc_archive_dir, \
     check_rocksmith_cdlc_dir, update_tags_in_song_data, is_official, log_new_songs_found, playlist_does_not_changed
 from modules.servant.tag_manager import tag_utils

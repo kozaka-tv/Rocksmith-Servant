@@ -12,8 +12,8 @@ from modules.servant.database.db_manager import DBManager
 from modules.servant.file_manager.cdlc_file_manager import FileManager
 from modules.servant.scene_switcher.scene_switcher import SceneSwitcher
 from modules.servant.setlist.setlist_logger import SetlistLogger
+from modules.servant.song_loader.dataclasses.songs import Songs
 from modules.servant.song_loader.song_loader import SongLoader
-from modules.servant.song_loader.songs import Songs
 from modules.servant.tag_manager.tag_manager import TagManager
 from utils.cmd_line_parser import parse_args
 from utils.exceptions import RocksnifferConnectionError, RSPLNotLoggedInError, \
