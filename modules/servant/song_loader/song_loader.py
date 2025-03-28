@@ -406,7 +406,7 @@ class SongLoader:
                                     self.rspl_tags)
 
             if loaded_count > 0:
-                log.debug("Loaded count: %s", to_download_count)
+                log.debug("Loaded count: %s", loaded_count)
                 set_tag_loaded(self.twitch_channel,
                                self.phpsessid,
                                playlist_item.id,
