@@ -11,7 +11,7 @@ ordered-set==4.1.0
 zstandard==0.22.0
 pycryptodome==3.20.0
 
-fastapi~=0.122.0
+fastapi==0.122.0
 fastapi[all]
 dacite==1.8.1
 uvicorn==0.30.1
