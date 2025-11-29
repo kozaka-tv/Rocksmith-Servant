@@ -28,7 +28,7 @@ CONFIG_FILE_PATH = "../../../config.ini"
 def read_config():
     print("in read_config")
     if not os.path.exists(CONFIG_FILE_PATH):
-        raise HTTPException(status_code=404, detail="Config file not founddddddddddddddddddddd")
+        raise HTTPException(status_code=404, detail="Config file not found!")
     config = configparser.ConfigParser()
     config.read(CONFIG_FILE_PATH)
     return {section: dict(config.items(section)) for section in config.sections()}
