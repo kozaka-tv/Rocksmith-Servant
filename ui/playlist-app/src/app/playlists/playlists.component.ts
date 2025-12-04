@@ -1,16 +1,14 @@
 import {HttpClient, HttpClientModule} from '@angular/common/http';
 import {Component, OnInit} from '@angular/core';
-import {NgForOf} from "@angular/common";
+
 
 @Component({
-  selector: 'app-playlists',
-  standalone: true,
-  imports: [
-    NgForOf,
+    selector: 'app-playlists',
+    imports: [
     HttpClientModule
-  ],
-  templateUrl: './playlists.component.html',
-  styleUrl: './playlists.component.css'
+],
+    templateUrl: './playlists.component.html',
+    styleUrl: './playlists.component.css'
 })
 export class PlaylistsComponent implements OnInit {
   playlists: any[] = [];
