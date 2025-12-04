@@ -26,7 +26,7 @@ def config_file_path(tmp_path):
         "[RockSniffer]\nhost = localhost\nport = 1234\nenabled = True\n[SongLoader]\ncdlc_archive_dir = /some/dir\nrocksmith_cdlc_dir = /another/dir\nallow_load_when_in_game = False\n")
     return str(config_file)
 
-
+# pylint: disable=redefined-outer-name
 @pytest.fixture
 def mock_serialized():
     mock_data = {
