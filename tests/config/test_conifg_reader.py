@@ -74,7 +74,8 @@ def mock_serialized():
         yield mock
 
 
-@pytest.fixture  # pylint: disable=redefined-outer-name
+# pylint: disable=redefined-outer-name
+@pytest.fixture
 def config_reader(config_file_path, mock_serialized):
     return ConfigReader(config_file_path)
 
