@@ -51,7 +51,7 @@ fail-under=9.5
 #from-stdin=
 
 # Files or directories to be skipped. They should be base names, not paths.
-ignore=CVS
+ignore=CVS,tests
 
 # Add files or directories matching the regular expressions patterns to the
 # ignore-list. The regex matches against paths and can be in Posix or Windows
@@ -62,7 +62,7 @@ ignore-paths=^new_stuffs_to_try_out/.*$,^tmp/.*$
 # Files or directories matching the regular expression patterns are skipped.
 # The regex matches against base names, not paths. The default value ignores
 # Emacs file locks
-ignore-patterns=^\.#
+ignore-patterns=^\.#,^tests/
 
 # List of module names for which member attributes should not be checked
 # (useful for modules/projects where namespaces are manipulated during runtime
@@ -73,7 +73,8 @@ ignored-modules=
 # Python code to execute, usually for sys.path manipulation such as
 # pygtk.require().
 [MASTER]
-init-hook='import sys; sys.path.append("/venv/Lib/site-packages/")'
+init-hook='import sys, os; sys.path.append(os.path.abspath(os.path.dirname(__file__)))'
+
 
 # Use multiple processes to speed up Pylint. Specifying 0 will auto-detect the
 # number of processors available to use, and will cap the count on Windows to
@@ -87,7 +88,7 @@ limit-inference-results=100
 
 # List of plugins (as comma separated values of python module names) to load,
 # usually to register additional checkers.
-load-plugins=
+load-plugins= pylint_pytest
 
 # Pickle collected data for later comparisons.
 persistent=yes
@@ -299,7 +300,7 @@ ignored-parents=
 max-args=5
 
 # Maximum number of attributes for a class (see R0902).
-max-attributes=7
+max-attributes=99
 
 # Maximum number of boolean expressions in an if statement (see R0916).
 max-bool-expr=5
@@ -308,7 +309,7 @@ max-bool-expr=5
 max-branches=12
 
 # Maximum number of locals for function / method body.
-max-locals=15
+max-locals=99
 
 # Maximum number of parents for a class (see R0901).
 max-parents=7

@@ -8,9 +8,9 @@ def download_site(url, session):
         print(f"Read {len(response.content)} from {url}")
 
 
-def download_all_sites(sites):
+def download_all_sites(sites_to_download):
     with requests.Session() as session:
-        for url in sites:
+        for url in sites_to_download:
             download_site(url, session)
 
 
