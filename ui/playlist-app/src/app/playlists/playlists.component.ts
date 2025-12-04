@@ -1,13 +1,12 @@
 import {HttpClient, HttpClientModule} from '@angular/common/http';
 import {Component, OnInit} from '@angular/core';
-import {NgForOf} from "@angular/common";
+
 
 @Component({
     selector: 'app-playlists',
     imports: [
-        NgForOf,
-        HttpClientModule
-    ],
+    HttpClientModule
+],
     templateUrl: './playlists.component.html',
     styleUrl: './playlists.component.css'
 })
