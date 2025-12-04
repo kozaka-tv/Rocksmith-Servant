@@ -74,7 +74,7 @@ def mock_serialized():
         yield mock
 
 
-@pytest.fixture
+@pytest.fixture  # pylint: disable=redefined-outer-name
 def config_reader(config_file_path, mock_serialized):
     return ConfigReader(config_file_path)
 
@@ -119,9 +119,9 @@ def test_if_needed_create_config_from_template_and_then_stop(mock_logging, confi
         with patch('sys.exit') as mock_exit, patch('builtins.input', return_value=''):
             print(f"Running __if_needed_create_config_from_template_and_then_stop for {empty_config_file_path}")
             config_reader._ConfigReader__if_needed_create_config_from_template_and_then_stop()
-            print(f"Checking if sys.exit was called...")
+            print("Checking if sys.exit was called...")
             mock_exit.assert_called_once()
-            print(f"Checking if log.error was called...")
+            print("Checking if log.error was called...")
             mock_logging.error.assert_called_once_with(
                 'Because this is the first run, and no configuration file was found, '
                 'I just created the %s configuration file for you!', config_reader.config_abspath)
