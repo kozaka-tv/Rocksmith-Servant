@@ -2,7 +2,7 @@ fastapi
 fastapi[all]
 uvicorn==0.30.1
 httpx==0.28.1
-pytest==8.3.4
+pytest==9.0.3
 pylint==3.3.3
 
 configparser==7.2.0
