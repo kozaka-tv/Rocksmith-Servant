@@ -131,8 +131,6 @@ class Servant:
         # pylint: disable=broad-exception-caught
         except Exception as e:
             log.error("Exception in manage_songs: %s", e)
-            self.fatal_error_event.set()  # Signal a fatal error to stop the program
-            raise SongLoaderError("A fatal error occurred in the manage_songs method.") from e
 
     def update_game_info_and_setlist(self):
         while not self.fatal_error_event.is_set():  # Periodically check if stop is requested
