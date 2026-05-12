@@ -28,6 +28,7 @@ HEARTBEAT = 5
 log = logging.getLogger()
 
 
+# pylint: disable=too-many-instance-attributes
 class SongLoader:
     def __init__(self, config_data: ConfigData, songs):
         self.enabled = config_data.song_loader.enabled
@@ -341,7 +342,7 @@ class SongLoader:
     def __no_file_found_in_db_for_this_song(songs_in_the_db):
         return is_collection_empty(songs_in_the_db)
 
-    def __find_existing_song_filenames_from_db_according_to_the_requests(self):
+    def __find_existing_song_filenames_from_db_according_to_the_requests(self):  # pylint: disable=too-many-locals
         playlist = self.rsplaylist.playlist
         for playlist_item in playlist:
             dlc_items_count = len(playlist_item.dlc_set)
