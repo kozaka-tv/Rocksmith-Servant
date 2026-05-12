@@ -264,8 +264,8 @@ class SongLoader:
         return 0
 
     @staticmethod
-    def __remove_missing_songs_from(songs_to_update: dict[str, SongData](), filenames):
-        removed = dict[str, SongData]()
+    def __remove_missing_songs_from(songs_to_update: dict[str, SongData], filenames: set[str]) -> dict[str, SongData]:
+        removed: dict[str, SongData] = {}
 
         missing = set(songs_to_update).difference(filenames)
 
@@ -273,8 +273,8 @@ class SongLoader:
             log.debug('Missing songs will be removed: %s', missing)
 
             for missing_song in missing:
-                pop = songs_to_update.pop(missing_song, None)
-                removed[pop.song_filename] = pop
+                song_data: SongData = songs_to_update.pop(missing_song)
+                removed[missing_song] = song_data
 
         return removed
 
