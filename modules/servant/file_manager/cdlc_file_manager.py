@@ -77,7 +77,7 @@ class FileManager:
         cdlc_files = file_utils.get_files_from_directory(TMP_DIR)
 
         if len(cdlc_files) > 0:
-            log.error('Found %s CDLC files in %s directory (they were probably not parsed before). Files: %s',
+            log.warning('Found %s CDLC files in %s directory (they were probably not parsed before). Files: %s',
                       len(cdlc_files), TMP_DIR, repr_in_multi_line(cdlc_files))
 
         return cdlc_files
