@@ -268,13 +268,17 @@ def test_get_method_error_handling(mock_logging, config_reader):
 
     # Capture the log output
     with patch('config.config_reader.log') as mock_log:
-        config_reader.get('RockSniffer', 'port', int)
+        result = config_reader.get('RockSniffer', 'port', int)
 
         # Verify that the error was logged
         mock_log.error.assert_called_with(
             'Error retrieving value from %s for section [%s] with key [%s].',
             config_reader.config_abspath, 'RockSniffer', 'port'
         )
+
+    # Verify that the invalid value was replaced with the default
+    assert result == 1234
+    assert config_reader.content.get('RockSniffer', 'port') == '1234'
 
 
 # Ensuring Configuration Directory Creation Test
