@@ -14,7 +14,7 @@ from modules.servant.song_loader.song_loader import SongLoader
 from modules.servant.tag_manager.tag_manager import TagManager
 from utils.cmd_line_parser import parse_args
 from utils.exceptions import RocksnifferConnectionError, RSPLNotLoggedInError, \
-    RSPLPlaylistIsNotEnabledError, ConfigError, SongLoaderError
+    RSPLPlaylistIsNotEnabledError, ConfigError
 from utils.project_dir_setter import set_project_directory
 from utils.rocksniffer import Rocksniffer
 
@@ -53,7 +53,7 @@ class Servant:
         self.file_manager = FileManager(config_data)
         self.songs = Songs()
         self.song_loader = SongLoader(config_data, self.songs)
-        self.tag_manager = TagManager(config_data, self.song_loader)
+        self.tag_manager = TagManager(config_data)
         self.scene_switcher = SceneSwitcher(config_data)
 
         check_modules_enabled(config_data)
