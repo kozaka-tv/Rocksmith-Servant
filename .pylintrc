@@ -3,7 +3,8 @@
 disable=
     missing-module-docstring,
     missing-class-docstring,
-    missing-function-docstring
+    missing-function-docstring,
+    too-few-public-methods
 
 # Analyse import fallback blocks. This can be used to support both Python 2 and
 # 3 compatible code, which means that the block might have code that exists
