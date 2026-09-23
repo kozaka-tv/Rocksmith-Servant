@@ -1,4 +1,5 @@
 import asyncio
+import os
 from contextlib import asynccontextmanager
 
 import uvicorn
@@ -50,13 +51,15 @@ async def say_hello(name: str):
 
 
 if __name__ == "__main__":
+    reload_enabled = os.getenv("UVICORN_RELOAD", "false").lower() == "true"
+
     try:
         uvicorn.run(
             "run:app",
             host="127.0.0.1",
             port=8000,
             log_level="debug",
-            reload=False,
+            reload=reload_enabled,
         )
     except KeyboardInterrupt:
         pass
