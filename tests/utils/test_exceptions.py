@@ -53,7 +53,8 @@ def test_config_error_details():
     error_msg = "Configuration error: {field}"
     details = {"field": "path"}
     exception = ConfigError(error_msg, **details)
-
+    assert str(exception) == "Configuration error: path"
+    assert exception.details == details
 
 def test_config_error_with_missing_kwarg():
     error_msg = "Configuration error in {field}: {detail}"
