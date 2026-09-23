@@ -1,4 +1,5 @@
 version: 1
+disable_existing_loggers: false
 formatters:
   logging:
     format: '[%(asctime)s] | %(levelname)s | %(processName)s:%(threadName)s:%(thread)s | [%(module)s::%(funcName)s:%(lineno)d] | %(message)s'
@@ -23,8 +24,8 @@ handlers:
     class: logging.StreamHandler
     level: INFO
     formatter: colorlog
-loggers:
-  '':
-    level: INFO
-    handlers: [ colour, file ]
-    propagate: yes
+root:
+  level: INFO
+  handlers:
+    - colour
+    - file

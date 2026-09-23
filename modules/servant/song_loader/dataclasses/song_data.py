@@ -6,7 +6,7 @@ from modules.servant.song_loader.dataclasses.artist_title import ArtistTitle
 
 
 @dataclass(slots=True)
-class SongData(object):
+class SongData:
     song_filename: Optional[str] = None
 
     artist_title: Optional[ArtistTitle] = None

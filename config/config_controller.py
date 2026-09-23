@@ -1,5 +1,4 @@
 import os
-import sys
 
 from config.config_data import ConfigData, ConfRockSniffer, ConfSetlistLogger, ConfSceneSwitcher, ConfSongLoader, \
     ConfFileManager, RSPLTagNames
@@ -48,22 +47,18 @@ ERR_MSG_RSPL_TAG = "Missing or undefined tag value of the tag '{}' in the config
 def load_config(config_file_path: str) -> ConfigData:
     conf = ConfigReader(config_file_path)
 
-    try:
-        conf_rocksniffer = __create_conf_rocksniffer(conf)
-        conf_setlist_logger = __create_conf_setlist_logger(conf)
-        conf_file_manager = __create_conf_file_manager(conf)
-        conf_song_loader = __create_conf_song_loader(conf)
-        conf_scene_switcher = __create_conf_scene_switcher(conf)
 
-        config_data = ConfigData(conf_rocksniffer,
-                                 conf_setlist_logger,
-                                 conf_file_manager,
-                                 conf_song_loader,
-                                 conf_scene_switcher)
+    conf_rocksniffer = __create_conf_rocksniffer(conf)
+    conf_setlist_logger = __create_conf_setlist_logger(conf)
+    conf_file_manager = __create_conf_file_manager(conf)
+    conf_song_loader = __create_conf_song_loader(conf)
+    conf_scene_switcher = __create_conf_scene_switcher(conf)
 
-    except ConfigError as e:
-        log.error(e)
-        sys.exit(1)
+    config_data = ConfigData(conf_rocksniffer,
+                             conf_setlist_logger,
+                             conf_file_manager,
+                             conf_song_loader,
+                             conf_scene_switcher)
 
     return config_data
 
@@ -115,21 +110,41 @@ def __fetch_tags(conf, tag_names):
 
 def __create_conf_song_loader(conf):
     enabled = conf.get_bool(SECTION_SONG_LOADER, KEY_ENABLED)
+
+    # Disabled modules should not require configuration or API validation.
+    if not enabled:
+        return ConfSongLoader(
+            enabled=False,
+            twitch_channel="",
+            phpsessid="",
+            rspl_tags=RSPLTagNames("", "", "", "", "", ""),
+            cdlc_archive_dir="",
+            destination_dir="",
+            rocksmith_cdlc_dir="",
+            allow_load_when_in_game=False
+        )
+
     twitch_channel = conf.get(SECTION_SONG_LOADER, "twitch_channel")
     phpsessid = __validate_and_get_phpsessid(conf, twitch_channel)
     rspl_tags = __create_rspl_tags(conf)
     cdlc_archive_dir = conf.get(SECTION_SONG_LOADER, "cdlc_archive_dir")
     destination_dir = conf.get(SECTION_FILE_MANAGER, "destination_dir")
     rocksmith_cdlc_dir = conf.get(SECTION_SONG_LOADER, "rocksmith_cdlc_dir")
-    allow_load_when_in_game = conf.get_bool(SECTION_SONG_LOADER, "allow_load_when_in_game")
-    return ConfSongLoader(enabled,
-                          twitch_channel,
-                          phpsessid,
-                          rspl_tags,
-                          cdlc_archive_dir,
-                          destination_dir,
-                          rocksmith_cdlc_dir,
-                          allow_load_when_in_game)
+    allow_load_when_in_game = conf.get_bool(
+        SECTION_SONG_LOADER,
+        "allow_load_when_in_game"
+    )
+
+    return ConfSongLoader(
+        enabled,
+        twitch_channel,
+        phpsessid,
+        rspl_tags,
+        cdlc_archive_dir,
+        destination_dir,
+        rocksmith_cdlc_dir,
+        allow_load_when_in_game
+    )
 
 
 def __create_conf_scene_switcher(conf):
@@ -146,8 +161,14 @@ def __validate_and_get_phpsessid(conf, twitch_channel):
 
     for phpsessid in phpsessid_set:
         viewers = get_viewers(twitch_channel, phpsessid)
+
         if viewers.get("result") != "Error":
             return phpsessid
+
+        log.warning(
+            "RS Playlist API error: %s",
+            viewers.get("message", "Unknown error")
+        )
 
     raise ConfigError(ERR_MSG_PHPSESSID)
 

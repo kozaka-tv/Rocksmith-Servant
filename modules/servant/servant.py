@@ -1,11 +1,8 @@
 import asyncio
 import logging
 import os
-import sys
 import threading
-from time import sleep
 
-import config.log_config
 from config import config_controller
 from config.config_data_helper import check_modules_enabled
 from modules.servant.database.db_manager import DBManager
@@ -17,7 +14,7 @@ from modules.servant.song_loader.song_loader import SongLoader
 from modules.servant.tag_manager.tag_manager import TagManager
 from utils.cmd_line_parser import parse_args
 from utils.exceptions import RocksnifferConnectionError, RSPLNotLoggedInError, \
-    RSPLPlaylistIsNotEnabledError, ConfigError, SongLoaderError
+    RSPLPlaylistIsNotEnabledError, ConfigError
 from utils.project_dir_setter import set_project_directory
 from utils.rocksniffer import Rocksniffer
 
@@ -35,17 +32,18 @@ class Servant:
         log.warning("----- SERVANT IS STARTING ----------------------------------------------")
         log.warning("------------------------------------------------------------------------")
 
+        # Separate stop signals for worker threads and the async Servant task
         self.fatal_error_event = threading.Event()  # Shared Event to signal fatal errors
+        self.async_stop_event = asyncio.Event()
 
         set_project_directory()
 
         try:
             self.config_file_path, self.db_file_path = parse_args()
-        except ValueError as e:
-            log.error("Incorrect command line parameter! Error: %s", e)
-            sys.exit(1)
-
-        config.log_config.config()
+        except ValueError as exc:
+            raise ConfigError(
+                f"Incorrect command line parameter: {exc}"
+            ) from exc
 
         config_data = config_controller.load_config(self.config_file_path)
 
@@ -55,14 +53,15 @@ class Servant:
         self.file_manager = FileManager(config_data)
         self.songs = Songs()
         self.song_loader = SongLoader(config_data, self.songs)
-        self.tag_manager = TagManager(config_data, self.song_loader)
+        self.tag_manager = TagManager(config_data)
         self.scene_switcher = SceneSwitcher(config_data)
 
-        try:
-            check_modules_enabled(config_data)
-        except ConfigError as e:
-            log.error("Incorrect configuration! Error: %s", e)
-            sys.exit(1)
+        check_modules_enabled(config_data)
+
+    def stop(self):
+        log.warning("Stopping Servant...")
+        self.fatal_error_event.set()
+        self.async_stop_event.set()
 
     def get_debug_message(self):
         modules_str = "--- Enabled modules ---" + os.linesep
@@ -122,7 +121,8 @@ class Servant:
                 try:
                     self.file_manager.run()
                     self.song_loader.run()
-                    sleep(HEARTBEAT_MANAGE_SONGS)
+                    # Allow shutdown to interrupt the heartbeat delay
+                    self.fatal_error_event.wait(HEARTBEAT_MANAGE_SONGS)
 
                 # Catch and log all known exceptions, but keep app alive.
                 except (RSPLNotLoggedInError, RSPLPlaylistIsNotEnabledError) as ex:
@@ -137,7 +137,9 @@ class Servant:
             try:
                 self.update_game_information()
                 self.put_the_song_into_the_setlist()
-                sleep(HEARTBEAT_UPDATE_GAME_INFO_AND_SETLIST)
+                self.fatal_error_event.wait(
+                    HEARTBEAT_UPDATE_GAME_INFO_AND_SETLIST
+                )
 
             # Catch all unchecked Exceptions, but keep app alive.
             # pylint: disable=broad-exception-caught
@@ -145,26 +147,43 @@ class Servant:
                 log.exception(ex)
 
     async def run(self):
+        manage_songs_thread = threading.Thread(
+            target=self.manage_songs,
+            args=(self.db_file_path,),
+            name="manage-songs",
+        )
 
-        manage_songs_thread = threading.Thread(target=self.manage_songs, args=(self.db_file_path,))
-        manage_songs_thread.daemon = True
+        update_game_info_and_setlist_thread = threading.Thread(
+            target=self.update_game_info_and_setlist,
+            name="game-info",
+        )
+
         manage_songs_thread.start()
-
-        update_game_info_and_setlist_thread = threading.Thread(target=self.update_game_info_and_setlist)
-        update_game_info_and_setlist_thread.daemon = True
         update_game_info_and_setlist_thread.start()
 
-        # Main thread logic
         try:
-            while not self.fatal_error_event.is_set():
-                log.debug("...still alive!")
-                await asyncio.sleep(5)
-        except KeyboardInterrupt:
-            log.warning("Shutting down due to user interrupt...")
-            self.fatal_error_event.set()  # Signal all threads to stop
-            sys.exit(0)
+            await self.async_stop_event.wait()
 
-        log.debug("Thread manage_songs_thread alive: %s", manage_songs_thread.is_alive())
-        log.debug("Thread update_game_info_and_setlist alive: %s", update_game_info_and_setlist_thread.is_alive())
+        finally:
+            # Signal all workers and wait for them to finish before exiting
+            self.fatal_error_event.set()
 
-        log.warning("Bye! See you soon! And the rock should be with you...")
+            for thread in (
+                manage_songs_thread,
+                update_game_info_and_setlist_thread,
+            ):
+                log.info("Waiting for %s to stop...", thread.name)
+
+                await asyncio.to_thread(thread.join, timeout=5)
+
+                if thread.is_alive():
+                    log.warning(
+                        "Worker %s did not stop within 5 seconds!",
+                        thread.name,
+                    )
+                else:
+                    log.info("Worker %s stopped.", thread.name)
+
+            log.warning(
+                "Bye! See you soon! And the rock should be with you..."
+            )
