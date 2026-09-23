@@ -42,9 +42,10 @@ class Servant:
 
         try:
             self.config_file_path, self.db_file_path = parse_args()
-        except ValueError as e:
-            log.error("Incorrect command line parameter! Error: %s", e)
-            sys.exit(1)
+        except ValueError as exc:
+            raise ConfigError(
+                f"Incorrect command line parameter: {exc}"
+            ) from exc
 
         config.log_config.config()
 
@@ -59,11 +60,7 @@ class Servant:
         self.tag_manager = TagManager(config_data, self.song_loader)
         self.scene_switcher = SceneSwitcher(config_data)
 
-        try:
-            check_modules_enabled(config_data)
-        except ConfigError as e:
-            log.error("Incorrect configuration! Error: %s", e)
-            sys.exit(1)
+        check_modules_enabled(config_data)
 
     def stop(self):
         log.warning("Stopping Servant...")

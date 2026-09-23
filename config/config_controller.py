@@ -1,5 +1,4 @@
 import os
-import sys
 
 from config.config_data import ConfigData, ConfRockSniffer, ConfSetlistLogger, ConfSceneSwitcher, ConfSongLoader, \
     ConfFileManager, RSPLTagNames
@@ -48,22 +47,18 @@ ERR_MSG_RSPL_TAG = "Missing or undefined tag value of the tag '{}' in the config
 def load_config(config_file_path: str) -> ConfigData:
     conf = ConfigReader(config_file_path)
 
-    try:
-        conf_rocksniffer = __create_conf_rocksniffer(conf)
-        conf_setlist_logger = __create_conf_setlist_logger(conf)
-        conf_file_manager = __create_conf_file_manager(conf)
-        conf_song_loader = __create_conf_song_loader(conf)
-        conf_scene_switcher = __create_conf_scene_switcher(conf)
 
-        config_data = ConfigData(conf_rocksniffer,
-                                 conf_setlist_logger,
-                                 conf_file_manager,
-                                 conf_song_loader,
-                                 conf_scene_switcher)
+    conf_rocksniffer = __create_conf_rocksniffer(conf)
+    conf_setlist_logger = __create_conf_setlist_logger(conf)
+    conf_file_manager = __create_conf_file_manager(conf)
+    conf_song_loader = __create_conf_song_loader(conf)
+    conf_scene_switcher = __create_conf_scene_switcher(conf)
 
-    except ConfigError as e:
-        log.error(e)
-        sys.exit(1)
+    config_data = ConfigData(conf_rocksniffer,
+                             conf_setlist_logger,
+                             conf_file_manager,
+                             conf_song_loader,
+                             conf_scene_switcher)
 
     return config_data
 
@@ -165,8 +160,14 @@ def __validate_and_get_phpsessid(conf, twitch_channel):
 
     for phpsessid in phpsessid_set:
         viewers = get_viewers(twitch_channel, phpsessid)
+
         if viewers.get("result") != "Error":
             return phpsessid
+
+        log.warning(
+            "RS Playlist API error: %s",
+            viewers.get("message", "Unknown error")
+        )
 
     raise ConfigError(ERR_MSG_PHPSESSID)
 

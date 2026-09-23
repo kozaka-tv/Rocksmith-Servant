@@ -9,17 +9,31 @@ from common.enums import Tags
 from modules.api import users_api_example
 from modules.servant.servant import Servant
 
+import logging
+
+from utils.exceptions import ConfigError
+
+log = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def start_servant_app(fast_api: FastAPI):
-    servant = Servant()
+    try:
+        servant = Servant()
+    except ConfigError as exc:
+        log.error("Application startup failed: %s", exc)
+        raise
+    except Exception:
+        log.exception("Unexpected error during application startup!")
+        raise
+
     servant_task = asyncio.create_task(servant.run())
 
-    yield
-
-    print("Shutting app server down...")
-    servant.stop()
-    await servant_task
+    try:
+        yield
+    finally:
+        log.info("Shutting down application...")
+        servant.stop()
+        await servant_task
 
 tags_metadata = [
     {"name": Tags.USERS, "description": "Some user endpoint examples...fake as f"},
