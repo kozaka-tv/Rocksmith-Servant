@@ -21,5 +21,15 @@ jobs:
           pip install pylint
       - name: Analysing the code with pylint
         run: |
-          pylint $(git ls-files '*.py') \
-            --disable=too-few-public-methods
+          # Main application
+          PYTHONPATH=. pylint $(git ls-files '*.py' \
+              ':!:services/config_service/**' \
+              ':!:services/microservice1/**')
+
+          # Config service
+          PYTHONPATH=services/config_service \
+              pylint services/config_service/app
+
+          # Microservice 1
+          PYTHONPATH=services/microservice1 \
+              pylint services/microservice1/app
