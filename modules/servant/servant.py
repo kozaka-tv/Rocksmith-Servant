@@ -1,11 +1,8 @@
 import asyncio
 import logging
 import os
-import sys
 import threading
-from time import sleep
 
-import config.log_config
 from config import config_controller
 from config.config_data_helper import check_modules_enabled
 from modules.servant.database.db_manager import DBManager
@@ -35,6 +32,7 @@ class Servant:
         log.warning("----- SERVANT IS STARTING ----------------------------------------------")
         log.warning("------------------------------------------------------------------------")
 
+        # Separate stop signals for worker threads and the async Servant task
         self.fatal_error_event = threading.Event()  # Shared Event to signal fatal errors
         self.async_stop_event = asyncio.Event()
 
@@ -46,8 +44,6 @@ class Servant:
             raise ConfigError(
                 f"Incorrect command line parameter: {exc}"
             ) from exc
-
-        config.log_config.config()
 
         config_data = config_controller.load_config(self.config_file_path)
 
@@ -125,6 +121,7 @@ class Servant:
                 try:
                     self.file_manager.run()
                     self.song_loader.run()
+                    # Allow shutdown to interrupt the heartbeat delay
                     self.fatal_error_event.wait(HEARTBEAT_MANAGE_SONGS)
 
                 # Catch and log all known exceptions, but keep app alive.
@@ -168,6 +165,7 @@ class Servant:
             await self.async_stop_event.wait()
 
         finally:
+            # Signal all workers and wait for them to finish before exiting
             self.fatal_error_event.set()
 
             for thread in (

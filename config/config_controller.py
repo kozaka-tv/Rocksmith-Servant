@@ -111,6 +111,7 @@ def __fetch_tags(conf, tag_names):
 def __create_conf_song_loader(conf):
     enabled = conf.get_bool(SECTION_SONG_LOADER, KEY_ENABLED)
 
+    # Disabled modules should not require configuration or API validation.
     if not enabled:
         return ConfSongLoader(
             enabled=False,

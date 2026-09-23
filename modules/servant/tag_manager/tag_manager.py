@@ -16,6 +16,7 @@ class TagManager:
         self.user_tags = {}
         self.server_tags = {}
 
+        # Avoid unnecessary RS Playlist API calls when SongLoader is disabled
         if not config_data.song_loader.enabled:
             return
 
