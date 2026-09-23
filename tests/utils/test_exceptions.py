@@ -23,15 +23,16 @@ def test_checked_exception_details():
 def test_checked_exception_with_missing_kwarg():
     error_msg = "Error occurred: {reason}, code: {code}"
     details = {"reason": "Timeout"}
+
     with pytest.raises(KeyError):
-        CheckedException(error_msg, **details)
+        CheckedException(error_msg, **details) # pylint: disable=pointless-exception-statement
 
 
 def test_checked_exception_with_empty_details():
     error_msg = "A generic error occurred without additional details."
     exception = CheckedException(error_msg)
     assert str(exception) == error_msg
-    assert exception.details == {}
+    assert exception.details == {} # pylint: disable=use-implicit-booleaness-not-comparison
 
 
 def test_config_error_message_formatting():
@@ -59,15 +60,16 @@ def test_config_error_details():
 def test_config_error_with_missing_kwarg():
     error_msg = "Configuration error in {field}: {detail}"
     details = {"field": "port"}
+
     with pytest.raises(KeyError):
-        ConfigError(error_msg, **details)
+        ConfigError(error_msg, **details) # pylint: disable=pointless-exception-statement
 
 
 def test_config_error_with_empty_details():
     error_msg = "A generic error occurred without additional details"
     exception = ConfigError(error_msg)
     assert str(exception) == error_msg
-    assert exception.details == {}
+    assert exception.details == {} # pylint: disable=use-implicit-booleaness-not-comparison
 
 
 def test_config_error():
