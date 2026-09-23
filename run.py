@@ -11,12 +11,14 @@ from modules.servant.servant import Servant
 
 @asynccontextmanager
 async def start_servant_app(fast_api: FastAPI):
-    # noinspection PyAsyncCall
-    asyncio.create_task(Servant().run())
+    servant = Servant()
+    servant_task = asyncio.create_task(servant.run())
 
     yield
-    print('Shutting app server down...')
 
+    print("Shutting app server down...")
+    servant.stop()
+    await servant_task
 
 tags_metadata = [
     {"name": Tags.USERS, "description": "Some user endpoint examples...fake as f"},
@@ -48,10 +50,13 @@ async def say_hello(name: str):
 
 
 if __name__ == "__main__":
-    uvicorn.run(
-        "run:app",
-        host="127.0.0.1",
-        port=8000,
-        log_level="debug",
-        reload=True,
-    )
+    try:
+        uvicorn.run(
+            "run:app",
+            host="127.0.0.1",
+            port=8000,
+            log_level="debug",
+            reload=False,
+        )
+    except KeyboardInterrupt:
+        pass

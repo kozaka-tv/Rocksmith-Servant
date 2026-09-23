@@ -115,21 +115,40 @@ def __fetch_tags(conf, tag_names):
 
 def __create_conf_song_loader(conf):
     enabled = conf.get_bool(SECTION_SONG_LOADER, KEY_ENABLED)
+
+    if not enabled:
+        return ConfSongLoader(
+            enabled=False,
+            twitch_channel="",
+            phpsessid="",
+            rspl_tags=RSPLTagNames("", "", "", "", "", ""),
+            cdlc_archive_dir="",
+            destination_dir="",
+            rocksmith_cdlc_dir="",
+            allow_load_when_in_game=False
+        )
+
     twitch_channel = conf.get(SECTION_SONG_LOADER, "twitch_channel")
     phpsessid = __validate_and_get_phpsessid(conf, twitch_channel)
     rspl_tags = __create_rspl_tags(conf)
     cdlc_archive_dir = conf.get(SECTION_SONG_LOADER, "cdlc_archive_dir")
     destination_dir = conf.get(SECTION_FILE_MANAGER, "destination_dir")
     rocksmith_cdlc_dir = conf.get(SECTION_SONG_LOADER, "rocksmith_cdlc_dir")
-    allow_load_when_in_game = conf.get_bool(SECTION_SONG_LOADER, "allow_load_when_in_game")
-    return ConfSongLoader(enabled,
-                          twitch_channel,
-                          phpsessid,
-                          rspl_tags,
-                          cdlc_archive_dir,
-                          destination_dir,
-                          rocksmith_cdlc_dir,
-                          allow_load_when_in_game)
+    allow_load_when_in_game = conf.get_bool(
+        SECTION_SONG_LOADER,
+        "allow_load_when_in_game"
+    )
+
+    return ConfSongLoader(
+        enabled,
+        twitch_channel,
+        phpsessid,
+        rspl_tags,
+        cdlc_archive_dir,
+        destination_dir,
+        rocksmith_cdlc_dir,
+        allow_load_when_in_game
+    )
 
 
 def __create_conf_scene_switcher(conf):

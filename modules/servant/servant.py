@@ -64,6 +64,10 @@ class Servant:
             log.error("Incorrect configuration! Error: %s", e)
             sys.exit(1)
 
+    def stop(self):
+        log.warning("Stopping Servant...")
+        self.fatal_error_event.set()
+
     def get_debug_message(self):
         modules_str = "--- Enabled modules ---" + os.linesep
         if self.sniffer.enabled:

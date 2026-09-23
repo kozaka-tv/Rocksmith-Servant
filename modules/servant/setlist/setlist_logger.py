@@ -60,8 +60,9 @@ class SetlistLogger:
         try:
             with open(self.file_name, 'a', encoding="utf-8") as file:
                 file.write(string + '\n')
-        except OSError:
-            pass
+        except Exception as exc:
+            log.exception("Could not write to setlist file: %s", exc)
+            raise
 
         return str(string)
 

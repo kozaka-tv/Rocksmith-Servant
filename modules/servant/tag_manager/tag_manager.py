@@ -12,9 +12,13 @@ log = logging.getLogger()
 
 class TagManager:
     def __init__(self, config_data: ConfigData, song_loader: SongLoader):
-        # TODO
-        # TODO
-        # TODO
+        self.all_tags = {}
+        self.user_tags = {}
+        self.server_tags = {}
+
+        if not config_data.song_loader.enabled:
+            return
+
         rsplaylist = self.get_rsplaylist(config_data)
         self.all_tags = self.__fetch_all_tags(rsplaylist)
         self.user_tags = self.__fetch_user_tags(rsplaylist)
