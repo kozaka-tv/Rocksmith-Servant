@@ -22,14 +22,14 @@ jobs:
       - name: Analysing the code with pylint
         run: |
           # Main application
-          PYTHONPATH=. pylint $(git ls-files '*.py' \
+          PYTHONPATH=. pylint --persistent=n $(git ls-files '*.py' \
               ':!:services/config_service/**' \
               ':!:services/microservice1/**')
-
+      
           # Config service
           PYTHONPATH=services/config_service \
-              pylint services/config_service/app
-
+              pylint --persistent=n services/config_service/app
+      
           # Microservice 1
           PYTHONPATH=services/microservice1 \
-              pylint services/microservice1/app
+              pylint --persistent=n services/microservice1/app
