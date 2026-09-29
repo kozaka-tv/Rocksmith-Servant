@@ -3,17 +3,17 @@ import time
 
 import requests
 
-session = None
+SESSION = None
 
 
 def set_global_session():
-    global session
-    if not session:
-        session = requests.Session()
+    global SESSION
+    if not SESSION:
+        SESSION = requests.Session()
 
 
 def download_site(url):
-    with session.get(url) as response:
+    with SESSION.get(url) as response:
         name = multiprocessing.current_process().name
         print(f"{name}:Read {len(response.content)} from {url}")
 
@@ -24,11 +24,11 @@ def download_all_sites(sites):
 
 
 if __name__ == "__main__":
-    sites = [
+    sites_to_download = [
                 "https://www.jython.org",
                 "http://olympus.realpython.org/dice",
             ] * 200
     start_time = time.time()
-    download_all_sites(sites)
+    download_all_sites(sites_to_download)
     duration = time.time() - start_time
-    print(f"Downloaded {len(sites)} in {duration} seconds")
+    print(f"Downloaded {len(sites_to_download)} in {duration} seconds")

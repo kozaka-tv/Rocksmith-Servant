@@ -1,31 +1,33 @@
-colorama==0.4.5
-setuptools==78.1.1
-requests==2.32.4
-munch==4.0.0
-deepdiff==7.0.1
-colorlog==6.8.2
-pyyaml==6.0.1
-wheel==0.43.0
-twine==5.1.0
-ordered-set==4.1.0
-zstandard==0.22.0
-pycryptodome==3.20.0
+colorama
+setuptools
+requests
+munch
 
-fastapi~=0.115.12
-fastapi[all]
-dacite==1.8.1
-uvicorn==0.30.1
-starlette==0.41.3
-httpx==0.28.1
+deepdiff>=8.6,<9
+colorlog>=6.10,<7
+pyyaml>=6.0.3,<7
+wheel>=0.45,<1
+twine>=6.2,<7
+ordered-set>=4.1,<5
+zstandard>=0.25,<1
+pycryptodome>=3.23,<4
 
-pytest==8.3.4
-pylint==3.3.3
+# Web / API
+fastapi[all]>=0.142,<1
+dacite>=1.9,<2
+uvicorn>=0.35,<1
+httpx>=0.28,<1
+httpx2
+pydantic>=2.12,<3
 
+# Testing / development
+pytest>=8.4,<10
+pylint>=3.3,<5
+
+# Utilities
 fuzzywuzzy==0.18.0
-watchdog==4.0.1
+watchdog>=6,<7
+configparser>=7.2,<8
 
-
-configparser~=7.2.0
-pydantic~=2.10.4
-
-twitchio~=3.0.1
+# Twitch
+twitchio>=3.0,<4
