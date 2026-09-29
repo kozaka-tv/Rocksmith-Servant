@@ -4,17 +4,21 @@ from dacite import from_dict
 
 from config.config_data import ConfigData
 from modules.servant.song_loader.dataclasses.rs_playlist_data import RsPlaylist
-from modules.servant.song_loader.song_loader import SongLoader
 from utils.rs_playlist_util import get_playlist
 
 log = logging.getLogger()
 
 
 class TagManager:
-    def __init__(self, config_data: ConfigData, song_loader: SongLoader):
-        # TODO
-        # TODO
-        # TODO
+    def __init__(self, config_data: ConfigData):
+        self.all_tags = {}
+        self.user_tags = {}
+        self.server_tags = {}
+
+        # Avoid unnecessary RS Playlist API calls when SongLoader is disabled
+        if not config_data.song_loader.enabled:
+            return
+
         rsplaylist = self.get_rsplaylist(config_data)
         self.all_tags = self.__fetch_all_tags(rsplaylist)
         self.user_tags = self.__fetch_user_tags(rsplaylist)

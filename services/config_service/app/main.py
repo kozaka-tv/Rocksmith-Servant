@@ -1,7 +1,7 @@
 import configparser
 import os
 
-from app.routers.config import config as config
+from app.routers.config import router as config_router
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -18,11 +18,10 @@ app.add_middleware(
 )
 
 # Include a router for your REST endpoints
-app.include_router(config)
+app.include_router(config_router)
 
 # Constants
 CONFIG_FILE_PATH = "../../../config.ini"
-
 
 # Helper: Read config.ini file
 def read_config():
@@ -80,5 +79,3 @@ def update_config(update: ConfigUpdate):
 @app.get("/")
 def read_root():
     return {"message": "Welcome to config service!"}
-
-

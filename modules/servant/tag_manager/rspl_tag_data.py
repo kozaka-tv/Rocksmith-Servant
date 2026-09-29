@@ -18,4 +18,3 @@ class RSPLTags:
     tag_new_viewer_request: RSPLTag
     tag_raider_request: RSPLTag
     tag_vip_viewer_request: RSPLTag
-
