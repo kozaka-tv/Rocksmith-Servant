@@ -30,45 +30,49 @@ log = logging.getLogger()
 
 class SongLoader:
     def __init__(self, config_data: ConfigData, songs):
-        self.enabled = config_data.song_loader.enabled
-        if self.enabled:
-            self.twitch_channel = config_data.song_loader.twitch_channel
-            self.phpsessid = config_data.song_loader.phpsessid
+        self.enabled = False
+        self.twitch_channel = None
+        self.phpsessid = None
 
-            self.rsplaylist = None
-            self.rsplaylist_json = None
-            self.rsplaylist_updated = True
-            # TODO Shouldn't we activate the tag manager here and load it? Or just set it to none?
-            self.rspl_tags = config_data.song_loader.rspl_tags
+        self.rsplaylist = None
+        self.rsplaylist_json = None
+        self.rsplaylist_updated = True
+        self.rspl_tags = None
+        self.rsplaylist_request_strings = set()
 
-            self.rsplaylist_request_strings = set()
+        self.cdlc_archive_dir = None
+        self.destination_dir = None
+        self.download_dirs = []
+        self.rocksmith_cdlc_dir = None
+        self.allow_load_when_in_game = False
 
-            self.cdlc_archive_dir = check_cdlc_archive_dir(config_data.song_loader.cdlc_archive_dir)
-            self.destination_dir = config_data.song_loader.destination_dir
-            self.download_dirs = config_data.file_manager.download_dirs
-            self.rocksmith_cdlc_dir = check_rocksmith_cdlc_dir(config_data.song_loader.rocksmith_cdlc_dir)
-            self.allow_load_when_in_game = config_data.song_loader.allow_load_when_in_game
+        self.db_manager = None
+        self.songs = songs
+        self.last_run = None
 
-            self.__create_directories()
-
-            self.db_manager = None
-            self.songs = songs
-
-            self.last_run = None
+        self.update_config(config_data)
 
     def set_db_manager(self, db_manager: DBManager):
         self.db_manager = db_manager
 
-    def update_config(self, config_data):
-        self.enabled = config_data.song_loader.enabled
-        self.rspl_tags = config_data.song_loader.rspl_tags
-        self.cdlc_archive_dir = check_cdlc_archive_dir(config_data.song_loader.cdlc_archive_dir)
-        self.destination_dir = config_data.song_loader.destination_dir
-        self.rocksmith_cdlc_dir = check_rocksmith_cdlc_dir(config_data.song_loader.rocksmith_cdlc_dir)
-        self.allow_load_when_in_game = config_data.song_loader.allow_load_when_in_game
-        self.phpsessid = config_data.song_loader.phpsessid
+    def update_config(self, config_data: ConfigData):
+        song_loader_config = config_data.song_loader
 
-        self.__create_directories()
+        self.enabled = song_loader_config.enabled
+        self.twitch_channel = song_loader_config.twitch_channel
+        self.phpsessid = song_loader_config.phpsessid
+        # TODO Shouldn't we activate the tag manager here and load it? Or just set it to none?
+        self.rspl_tags = song_loader_config.rspl_tags
+
+        self.cdlc_archive_dir = check_cdlc_archive_dir(song_loader_config.cdlc_archive_dir)
+        self.destination_dir = song_loader_config.destination_dir
+        self.rocksmith_cdlc_dir = check_rocksmith_cdlc_dir(song_loader_config.rocksmith_cdlc_dir)
+        self.allow_load_when_in_game = song_loader_config.allow_load_when_in_game
+
+        self.download_dirs = config_data.file_manager.download_dirs
+
+        if self.enabled:
+            self.__create_directories()
 
     def __create_directories(self):
         try:
@@ -260,8 +264,8 @@ class SongLoader:
         return 0
 
     @staticmethod
-    def __remove_missing_songs_from(songs_to_update: dict[str, SongData](), filenames):
-        removed = dict[str, SongData]()
+    def __remove_missing_songs_from(songs_to_update: dict[str, SongData], filenames: set[str]) -> dict[str, SongData]:
+        removed: dict[str, SongData] = {}
 
         missing = set(songs_to_update).difference(filenames)
 
@@ -269,8 +273,8 @@ class SongLoader:
             log.debug('Missing songs will be removed: %s', missing)
 
             for missing_song in missing:
-                pop = songs_to_update.pop(missing_song, None)
-                removed[pop.song_filename] = pop
+                song_data: SongData = songs_to_update.pop(missing_song)
+                removed[missing_song] = song_data
 
         return removed
 

@@ -128,6 +128,7 @@ class Servant:
                 except (RSPLNotLoggedInError, RSPLPlaylistIsNotEnabledError) as ex:
                     log.error(ex)
 
+        # Catch and log all exceptions to keep app alive.
         # pylint: disable=broad-exception-caught
         except Exception as e:
             log.error("Exception in manage_songs: %s", e)

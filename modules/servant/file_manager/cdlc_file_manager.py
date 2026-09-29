@@ -17,19 +17,25 @@ class FileManager:
         """
         File manager to manage CDLC files
         """
-        self.enabled = config_data.file_manager.enabled
-        if self.enabled:
-            self.last_run = datetime.datetime.now()
-            self.last_run_not_parsed = self.last_run
-            self.download_dirs: set = config_data.file_manager.download_dirs
-            self.destination_dir = config_data.file_manager.destination_dir
-            self.using_cfsm = config_data.file_manager.using_cfsm
+        now = datetime.datetime.now()
+
+        self.enabled = False
+        self.last_run = now
+        self.last_run_not_parsed = now
+
+        self.download_dirs: set[str] = set()
+        self.destination_dir = None
+        self.using_cfsm = False
+
+        self.update_config(config_data)
 
     def update_config(self, config_data):
-        self.enabled = config_data.file_manager.enabled
-        self.download_dirs = config_data.file_manager.download_dirs
-        self.destination_dir = config_data.file_manager.destination_dir
-        self.using_cfsm = config_data.file_manager.using_cfsm
+        file_manager_config = config_data.file_manager
+
+        self.enabled = file_manager_config.enabled
+        self.download_dirs = file_manager_config.download_dirs
+        self.destination_dir = file_manager_config.destination_dir
+        self.using_cfsm = file_manager_config.using_cfsm
 
     def run(self):
         if self.enabled:
@@ -44,15 +50,16 @@ class FileManager:
 
     def __move_non_parsed_files_to_tmp_dir(self):
         log.debug("Scan and move files which were not parsed by CFSM.")
+
         moved = self.__move_not_parsed_files_to_tmp()
         if moved:
             log.debug("Found non parsed files which were now moved... ")
-            self.last_run = datetime.datetime.now()
-            self.last_run_not_parsed = self.last_run
         else:
             log.debug("Nothing moved... ")
-            self.last_run = datetime.datetime.now()
-            self.last_run_not_parsed = self.last_run
+
+        now = datetime.datetime.now()
+        self.last_run = now
+        self.last_run_not_parsed = now
 
     def __beat_last_run(self):
         return math.floor((datetime.datetime.now() - self.last_run).seconds) >= HEARTBEAT
@@ -105,5 +112,5 @@ class FileManager:
         return file_utils.get_not_parsed_files_from_directory(self.destination_dir)
 
     def __move_files_to_destination_dir(self, files):
-        if files and len(files) > 0:
+        if files:
             file_utils.move_files_to(self.destination_dir, files)
