@@ -13,10 +13,11 @@ zstandard>=0.25,<1
 pycryptodome>=3.23,<4
 
 # Web / API
-fastapi[all]>=0.118,<1
+fastapi[all]>=0.142,<1
 dacite>=1.9,<2
 uvicorn>=0.35,<1
 httpx>=0.28,<1
+httpx2
 pydantic>=2.12,<3
 
 # Testing / development
