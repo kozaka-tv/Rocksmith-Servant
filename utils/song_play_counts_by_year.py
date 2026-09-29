@@ -52,25 +52,27 @@ for filename in os.listdir(SETLIST_DIR):
                         year_artist_counts[year][artist] += 1
 
 # Write summarized data to separate files for each year
-for year in year_song_counts.keys():
+for year, song_counts in year_song_counts.items():
+    artist_counts = year_artist_counts[year]
+
     # Set the output file name for the current year
     output_file = os.path.join(OUTPUT_DIR, f"song_count_{year}.txt")
 
     # Calculate the total number of songs played and distinct songs played in the year
-    total_songs_played = sum(year_song_counts[year].values())
-    distinct_songs_count = len(year_song_counts[year])
+    total_songs_played = sum(song_counts.values())
+    distinct_songs_count = len(song_counts)
 
     # Calculate the total number of songs played (from artist counts) and distinct artists
-    artist_total_songs = sum(year_artist_counts[year].values())
-    distinct_artist_count = len(year_artist_counts[year])
+    artist_total_songs = sum(artist_counts.values())
+    distinct_artist_count = len(artist_counts)
 
     # Get the top 10 songs played in the year
-    top_10_songs = sorted(year_song_counts[year].items(), key=lambda x: x[1], reverse=True)[:10]
+    top_10_songs = sorted(song_counts.items(), key=lambda x: x[1], reverse=True)[:10]
 
     # Determine the dynamic width for the count columns
     max_count_top_10 = max((count for _, count in top_10_songs), default=1)
-    max_count_artist = max((count for _, count in year_artist_counts[year].items()), default=1)
-    max_count_song = max((count for _, count in year_song_counts[year].items()), default=1)
+    max_count_artist = max((count for _, count in artist_counts.items()), default=1)
+    max_count_song = max((count for _, count in song_counts.items()), default=1)
 
     WIDTH_TOP_10 = len(str(max_count_top_10))
     WIDTH_ARTIST = len(str(max_count_artist))
@@ -92,7 +94,7 @@ for year in year_song_counts.keys():
         f.write(f"Distinct artists appeared: {distinct_artist_count}\n")
         f.write(f"{'Count'.ljust(WIDTH_ARTIST)} | Artist\n")
         f.write(f"{'-' * (WIDTH_ARTIST + 20)}\n")
-        for artist, count in sorted(year_artist_counts[year].items(), key=lambda x: x[1], reverse=True):
+        for artist, count in sorted(artist_counts.items(), key=lambda x: x[1], reverse=True):
             f.write(f"{str(count).rjust(WIDTH_ARTIST)} | {artist}\n")  # Right-align based on width
         f.write("\n")  # Add a newline before the next section
 
@@ -101,7 +103,7 @@ for year in year_song_counts.keys():
         f.write(f"Distinct songs played: {distinct_songs_count}\n")
         f.write(f"{'Count'.ljust(WIDTH_SONG)} | Artist - Song\n")
         f.write(f"{'-' * (WIDTH_SONG + 20)}\n")
-        for song, count in sorted(year_song_counts[year].items(), key=lambda x: x[1], reverse=True):
+        for song, count in sorted(song_counts.items(), key=lambda x: x[1], reverse=True):
             f.write(f"{str(count).rjust(WIDTH_SONG)} | {song}\n")  # Right-align based on width
         f.write("\n")  # Add a newline at the end
 

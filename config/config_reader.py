@@ -150,7 +150,8 @@ class ConfigReader:
 
             # Else we cast it
             return cast(self.content[section][key])
-        except:
+
+        except (KeyError, ValueError, TypeError):
             # To keep consistency and ease to use for the end user correct the bad value
             self.__log_bad_value_message(section, key, cast)
             self.__replace_bad_value(section, key, cast)

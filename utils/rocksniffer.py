@@ -1,8 +1,17 @@
 import json
+
+from dataclasses import dataclass
 from urllib.request import urlopen
 
 from utils.exceptions import RocksnifferConnectionError
 
+@dataclass
+class SongDetails:
+    artist_name: str | None = None
+    song_name: str | None = None
+    album_name: str | None = None
+    song_length: int | None = None
+    album_year: int | None = None
 
 class Rocksniffer:
     def __init__(self, config_data):
@@ -14,13 +23,7 @@ class Rocksniffer:
         self.port = config_data.sniffer.port
 
         self.memory = None
-
-        self.artist_name = None
-        self.song_name = None
-        self.album_name = None
-        self.song_length = None
-        self.album_year = None
-
+        self.song_details = SongDetails()
         self.samples = [0, 0, 0]
 
     def update_config(self, config_data):
@@ -47,11 +50,15 @@ class Rocksniffer:
         return result
 
     def get_song_details(self):
-        self.artist_name = self.memory['songDetails']['artistName']
-        self.song_name = self.memory['songDetails']['songName']
-        self.album_name = self.memory['songDetails']['albumName']
-        self.song_length = self.memory['songDetails']['songLength']
-        self.album_year = self.memory['songDetails']['albumYear']
+        details = self.memory["songDetails"]
+
+        self.song_details = SongDetails(
+            artist_name=details["artistName"],
+            song_name=details["songName"],
+            album_name=details["albumName"],
+            song_length=details["songLength"],
+            album_year=details["albumYear"],
+        )
 
     def take_sample(self):
         """
@@ -64,10 +71,8 @@ class Rocksniffer:
 
     @property
     def success(self):
-        try:
-            return self.memory['success']
-        except:
-            return False
+        # Return False if no data is available or the success field is missing.
+        return bool(self.memory and self.memory.get("success", False))
 
     @property
     def in_pause(self):
@@ -88,3 +93,23 @@ class Rocksniffer:
     @property
     def in_game(self):
         return self.current_state in range(3, 5)
+
+    @property
+    def artist_name(self):
+        return self.song_details.artist_name
+
+    @property
+    def song_name(self):
+        return self.song_details.song_name
+
+    @property
+    def album_name(self):
+        return self.song_details.album_name
+
+    @property
+    def song_length(self):
+        return self.song_details.song_length
+
+    @property
+    def album_year(self):
+        return self.song_details.album_year
